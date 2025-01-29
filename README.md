@@ -49,6 +49,15 @@ Setta is **not**:
       <video src="https://github.com/user-attachments/assets/3303294e-20e7-419a-8274-57ac8e5aea92" />
     </td>
   </tr>
+<tr>
+    <td style="vertical-align: top; padding-right: 20px;">
+      <h3>Customizable, Integrated Documentation</h3>
+      Integrate your documentation, tooltips, markdown, social content, and images to make your configurations more approachable.
+    </td>
+    <td style="vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/d08bcede-06b5-4b66-9559-c3f7574e5894" />
+    </td>
+  </tr>
 </table>
 
 
@@ -57,8 +66,6 @@ Setta is **not**:
 
 
 
-### Customizable, Integrated Documentation
-Integrate your documentation, tooltips, markdown, social content, and images to make your configurations more approachable.
 
 ### Flexible UI
 - Create, organize and set your configs in a flexible drag-and-drop user interface.
