@@ -21,5 +21,5 @@ pip install setta
 
 ## Contributors
 
-- Kevin Musgrave: co-creator & full-stack developer.
-- Jeff Musgrave: co-creator, UI/UX developer, frontend developer, and designer.
+- [Kevin Musgrave](https://github.com/KevinMusgrave): co-creator & full-stack developer.
+- [Jeff Musgrave](https://github.com/JeffMusgrave): co-creator, UI/UX developer, frontend developer, and designer.
