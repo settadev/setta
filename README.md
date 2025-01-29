@@ -1,4 +1,6 @@
-# setta
+![Setta Logo](images/setta-github-light.png#gh-light-mode-only)
+![Setta Logo](images/setta-github-dark.png#gh-dark-mode-only)
+
 
 ## Python Without The Drudgery
 
