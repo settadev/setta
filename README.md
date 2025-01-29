@@ -20,11 +20,11 @@ Setta is **not**:
 
 ## Why Setta Is Betta
 
-### Built for Devs
 
 <table>
   <tr>
     <td style="vertical-align: top; padding-right: 20px;">
+      <h3>Built for Devs</h3>
       <ul>
         <li>Write your core logic wherever you want, whether that’s inside a Setta code block, or in your favorite IDE.</li>
         <li>Set your configs inside Setta, with autocompletions, type-checking, and refactoring support.</li>
@@ -36,14 +36,26 @@ Setta is **not**:
       <video src="https://github.com/user-attachments/assets/ab5786d4-cf3f-4f8d-8951-7a9fd4a9f9bf" />
     </td>
   </tr>
+  <tr>
+    <td style="vertical-align: top; padding-right: 20px;">
+      <h3>Powerful Config Management</h3>
+      <ul>
+        <li>Version your configs at a granular level.</li>
+        <li>Share configurations between projects.</li>
+        <li>Run param sweeps across both scalar values and config versions.</li>
+      </ul>
+    </td>
+    <td style="vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/3303294e-20e7-419a-8274-57ac8e5aea92" />
+    </td>
+  </tr>
 </table>
 
 
-### Powerful Config Management
 
-- Version your configs at a granular level.
-- Share configurations between projects.
-- Run param sweeps across both scalar values and config versions.
+
+
+
 
 ### Customizable, Integrated Documentation
 Integrate your documentation, tooltips, markdown, social content, and images to make your configurations more approachable.
