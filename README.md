@@ -58,24 +58,37 @@ Setta is **not**:
       <video src="https://github.com/user-attachments/assets/d08bcede-06b5-4b66-9559-c3f7574e5894" />
     </td>
   </tr>
+<tr>
+    <td style="vertical-align: top; padding-right: 20px;">
+      <h3>Flexible UI</h3>
+      <ul>
+        <li>Create, organize and set your configs in a flexible drag-and-drop user interface.</li>
+        <li>Utilize common UI types like sliders, color pickers, switches, and text input fields.</li>
+      </ul>
+    </td>
+    <td style="vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/8730c9f3-dbcb-47af-8290-a5d460e82e4b" />
+    </td>
+  </tr>
+<tr>
+    <td style="vertical-align: top; padding-right: 20px;">
+      <h3>Monitor Long Running Scripts</h3>
+      Configure your machine-learning training runs, LLM evals, and data analysis scripts.
+    </td>
+    <td style="vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/a118f895-19c5-4d0f-bebe-4a0b594ee405" />
+    </td>
+  </tr>
+<tr>
+    <td style="vertical-align: top; padding-right: 20px;">
+      <h3>Interact In Real-Time</h3>
+      Inpaint your AI images and adjust data visualizations with real-time outputs in Setta.
+    </td>
+    <td style="vertical-align: top;">
+      <video src="Inpaint your AI images and adjust data visualizations with real-time outputs in Setta." />
+    </td>
+  </tr>
 </table>
-
-
-
-
-
-
-
-
-### Flexible UI
-- Create, organize and set your configs in a flexible drag-and-drop user interface.
-- Utilize common UI types like sliders, color pickers, switches, and text input fields.
-
-### Monitor Long Running Scripts
-Such as, configure your machine-learning training runs, LLM evals, and data analysis scripts.
-
-### Interact In Real-Time
-Inpaint your AI images and adjust data visualizations with real-time outputs in Setta.
 
 
 ## Installation
