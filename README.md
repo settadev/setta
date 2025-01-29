@@ -4,6 +4,10 @@
 
 ## Python Without The Drudgery
 
+<div align="center">
+  <video src="https://raw.githubusercontent.com/settadev/setta/main/images/hero.mp4" width=400/>
+</div>
+  
 ### Streamline your code
 
 ### Skip the boilerplate parsers and frontend
