@@ -4,6 +4,8 @@
 
 ## Python Without The Drudgery
 
+https://github.com/user-attachments/assets/58b9b29b-8131-4dc9-8d08-0bbf5d1b9356
+  
 ### Streamline your code
 
 ### Skip the boilerplate parsers and frontend
