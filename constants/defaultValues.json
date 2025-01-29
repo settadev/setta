@@ -1,0 +1,125 @@
+{
+  "projectConfig": {
+    "id": null,
+    "name": "",
+    "previewImgColor": "bg-blue-500/60 dark:bg-blue-600/30",
+    "viewport": null,
+    "children": {}
+  },
+  "section": {
+    "id": null,
+    "name": "",
+    "size": { "width": "auto", "height": "auto" },
+    "parentId": null,
+    "variantId": null,
+    "uiTypeId": null,
+    "uiTypeColId": null,
+    "social": "",
+    "artifactGroupIds": [],
+    "defaultVariantId": null,
+    "variantIds": [],
+    "paramSweepSectionId": null,
+    "nonPresetUITypeIds": [],
+    "codeLanguage": "python",
+    "configLanguage": "python",
+    "runInMemory": false,
+    "isFrozen": false,
+    "isHorizontalOrientation": false,
+    "hideParams": false,
+    "hideSearch": false,
+    "hideUnpinnedParams": false,
+    "displayMode": "GUI",
+    "pinnedAreaHeight": "auto",
+    "isMinimized": false,
+    "canvasSettings": {
+      "activeLayerId": null,
+      "color": "#ff0000",
+      "brushSize": 16,
+      "brushShape": "butt",
+      "eraserBrushSize": 16,
+      "drawThrottleDelay": 0,
+      "canvasTransferQueueLength": 50,
+      "artifactIdUsedToSetCanvasSize": null,
+      "mode": "draw"
+    },
+    "chartSettings": {
+      "type": "line",
+      "xAxisColumn": "",
+      "secondYAxisColumns": [],
+      "xAxisLog": false,
+      "y1AxisLog": false,
+      "y2AxisLog": false
+    },
+    "isTemporary": false,
+    "isReadOnlyTerminal": false,
+    "renderMarkdown": false,
+    "positionAndSizeLocked": false,
+    "jsonSource": "",
+    "jsonSourceKeys": [],
+    "selectedVariantIds": {},
+    "paramFilter": "",
+    "jsonSourceMissing": false,
+    "isInOtherProjectConfigs": false,
+    "aspectRatio": false,
+    "aspectRatioExtraHeight": 0,
+    "aspectRatioExtraWidth": 0,
+    "columnWidth": null,
+    "renderedValue": null
+  },
+  "sectionVariant": {
+    "name": "",
+    "values": {},
+    "children": [],
+    "selectedItem": null,
+    "code": "",
+    "codeInfoColId": null,
+    "description": "",
+    "evRefs": [],
+    "templateVars": [],
+    "isFrozen": false,
+    "sweep": [],
+    "runGroup": {}
+  },
+  "codeInfo": {
+    "id": null,
+    "name": "",
+    "editable": false,
+    "rcType": "parameter",
+    "defaultVal": "",
+    "description": "",
+    "positionalOnly": false,
+    "isPinned": false,
+    "isFrozen": false,
+    "isSelected": false,
+    "evRefs": []
+  },
+  "codeInfoCol": {
+    "children": { "null": [] }
+  },
+  "uiType": {
+    "id": null,
+    "type": "TEXT",
+    "name": "",
+    "presetType": "BASE",
+    "config": {}
+  },
+  "evEntry": { "value": "", "evRefs": [] },
+  "runGroupEntry": { "selected": true, "paramSweeps": {}, "versions": {} },
+  "uiTypeColEntry": {
+    "uiTypeId": "3fdaeb6a-e989-4888-b844-17a76f0b0192",
+    "nonPresetUITypeIds": []
+  },
+  "evRefEntry": {
+    "sectionId": null,
+    "paramInfoId": null,
+    "isArgsObj": false,
+    "startPos": 0,
+    "keyword": ""
+  },
+  "artifact": {
+    "name": "",
+    "path": "",
+    "value": null,
+    "type": ""
+  }
+}

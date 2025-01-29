@@ -1,0 +1,48 @@
+/* .dndline::after,
+.dndline::before {
+  content: "DROP";
+
+  height: 40px;
+  border-radius: 100px;
+
+	background-size: 400% 400%;
+	animation: gradient 1s ease infinite;
+  width: 100%;
+  padding: 1rem 5rem;
+  position: absolute;
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  display: grid;
+  place-items: center;
+  margin:auto;
+
+  z-index:2000;
+}  */
+
+/* .dndline::before {
+  top: 6px;
+}
+.dndline::after {
+  bottom: 6px;
+} */
+
+@keyframes dash {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

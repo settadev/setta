@@ -1,0 +1,276 @@
+{
+  "projectConfig": {
+    "id": "a5dfa397-089a-4f5e-bbec-978a314b4266",
+    "name": "settings",
+    "children": {
+      "69084c06-aa67-4e6b-8098-3334044eebc9": {
+        "x": 0,
+        "y": 119,
+        "zIndex": 0,
+        "w": 552,
+        "h": 938
+      },
+      "6b264a9a-0f87-4288-80aa-45cc6b16db96": {
+        "x": 600,
+        "y": 119,
+        "zIndex": 0,
+        "w": 552,
+        "h": 506
+      },
+      "f74b5aaf-d11d-4153-b55b-9c18e11e3a73": {
+        "x": 1200,
+        "y": 119,
+        "zIndex": 0,
+        "w": 552,
+        "h": 338
+      },
+      "8389d4b3-0a1e-4c44-819b-7c745d6c3f1b": {
+        "x": 1800,
+        "y": 119,
+        "zIndex": 0,
+        "w": 552,
+        "h": 80
+      },
+      "514c2046-25de-4b0a-b6f9-fca1dd14ad8e": {
+        "x": 2400,
+        "y": 119,
+        "zIndex": 0,
+        "w": 552,
+        "h": 458
+      }
+    }
+  },
+  "sectionVariants": {
+    "19f203aa-cae6-4ccc-928c-dab0194ade77": {
+      "name": "setta-settings.json"
+    },
+    "f3cb4189-2692-4e75-b58f-76d632f44205": {
+      "name": "setta-settings.json"
+    },
+    "36d29a06-7971-48d1-a1d2-23480f770d74": {
+      "name": "setta-settings.json"
+    },
+    "4490975a-8d8d-4f02-8ed4-f48f8258f1ec": {
+      "name": "setta-settings.json"
+    },
+    "d2c7059a-8e28-488a-aa33-056476652d5e": {
+      "name": "setta-settings.json"
+    }
+  },
+  "uiTypes": {
+    "90f2233a-2864-498f-a4df-4c027fa0c4a4": {
+      "id": "90f2233a-2864-498f-a4df-4c027fa0c4a4",
+      "type": "DROPDOWN",
+      "name": "Grid Patterns",
+      "presetType": "USER",
+      "config": {
+        "choices": [
+          {
+            "id": "\"Dots\"",
+            "name": "\"Dots\""
+          },
+          {
+            "id": "\"Lines\"",
+            "name": "\"Lines\""
+          },
+          {
+            "id": "\"Cross\"",
+            "name": "\"Cross\""
+          }
+        ]
+      }
+    },
+    "1ec5d8de-f984-451d-b43a-78917f698d52": {
+      "id": "1ec5d8de-f984-451d-b43a-78917f698d52",
+      "type": "DROPDOWN",
+      "name": "Selection Modes",
+      "presetType": "USER",
+      "config": {
+        "choices": [
+          {
+            "id": "\"partial\"",
+            "name": "\"partial\""
+          },
+          {
+            "id": "\"full\"",
+            "name": "\"full\""
+          }
+        ]
+      }
+    },
+    "86b19dfb-742b-4d82-aa5f-5d4cca9f3d0a": {
+      "id": "86b19dfb-742b-4d82-aa5f-5d4cca9f3d0a",
+      "type": "DROPDOWN",
+      "name": "Pan-On-Scroll Modes",
+      "presetType": "USER",
+      "config": {
+        "choices": [
+          {
+            "id": "\"free\"",
+            "name": "\"free\""
+          },
+          {
+            "id": "\"vertical\"",
+            "name": "\"vertical\""
+          },
+          {
+            "id": "\"horizontal\"",
+            "name": "\"horizontal\""
+          }
+        ]
+      }
+    }
+  },
+  "uiTypeCols": {
+    "04f95495-52ba-4277-a79e-228bb1c6a5bc": {
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"panOnScrollMode\"]}": {
+        "uiTypeId": "86b19dfb-742b-4d82-aa5f-5d4cca9f3d0a"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"selectionMode\"]}": {
+        "uiTypeId": "1ec5d8de-f984-451d-b43a-78917f698d52"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"showGridLines\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"gridColor\"]}": {
+        "uiTypeId": "74de30af-accf-44db-9b6b-da4260f0bd60"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"gridColorDarkMode\"]}": {
+        "uiTypeId": "74de30af-accf-44db-9b6b-da4260f0bd60"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"gridPattern\"]}": {
+        "uiTypeId": "90f2233a-2864-498f-a4df-4c027fa0c4a4"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"showDefaultConfigOnLoad\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"inferImports\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"autosave\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"autobackup\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"leftSidePaneShiftsMap\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"panOnDrag\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"panOnScroll\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"zoomOnScroll\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"zoomOnPinch\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"gui\",\"zoomOnDoubleClick\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"clearTerminalBeforeMarkingAsReady\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"exportDbRawOnSave\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"exportDbReadableOnSave\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"exportDbReadableWithVariantsOnSave\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      },
+      "JSON-{\"filenameGlob\":\"setta-settings*.json\",\"key\":[\"backend\",\"saveRenderedValues\"]}": {
+        "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
+      }
+    }
+  },
+  "sections": {
+    "69084c06-aa67-4e6b-8098-3334044eebc9": {
+      "id": "69084c06-aa67-4e6b-8098-3334044eebc9",
+      "name": "shortcuts",
+      "size": {
+        "width": 550
+      },
+      "variantId": "19f203aa-cae6-4ccc-928c-dab0194ade77",
+      "uiTypeId": "0191cde4-3d98-4ba0-972a-fead19b8ac73",
+      "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
+      "defaultVariantId": "19f203aa-cae6-4ccc-928c-dab0194ade77",
+      "variantIds": ["19f203aa-cae6-4ccc-928c-dab0194ade77"],
+      "configLanguage": "json",
+      "hideSearch": true,
+      "jsonSource": "setta-settings*.json",
+      "jsonSourceKeys": ["shortcuts"]
+    },
+    "6b264a9a-0f87-4288-80aa-45cc6b16db96": {
+      "id": "6b264a9a-0f87-4288-80aa-45cc6b16db96",
+      "name": "gui",
+      "size": {
+        "width": 550
+      },
+      "variantId": "f3cb4189-2692-4e75-b58f-76d632f44205",
+      "uiTypeId": "0191cde4-3d98-4ba0-972a-fead19b8ac73",
+      "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
+      "defaultVariantId": "f3cb4189-2692-4e75-b58f-76d632f44205",
+      "variantIds": ["f3cb4189-2692-4e75-b58f-76d632f44205"],
+      "configLanguage": "json",
+      "hideSearch": true,
+      "jsonSource": "setta-settings*.json",
+      "jsonSourceKeys": ["gui"]
+    },
+    "f74b5aaf-d11d-4153-b55b-9c18e11e3a73": {
+      "id": "f74b5aaf-d11d-4153-b55b-9c18e11e3a73",
+      "name": "backend",
+      "size": {
+        "width": 550
+      },
+      "variantId": "36d29a06-7971-48d1-a1d2-23480f770d74",
+      "uiTypeId": "0191cde4-3d98-4ba0-972a-fead19b8ac73",
+      "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
+      "defaultVariantId": "36d29a06-7971-48d1-a1d2-23480f770d74",
+      "variantIds": ["36d29a06-7971-48d1-a1d2-23480f770d74"],
+      "configLanguage": "json",
+      "hideSearch": true,
+      "jsonSource": "setta-settings*.json",
+      "jsonSourceKeys": ["backend"]
+    },
+    "8389d4b3-0a1e-4c44-819b-7c745d6c3f1b": {
+      "id": "8389d4b3-0a1e-4c44-819b-7c745d6c3f1b",
+      "name": "languageServer",
+      "size": {
+        "width": 550
+      },
+      "variantId": "4490975a-8d8d-4f02-8ed4-f48f8258f1ec",
+      "uiTypeId": "0191cde4-3d98-4ba0-972a-fead19b8ac73",
+      "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
+      "defaultVariantId": "4490975a-8d8d-4f02-8ed4-f48f8258f1ec",
+      "variantIds": ["4490975a-8d8d-4f02-8ed4-f48f8258f1ec"],
+      "configLanguage": "json",
+      "hideSearch": true,
+      "jsonSource": "setta-settings*.json",
+      "jsonSourceKeys": ["languageServer"]
+    },
+    "514c2046-25de-4b0a-b6f9-fca1dd14ad8e": {
+      "id": "514c2046-25de-4b0a-b6f9-fca1dd14ad8e",
+      "name": "sections",
+      "size": {
+        "width": 550
+      },
+      "variantId": "d2c7059a-8e28-488a-aa33-056476652d5e",
+      "uiTypeId": "0191cde4-3d98-4ba0-972a-fead19b8ac73",
+      "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
+      "defaultVariantId": "d2c7059a-8e28-488a-aa33-056476652d5e",
+      "variantIds": ["d2c7059a-8e28-488a-aa33-056476652d5e"],
+      "configLanguage": "json",
+      "hideSearch": true,
+      "jsonSource": "setta-settings*.json",
+      "jsonSourceKeys": ["sections"]
+    }
+  },
+  "codeInfo": {},
+  "codeInfoCols": {},
+  "artifacts": {}
+}

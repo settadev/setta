@@ -1,0 +1,3 @@
+recursive-include backend/setta/static/frontend *
+recursive-include backend/setta/static/seed *
+recursive-include backend/setta/static/constants *

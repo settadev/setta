@@ -1,0 +1,113 @@
+{
+  "shortcuts": {
+    "newCardShortcut": "N",
+    "newGroupShortcut": "G",
+    "typeCheckShortcut": "",
+    "newProjectConfigShortcut": "",
+    "undoShortcut": "Mod + Z",
+    "redoShortcut": "Mod + Shift + Z",
+    "groupShortcut": "Mod + G",
+    "ungroupShortcut": "Shift + Mod + G",
+    "saveShortcut": "Mod + S",
+    "saveAsShortcut": "Mod + Shift + S",
+    "loadShortcut": "Mod + L",
+    "searchShortcut": "Mod + K",
+    "advancedSearchShortcut": "Mod + P",
+    "resetZoomShortcut": "Mod + Comma",
+    "copyShortcut": "Mod + C",
+    "pasteShortcut": "Mod + V",
+    "pasteAsRefShortcut": "Mod + Shift + V",
+    "sortingShortcut": "Shift",
+    "movingFreeShortcut": "Alt",
+    "showTooltipShortcut": "Q",
+    "tooltipToPlaintextShortcut": "Q + S",
+    "tooltipToMarkdownShortcut": "Q + W",
+    "freezeTooltipShortcut": "Q + F",
+    "frozenTooltipToPlaintextShortcut": "S",
+    "frozenTooltipToMarkdownShortcut": "W",
+    "incrementTooltipPageShortcut": "Q + ArrowRight",
+    "decrementTooltipPageShortcut": "Q + ArrowLeft",
+    "copyTooltipTextShortcut": "Q + C",
+    "frozenTooltipIncrementShortcut": "ArrowRight",
+    "frozenTooltipDecrementShortcut": "ArrowLeft",
+    "frozenTooltipCopyShortcut": "C",
+    "newTerminalShortcut": "Ctrl + `",
+    "fitViewShortcut": "F",
+    "zoomToMouseShortcut": "Z",
+    "deleteSectionShortcut": "Backspace",
+    "selectAll": "Mod + A",
+    "selectTopLevelNonGroupSections": "Mod + Shift + A",
+    "showVersionsTabShortcut": "V",
+    "showParamUITypeTabShortcut": "P",
+    "showProjectOverviewTabShortcut": "O",
+    "runCodeShortcut": "Mod + Enter",
+    "runAllCodeShortcut": "Mod + Shift + Enter",
+    "paramSelect": "Mod + Shift",
+    "formatCode": "Shift + Alt + F",
+    "selectionKeyCode": "Shift",
+    "multiSelectionKeyCode": "Mod",
+    "panActivationKeyCode": "Space",
+    "zoomActivationKeyCode": "Mod",
+    "zoomInShortcut": "Equal",
+    "zoomOutShortcut": "Minus",
+    "restartLanguageServerShortcut": "Alt + Shift + R"
+  },
+  "gui": {
+    "snapGrid": [15, 15],
+    "showGridLines": true,
+    "gridPattern": "Dots",
+    "gridPatternSize": 2,
+    "gridColor": "#afbacf",
+    "gridColorDarkMode": "#222a3a",
+    "defaultZoomLevel": 1,
+    "minZoom": 0.1,
+    "maxZoom": 10,
+    "panOnDrag": true,
+    "panOnScroll": true,
+    "panOnScrollSpeed": 1,
+    "panOnScrollMode": "free",
+    "zoomOnScroll": true,
+    "zoomOnPinch": true,
+    "zoomOnDoubleClick": true,
+    "selectionMode": "partial",
+    "leftSidePaneShiftsMap": true,
+    "transitionDuration": 50
+  },
+  "backend": {
+    "showDefaultConfigOnLoad": true,
+    "inferImports": true,
+    "autosave": false,
+    "autobackup": false,
+    "autobackupFreq": 300,
+    "autobackupKeepLastN": 10,
+    "clearTerminalBeforeMarkingAsReady": true,
+    "defaultTerminalShell": null,
+    "exportDbRawOnSave": false,
+    "exportDbReadableOnSave": false,
+    "exportDbReadableWithVariantsOnSave": false,
+    "renameReferencesOnSectionMoveMode": "Always Ask",
+    "saveRenderedValues": false
+  },
+  "languageServer": {},
+  "sections": {
+    "CODE": {
+      "size": { "width": 500 }
+    },
+    "TERMINAL": {
+      "size": { "width": 700, "height": 300 }
+    },
+    "CHART": {
+      "size": { "width": 400, "height": 400 }
+    },
+    "GLOBAL_VARIABLES": {
+      "name": "Global Variables"
+    },
+    "GLOBAL_PARAM_SWEEP": {
+      "name": "Global Param Sweep"
+    },
+    "INFO": {
+      "name": "Empty Info Section",
+      "displayMode": "RENDER"
+    }
+  }
+}

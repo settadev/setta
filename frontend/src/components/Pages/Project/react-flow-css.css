@@ -1,0 +1,18 @@
+/* https://github.com/wbkd/react-flow/issues/1421 */
+
+.react-flow__renderer {
+  z-index: auto;
+}
+
+.react-flow__pane {
+  z-index: auto;
+}
+
+.react-flow__background {
+  z-index: auto;
+  pointer-events: none;
+}
+
+.react-flow__minimap {
+  background-color: #94a3b8b6 !important;
+}

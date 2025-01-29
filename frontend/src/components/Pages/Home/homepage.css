@@ -1,0 +1,7 @@
+.badgefade {
+  mask-image: linear-gradient(
+    to right,
+    black calc(100% - 48px),
+    transparent 100%
+  );
+}
