@@ -13,15 +13,24 @@ Setta enables you to:
 - Effortlessly expose your Python functions as a flexible UI. 
 - Configure, interact, and share with ease.
 
+## What Setta Is Not
+Setta is **not**:
+- A frontend framework.
+- A visual programming system.
+
 ## Why Setta Is Betta
 
 ### Built for Devs
+
+https://github.com/user-attachments/assets/ab5786d4-cf3f-4f8d-8951-7a9fd4a9f9bf
+
 - Write your core logic wherever you want, whether that’s inside a Setta code block, or in your favorite IDE.
 - Set your configs inside Setta, with autocompletions, type-checking, and refactoring support.
 - Run. No config parsers needed.
 - Auto-export your Setta projects in a Git-friendly yaml format.
 
 ### Powerful Config Management
+
 - Version your configs at a granular level.
 - Share configurations between projects.
 - Run param sweeps across both scalar values and config versions.
