@@ -4,9 +4,7 @@
 
 ## Python Without The Drudgery
 
-<div align="center">
-  <video src="https://raw.githubusercontent.com/settadev/setta/main/images/hero.mp4" width=400/>
-</div>
+https://github.com/user-attachments/assets/58b9b29b-8131-4dc9-8d08-0bbf5d1b9356
   
 ### Streamline your code
 
