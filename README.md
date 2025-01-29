@@ -1,32 +1,25 @@
 # setta
 
-Dev setup:
+## Python Without The Drudgery
+
+### Streamline your code
+
+### Skip the boilerplate parsers and frontend
+
+### Effortlessly expose your Python functions as a flexible UI
+
+### Configure, interact, and share with ease
+
+
+## Installation
 
 ```
-. ./dev_install.sh
-```
-
-
-To test pip package installation:
-```
-. ./test_install.sh
-```
-
-
-Format and lint python:
-
-```
-./format_code.sh
+pip install setta
 ```
 
 
-Start frontend and backend in dev mode:
-```
-cd frontend
-pnpm start
-```
 
-There is reload mode where the backend reloads on file changes, but it's broken.
+## Contributors
 
-
-Find dnd-kit fork changes by searching for SETTA FORK CHANGE
+- Kevin Musgrave: co-creator & full-stack developer.
+- Jeff Musgrave: co-creator, UI/UX developer, frontend developer, and designer.
