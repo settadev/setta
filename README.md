@@ -22,12 +22,22 @@ Setta is **not**:
 
 ### Built for Devs
 
-https://github.com/user-attachments/assets/ab5786d4-cf3f-4f8d-8951-7a9fd4a9f9bf
+<table>
+  <tr>
+    <td style="vertical-align: top; padding-right: 20px;">
+      <ul>
+        <li>Write your core logic wherever you want, whether that’s inside a Setta code block, or in your favorite IDE.</li>
+        <li>Set your configs inside Setta, with autocompletions, type-checking, and refactoring support.</li>
+        <li>Run. No config parsers needed.</li>
+        <li>Auto-export your Setta projects in a Git-friendly yaml format.</li>
+      </ul>
+    </td>
+    <td style="vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/ab5786d4-cf3f-4f8d-8951-7a9fd4a9f9bf" />
+    </td>
+  </tr>
+</table>
 
-- Write your core logic wherever you want, whether that’s inside a Setta code block, or in your favorite IDE.
-- Set your configs inside Setta, with autocompletions, type-checking, and refactoring support.
-- Run. No config parsers needed.
-- Auto-export your Setta projects in a Git-friendly yaml format.
 
 ### Powerful Config Management
 
