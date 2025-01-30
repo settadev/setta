@@ -91,16 +91,13 @@ Setta is **not**:
 </table>
 
 
-
-
-
-
 ## Installation
 
 ```
 pip install setta
 ```
 
+**Documentation & examples coming soon!**
 
 
 ## Contributors
