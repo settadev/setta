@@ -85,10 +85,14 @@ Setta is **not**:
       Inpaint your AI images and adjust data visualizations with real-time outputs in Setta.
     </td>
     <td style="vertical-align: top;">
-      <video src="Inpaint your AI images and adjust data visualizations with real-time outputs in Setta." />
+      <video src="https://github.com/user-attachments/assets/3e04c72f-3422-40b7-ba08-328b4534ea2b" />
     </td>
   </tr>
 </table>
+
+
+
+
 
 
 ## Installation
