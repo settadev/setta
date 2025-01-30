@@ -2,7 +2,7 @@
 ![Setta Logo](images/setta-github-dark.png#gh-dark-mode-only)
 
 
-# Python Without The Drudgery
+# Python Without The Grind
 
 https://github.com/user-attachments/assets/58b9b29b-8131-4dc9-8d08-0bbf5d1b9356
 
