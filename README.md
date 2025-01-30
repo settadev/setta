@@ -101,6 +101,10 @@ pip install setta
 
 Documentation is in progress: https://docs.setta.dev/
 
+## Examples
+
+Examples showing how to use Setta will be here: https://github.com/settadev/examples
+
 
 ## Contributors
 
