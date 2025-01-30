@@ -97,7 +97,9 @@ Setta is **not**:
 pip install setta
 ```
 
-**Documentation & examples coming soon!**
+## Documentation
+
+Documentation is in progress: https://docs.setta.dev/
 
 
 ## Contributors
