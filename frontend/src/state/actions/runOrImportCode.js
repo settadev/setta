@@ -45,9 +45,7 @@ export async function runCodeBlocks(sectionIds) {
   if (sectionIds.length === 0) {
     return;
   }
-  const project = getProjectDataToGenerateCode({
-    includeInfoToFullName: false,
-  });
+  const project = getProjectDataToGenerateCode({});
   project.runCodeBlocks = sectionIds;
   await sendRunCodeMessage(project);
 }
@@ -62,9 +60,7 @@ export async function runOrImportAllCode() {
     asSubprocess.length > 0 ||
     (inMemory.length === 0 && asSubprocess.length === 0)
   ) {
-    const project = getProjectDataToGenerateCode({
-      includeInfoToFullName: false,
-    });
+    const project = getProjectDataToGenerateCode({});
     let count = 0;
     for (const projectVariant of getProjectRuns(project)) {
       await sendRunCodeMessage(projectVariant, count);
