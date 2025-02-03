@@ -1,5 +1,4 @@
 import copy
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -23,6 +22,7 @@ from setta.code_gen.utils import process_refs
 from setta.utils.constants import (
     CODE_FOLDER,
     CODE_FOLDER_ENV_VARIABLE,
+    CWD,
     USER_SETTINGS,
     C,
 )
@@ -56,13 +56,13 @@ async def runCode(message, lsp_writers):
     id_to_relpath = {}
     for sid in to_write:
         curr_code = code_dict[sid]
-        rel_path = write_code_to_file(
+        rel_path_str = write_code_to_file(
             folder_path,
             curr_code["sanitized_full_name"],
             curr_code["code"],
             curr_code["codeLanguage"],
         )
-        id_to_relpath[sid] = rel_path
+        id_to_relpath[sid] = rel_path_str
 
     # Only run code that isn't referenced by other code
     run_order = [
@@ -71,8 +71,8 @@ async def runCode(message, lsp_writers):
 
     # create a wrapper script if there are multiple files to run
     if len(run_order) > 1:
-        rel_path = create_wrapper_bash_script(folder_path, run_order, code_dict)
-        command = codeCallStr(rel_path, "bash")
+        rel_path_str = create_wrapper_bash_script(folder_path, run_order, code_dict)
+        command = codeCallStr(rel_path_str, "bash")
     else:
         sid = run_order[0]
         command = codeCallStr(id_to_relpath[sid], code_dict[sid]["codeLanguage"])
@@ -286,7 +286,7 @@ def get_template_var_replacement_value_fn(
         elif codeLanguage == "bash":
             section_dependencies.append(template_var["sectionId"])
             keyword = sanitize_section_path_full_name(remove_tp(keyword))
-            return codePathStr(Path(os.path.relpath(folder_path)), keyword, "python")
+            return codePathStr(folder_path, keyword, "python")
 
     return get_template_var_replacement_value
 
@@ -337,7 +337,7 @@ def preprocess_template_vars(code, evRefs, templateVars, cursor_position):
 
 
 def convert_folder_path_to_module_path(folder_path):
-    return os.path.relpath(folder_path).replace("/", ".").replace("\\", ".")
+    return folder_path.relative_to(CWD).as_posix().replace("/", ".").replace("\\", ".")
 
 
 def languageToExtension(x):
@@ -351,7 +351,7 @@ def languageToCall(x):
 def codePathStr(folder_path, filename, codeLanguage):
     extension = languageToExtension(codeLanguage)
     output = folder_path / f"{filename}{extension}"
-    return os.path.relpath(output).replace(os.sep, "/")
+    return output.relative_to(CWD).as_posix()
 
 
 def codeCallStr(filepath, codeLanguage):
@@ -414,7 +414,7 @@ def create_timestamped_folder(base_dir, prefix=""):
 def write_code_to_file(folder_path, filename, code, codeLanguage):
     extension = languageToExtension(codeLanguage)
     filepath = write_string_to_file(folder_path, f"{filename}{extension}", code)
-    return os.path.relpath(filepath).replace(os.sep, "/")
+    return filepath.relative_to(CWD).as_posix()
 
 
 def write_string_to_file(folder, filename, content):

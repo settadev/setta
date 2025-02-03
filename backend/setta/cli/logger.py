@@ -8,7 +8,6 @@ import requests
 
 from setta.utils.constants import (
     CODE_FOLDER_ENV_VARIABLE,
-    CWD,
     HOST_ENV_VARIABLE,
     PORT_ENV_VARIABLE,
     C,
@@ -27,9 +26,7 @@ class Setta:
         if root_path:
             self.root_path = Path(root_path)
         else:
-            self.root_path = Path(
-                os.environ.get(CODE_FOLDER_ENV_VARIABLE, os.path.relpath(CWD))
-            )
+            self.root_path = Path(os.environ.get(CODE_FOLDER_ENV_VARIABLE, "."))
 
         self.name_path_type_to_id = {}
 
