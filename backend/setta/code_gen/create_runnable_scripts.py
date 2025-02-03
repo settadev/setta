@@ -407,13 +407,7 @@ def create_timestamped_folder(base_dir, prefix=""):
     folder_name = f"_{prefix}{timestamp}"
     # Full path for the new folder
     folder_path = Path(base_dir) / folder_name
-
-    if not os.path.exists(folder_path):
-        try:
-            os.makedirs(folder_path)
-        except FileExistsError:
-            pass
-
+    folder_path.mkdir(parents=True, exist_ok=True)
     return folder_path
 
 
@@ -424,11 +418,8 @@ def write_code_to_file(folder_path, filename, code, codeLanguage):
 
 
 def write_string_to_file(folder, filename, content):
-    # Full path to the file
-    file_path = os.path.join(folder, filename)
-    # Write the content to the file
-    with open(file_path, "w") as file:
-        file.write(content)
+    file_path = Path(folder) / filename
+    file_path.write_text(content)
     return file_path
 
 

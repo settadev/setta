@@ -11,7 +11,7 @@ from setta.database.db.sections.jsonSource import (
     remove_json_source_data,
     save_json_source_data,
 )
-from setta.utils.constants import CONSTANTS_FOLDER, USER_SETTINGS
+from setta.utils.constants import CONSTANTS_FOLDER, DOT_SETTA_FOLDER, USER_SETTINGS
 from setta.utils.utils import get_absolute_path, save_json_to_file
 
 logger = logging.getLogger(__name__)
@@ -63,8 +63,8 @@ class MetaSettingsFile:
         self.path_seed_meta_settings = get_absolute_path(
             __file__, CONSTANTS_FOLDER / "settingsProject.json"
         )
-        self.path_default_settings = "setta-settings.json"
-        self.path_meta_settings = "setta-meta-settings.json"
+        self.path_default_settings = DOT_SETTA_FOLDER / "setta-settings.json"
+        self.path_meta_settings = DOT_SETTA_FOLDER / "setta-meta-settings.json"
         self.load_seed_files()
 
     def get_settings_paths(self):

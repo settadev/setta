@@ -1,5 +1,4 @@
 import logging
-import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -35,7 +34,7 @@ from setta.routers import (
 )
 from setta.tasks.tasks import Tasks
 from setta.terminals.terminals import TerminalWebsockets
-from setta.utils.constants import CODE_FOLDER, USER_SETTINGS, C
+from setta.utils.constants import CODE_FOLDER, CWD, USER_SETTINGS, C
 from setta.utils.utils import get_absolute_path, is_dev_mode
 from setta.utils.websocket_manager import WebsocketManager
 
@@ -45,8 +44,8 @@ async def lifespan(app: FastAPI):
     # startup
     app.state.settings_file = SettingsFile()
     app.state.lsps = create_lsps(
-        workspace_folder=Path(os.getcwd()),
-        code_folder=Path(os.getcwd()) / CODE_FOLDER / "temp_folder",
+        workspace_folder=CWD,
+        code_folder=CODE_FOLDER / "temp_folder",
         settings=USER_SETTINGS["languageServer"],
     )
     app.state.lsp_writers = create_lsp_writers(app.state.lsps)

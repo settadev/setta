@@ -1,12 +1,12 @@
 import importlib.util
 import json
 import multiprocessing
-import os
 import sys
 import traceback
 import uuid
 
 from setta.tasks.fns.utils import TaskDefinition
+from setta.utils.constants import CWD
 from setta.utils.utils import nested_access
 
 
@@ -16,7 +16,7 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
         module_name = f"setta_dynamic_module_{uuid.uuid4().hex}"
 
     # Add current directory to sys.path if it's not already there
-    current_dir = os.getcwd()
+    current_dir = CWD
     if current_dir not in sys.path:
         sys.path.insert(0, current_dir)
 

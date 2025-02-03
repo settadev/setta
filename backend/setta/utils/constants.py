@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from pathlib import Path
 
 from .utils import get_absolute_path, is_dev_mode
@@ -10,8 +11,10 @@ CONSTANTS_FOLDER = (
     Path("../../../constants") if is_dev_mode() else Path("../static/constants")
 )
 SEED_FOLDER = Path("../../../seed") if is_dev_mode() else Path("../static/seed")
-CODE_FOLDER = "setta_code"
-DB_BACKUP_FOLDER = ".setta_backups"
+CWD = Path(os.getcwd())
+DOT_SETTA_FOLDER = CWD / ".setta"
+CODE_FOLDER = DOT_SETTA_FOLDER / "code"
+DB_BACKUP_FOLDER = DOT_SETTA_FOLDER / "backups"
 CODE_FOLDER_ENV_VARIABLE = "SETTA_CODE_FOLDER"
 HOST_ENV_VARIABLE = "SETTA_HOST"
 PORT_ENV_VARIABLE = "SETTA_PORT"
