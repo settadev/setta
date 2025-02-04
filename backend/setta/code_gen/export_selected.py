@@ -11,10 +11,6 @@ from .find_placeholders import tp
 from .utils import process_refs
 
 
-def get_args_var_name(var_name):
-    return f"{C.ARGS_PREFIX}{var_name}"
-
-
 def get_section_type(p, id):
     ui_type_id = p["sections"][id]["uiTypeId"]
     ui_type = p["uiTypes"].get(ui_type_id) or BASE_UI_TYPES[ui_type_id]
@@ -144,7 +140,7 @@ def no_entered_value(value):
 
 
 def get_var_name(var_name_mapping):
-    return f"__x{len(var_name_mapping)}"
+    return f"{C.ARGS_PREFIX}x{len(var_name_mapping)}"
 
 
 def get_for_section_id(p, section_id):
