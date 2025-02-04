@@ -1,7 +1,7 @@
 import queue
 import sqlite3
 
-from setta.utils.constants import DOT_SETTA_FOLDER
+from setta.utils.constants import SETTA_FILES_FOLDER
 
 
 class DB:
@@ -105,4 +105,4 @@ class DBQueue:
 
 
 def get_default_db_path():
-    return DOT_SETTA_FOLDER / "setta.db"
+    return SETTA_FILES_FOLDER / "setta.db"

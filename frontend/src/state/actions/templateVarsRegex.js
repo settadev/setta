@@ -13,10 +13,24 @@ export function getTemplateVarsRegexAndColorMap(state) {
   }
 
   const sectionState = useSectionInfos.getState();
-  for (const sectionId of state.templateVarEligibleSections) {
-    const fullName = getSectionPathFullName(sectionId, sectionState);
-    names.push(escapeRegExp(fullName));
-    fullRawNameToSectionId[fullName] = sectionId;
+  for (const sectionId of state.templateVarEligibleSections.importPath) {
+    nameListHelper(
+      names,
+      fullRawNameToSectionId,
+      sectionId,
+      sectionState,
+      `$${C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX}`,
+    );
+  }
+
+  for (const sectionId of state.templateVarEligibleSections.version) {
+    nameListHelper(
+      names,
+      fullRawNameToSectionId,
+      sectionId,
+      sectionState,
+      `$${C.TEMPLATE_VAR_VERSION_SUFFIX}`,
+    );
   }
 
   const fullNameToSectionId = _.mapKeys(fullRawNameToSectionId, (v, k) =>
@@ -34,4 +48,16 @@ export function getTemplateVarsRegexAndColorMap(state) {
   const pattern = new RegExp(patternStr, "g");
 
   return { pattern, fullNameToSectionId };
+}
+
+function nameListHelper(
+  names,
+  fullRawNameToSectionId,
+  sectionId,
+  sectionState,
+  suffix,
+) {
+  const fullName = getSectionPathFullName(sectionId, sectionState) + suffix;
+  names.push(escapeRegExp(fullName));
+  fullRawNameToSectionId[fullName] = sectionId;
 }

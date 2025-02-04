@@ -8,7 +8,7 @@ from setta.code_gen.export_selected import (
     get_section_type,
     get_selected_section_variant,
 )
-from setta.code_gen.find_placeholders import remove_tp, tp
+from setta.code_gen.find_placeholders import parse_template_var, tp
 from setta.code_gen.python.generate_code import (
     convert_var_names_to_readable_form,
     generate_code,
@@ -280,9 +280,12 @@ def get_template_var_replacement_value_fn(
                     chars_before_template_var,
                 )
             else:
-                section_dependencies.append(template_var["sectionId"])
-                keyword = remove_tp(keyword)
-                return construct_module_path(folder_path, keyword)
+                keyword, keyword_type = parse_template_var(keyword)
+                if keyword_type == C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX:
+                    section_dependencies.append(template_var["sectionId"])
+                    return construct_module_path(folder_path, keyword)
+                # elif keyword_type == C.TEMPLATE_VAR_VERSION_SUFFIX:
+
         elif codeLanguage == "bash":
             section_dependencies.append(template_var["sectionId"])
             keyword = sanitize_section_path_full_name(remove_tp(keyword))

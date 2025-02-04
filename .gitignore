@@ -40,4 +40,4 @@ setta_code/
 .mypy_cache/
 .dmypy.json
 backend/setta/frontend
-.setta/
+setta_files/

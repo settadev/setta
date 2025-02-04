@@ -12,7 +12,7 @@ from .database.db_init import maybe_create_tables_and_seed
 from .database.db_objs import DBQueue, get_default_db_path
 from .database.export_db.export_db import export_database
 from .database.import_db import import_database
-from .utils.constants import DOT_SETTA_FOLDER, C, set_constants
+from .utils.constants import SETTA_FILES_FOLDER, C, set_constants
 
 
 @click.command()
@@ -78,7 +78,7 @@ def cli(ctx, reload, with_examples, db, host, port, log_level):
     if ctx.invoked_subcommand is None:
         print("Starting Setta", flush=True)
 
-        DOT_SETTA_FOLDER.mkdir(parents=True, exist_ok=True)
+        SETTA_FILES_FOLDER.mkdir(parents=True, exist_ok=True)
 
         set_constants(
             with_examples=with_examples,

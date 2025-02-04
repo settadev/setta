@@ -172,7 +172,7 @@ function regexSubscriptionFn(x) {
       rcType: c.rcType,
     })),
     globalVariableId: x.singletonSections[C.GLOBAL_VARIABLES],
-    templateVarEligibleSections: [],
+    templateVarEligibleSections: { importPath: [], version: [] },
   };
 
   let sectionVariant, sectionTypeName;
@@ -197,8 +197,9 @@ function regexSubscriptionFn(x) {
     };
 
     if (sectionTypeName === C.CODE) {
-      output.templateVarEligibleSections.push(id);
+      output.templateVarEligibleSections.importPath.push(id);
     }
+    output.templateVarEligibleSections.version.push(id);
   }
 
   return output;

@@ -88,7 +88,7 @@
     "startr": "concurrently --kill-others \"vite\" \"bash ./backendStart.sh --reload\"",
     "ncm": "concurrently --kill-others \"vite --mode ncm\" \"bash ./backendStart.sh\"",
     "ncmr": "concurrently --kill-others \"vite --mode ncm\" \"bash ./backendStart.sh --reload\"",
-    "reset": "cd .. && rm -rf .setta && cd frontend && pnpm start",
+    "reset": "cd .. && rm -rf setta_files && cd frontend && pnpm start",
     "build": "vite build --base=/static/",
     "test": "vitest",
     "serve": "vite preview",
