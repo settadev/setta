@@ -172,7 +172,7 @@ function regexSubscriptionFn(x) {
       rcType: c.rcType,
     })),
     globalVariableId: x.singletonSections[C.GLOBAL_VARIABLES],
-    templateVarEligibleSections: { importPath: [], version: [], filePath: [] },
+    templateVarEligibleSections: {},
   };
 
   let sectionVariant, sectionTypeName;
@@ -197,10 +197,14 @@ function regexSubscriptionFn(x) {
     };
 
     if (sectionTypeName === C.CODE) {
-      output.templateVarEligibleSections.importPath.push(id);
-      output.templateVarEligibleSections.filePath.push(id);
+      output.templateVarEligibleSections[id] = [
+        C.TEMPLATE_VAR_VERSION_SUFFIX,
+        C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX,
+        C.TEMPLATE_VAR_FILE_PATH_SUFFIX,
+      ];
+    } else {
+      output.templateVarEligibleSections[id] = [C.TEMPLATE_VAR_VERSION_SUFFIX];
     }
-    output.templateVarEligibleSections.version.push(id);
   }
 
   return output;

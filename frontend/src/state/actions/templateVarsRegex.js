@@ -14,34 +14,15 @@ export function getTemplateVarsRegexAndColorMap(state) {
 
   const sectionState = useSectionInfos.getState();
   // TODO: make this better instead of 3 for loops
-  for (const sectionId of state.templateVarEligibleSections.importPath) {
-    nameListHelper(
-      names,
-      fullRawNameToSectionId,
-      sectionId,
-      sectionState,
-      `${C.TEMPLATE_PREFIX}${C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX}`,
-    );
-  }
-
-  for (const sectionId of state.templateVarEligibleSections.version) {
-    nameListHelper(
-      names,
-      fullRawNameToSectionId,
-      sectionId,
-      sectionState,
-      `${C.TEMPLATE_PREFIX}${C.TEMPLATE_VAR_VERSION_SUFFIX}`,
-    );
-  }
-
-  for (const sectionId of state.templateVarEligibleSections.filePath) {
-    nameListHelper(
-      names,
-      fullRawNameToSectionId,
-      sectionId,
-      sectionState,
-      `${C.TEMPLATE_PREFIX}${C.TEMPLATE_VAR_FILE_PATH_SUFFIX}`,
-    );
+  for (const [sectionId, suffixes] of Object.entries(
+    state.templateVarEligibleSections,
+  )) {
+    const sectionFullName = getSectionPathFullName(sectionId, sectionState);
+    for (const suffix of suffixes) {
+      const fullName = sectionFullName + `${C.TEMPLATE_PREFIX}${suffix}`;
+      names.push(escapeRegExp(fullName));
+      fullRawNameToSectionId[fullName] = sectionId;
+    }
   }
 
   const fullNameToSectionId = _.mapKeys(fullRawNameToSectionId, (v, k) =>
@@ -59,16 +40,4 @@ export function getTemplateVarsRegexAndColorMap(state) {
   const pattern = new RegExp(patternStr, "g");
 
   return { pattern, fullNameToSectionId };
-}
-
-function nameListHelper(
-  names,
-  fullRawNameToSectionId,
-  sectionId,
-  sectionState,
-  suffix,
-) {
-  const fullName = getSectionPathFullName(sectionId, sectionState) + suffix;
-  names.push(escapeRegExp(fullName));
-  fullRawNameToSectionId[fullName] = sectionId;
 }
