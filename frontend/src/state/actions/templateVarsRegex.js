@@ -13,13 +13,14 @@ export function getTemplateVarsRegexAndColorMap(state) {
   }
 
   const sectionState = useSectionInfos.getState();
+  // TODO: make this better instead of 3 for loops
   for (const sectionId of state.templateVarEligibleSections.importPath) {
     nameListHelper(
       names,
       fullRawNameToSectionId,
       sectionId,
       sectionState,
-      `$${C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX}`,
+      `${C.TEMPLATE_PREFIX}${C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX}`,
     );
   }
 
@@ -29,7 +30,17 @@ export function getTemplateVarsRegexAndColorMap(state) {
       fullRawNameToSectionId,
       sectionId,
       sectionState,
-      `$${C.TEMPLATE_VAR_VERSION_SUFFIX}`,
+      `${C.TEMPLATE_PREFIX}${C.TEMPLATE_VAR_VERSION_SUFFIX}`,
+    );
+  }
+
+  for (const sectionId of state.templateVarEligibleSections.filePath) {
+    nameListHelper(
+      names,
+      fullRawNameToSectionId,
+      sectionId,
+      sectionState,
+      `${C.TEMPLATE_PREFIX}${C.TEMPLATE_VAR_FILE_PATH_SUFFIX}`,
     );
   }
 

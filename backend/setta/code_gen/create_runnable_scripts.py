@@ -5,6 +5,7 @@ from pathlib import Path
 from setta.code_gen.export_selected import (
     export_selected,
     get_gen_code_template_var,
+    get_section_name,
     get_section_type,
     get_selected_section_variant,
 )
@@ -280,18 +281,39 @@ def get_template_var_replacement_value_fn(
                     chars_before_template_var,
                 )
             else:
-                keyword, keyword_type = parse_template_var(keyword)
-                if keyword_type == C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX:
-                    section_dependencies.append(template_var["sectionId"])
-                    return construct_module_path(folder_path, keyword)
-                # elif keyword_type == C.TEMPLATE_VAR_VERSION_SUFFIX:
+                return process_non_hardcoded_template_var(
+                    keyword,
+                    template_var,
+                    exporter_obj,
+                    section_dependencies,
+                    folder_path,
+                )
 
         elif codeLanguage == "bash":
-            section_dependencies.append(template_var["sectionId"])
-            keyword = sanitize_section_path_full_name(remove_tp(keyword))
-            return codePathStr(folder_path, keyword, "python")
+            return process_non_hardcoded_template_var(
+                keyword, template_var, exporter_obj, section_dependencies, folder_path
+            )
 
     return get_template_var_replacement_value
+
+
+def process_non_hardcoded_template_var(
+    keyword, template_var, exporter_obj, section_dependencies, folder_path
+):
+    keyword, keyword_type = parse_template_var(keyword)
+    if keyword_type == C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX:
+        section_dependencies.append(template_var["sectionId"])
+        return construct_module_path(folder_path, keyword)
+    elif keyword_type == C.TEMPLATE_VAR_VERSION_SUFFIX:
+        version_name = get_selected_section_variant(
+            exporter_obj.p, template_var["sectionId"]
+        )["name"]
+        section_name = get_section_name(exporter_obj.p, template_var["sectionId"])
+        return f'"{section_name}@{version_name}"'
+    elif keyword_type == C.TEMPLATE_VAR_FILE_PATH_SUFFIX:
+        section_dependencies.append(template_var["sectionId"])
+        keyword = sanitize_section_path_full_name(keyword)
+        return f'"{codePathStr(folder_path, keyword, "python")}"'
 
 
 def get_absolute_decl_position_from_rel_position(

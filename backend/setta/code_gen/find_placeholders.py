@@ -10,14 +10,15 @@ def remove_tp(x):
 
 
 def parse_template_var(template_str: str) -> tuple[str, str | None]:
-    suffixes = {
-        f"{tp(C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX)}": C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX,
-        f"{tp(C.TEMPLATE_VAR_VERSION_SUFFIX)}": C.TEMPLATE_VAR_VERSION_SUFFIX,
-    }
+    suffixes = [
+        f"{tp(C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX)}",
+        f"{tp(C.TEMPLATE_VAR_VERSION_SUFFIX)}",
+        f"{tp(C.TEMPLATE_VAR_FILE_PATH_SUFFIX)}",
+    ]
 
-    for suffix, type_name in suffixes.items():
+    for suffix in suffixes:
         if template_str.endswith(suffix):
             base_str = remove_tp(template_str[: -len(suffix)])
-            return base_str, type_name
+            return base_str, remove_tp(suffix)
 
     return template_str, None
