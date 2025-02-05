@@ -101,6 +101,7 @@ CODE_INFO_TABLE_DATA_JSON_FIELDS = set(
         "positionalOnly",
         "isPinned",
         "isFrozen",
+        "ignoreTypeErrors",
     )
 )
 

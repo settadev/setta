@@ -6,6 +6,7 @@ import _ from "lodash";
 import React, { useEffect, useRef } from "react";
 import { BiChevronUp, BiError } from "react-icons/bi";
 import { HiOutlineDuplicate } from "react-icons/hi";
+import { openTypeErrorContextMenu } from "state/actions/contextMenus";
 import { useSectionColumnWidth, useSectionInfos } from "state/definitions";
 import { ParamInput } from "./ParamItems/ParamInput";
 import { ResizeHandle } from "./ResizeHandle";
@@ -77,7 +78,7 @@ function _ParamContainer({
           maybeErrorMessage={maybeErrorMessage}
         />
         <ResizeHandle showResizeHandle={true} onMouseDown={onResizeStart} />
-        {!!maybeErrorMessage && <ErrorSection />}
+        {!!maybeErrorMessage && <ErrorSection paramInfoId={paramInfoId} />}
       </article>
     </>
   ) : (
@@ -129,9 +130,16 @@ function useColumnWidth(sectionId, paramChildren) {
   return { childlessRef, childlessNameRef, parentRef };
 }
 
-function ErrorSection() {
+function ErrorSection({ paramInfoId }) {
+  function onContextMenu(e) {
+    openTypeErrorContextMenu(e, paramInfoId);
+  }
+
   return (
-    <BiError className="section-key-value grid-row-start-1 group/ w-45overflow-y-clip ml-auto aspect-square  cursor-help rounded-full bg-red-500/80 px-0.5 pb-0.5 pt-[1px] text-white  peer-focus-within/textinput:text-red-100 peer-focus-within/textinput:!opacity-20 dark:bg-red-700/80 dark:peer-focus-within/textinput:text-red-400" />
+    <BiError
+      className="section-key-value grid-row-start-1 group/ w-45overflow-y-clip ml-auto aspect-square  cursor-help rounded-full bg-red-500/80 px-0.5 pb-0.5 pt-[1px] text-white  peer-focus-within/textinput:text-red-100 peer-focus-within/textinput:!opacity-20 dark:bg-red-700/80 dark:peer-focus-within/textinput:text-red-400"
+      onContextMenu={onContextMenu}
+    />
   );
 }
 

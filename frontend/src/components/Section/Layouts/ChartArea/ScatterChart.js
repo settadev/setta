@@ -66,7 +66,7 @@ export function updateScatterChartWithNewData({
 
   // yAxisColumn might be undefined if categoryColumn and xAxisColumn
   // are using the only available columns
-  // TODO: maybe this should be guaranteed to be avoided by 
+  // TODO: maybe this should be guaranteed to be avoided by
   // updating axis column names in processChartArtifacts
   if (!yAxisColumn) {
     return { datasets: [] };

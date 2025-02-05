@@ -1,5 +1,9 @@
 import _ from "lodash";
-import { useProjectConfig, useTypeErrors } from "state/definitions";
+import {
+  useProjectConfig,
+  useSectionInfos,
+  useTypeErrors,
+} from "state/definitions";
 import { setNotificationMessage } from "./notification";
 
 export function processTypeErrors(content) {
@@ -12,6 +16,9 @@ export function processTypeErrors(content) {
 
   for (const d of diagnostics) {
     const { sectionId, paramInfoId, message } = d;
+    if (useSectionInfos.getState().codeInfo[paramInfoId].ignoreTypeErrors) {
+      continue;
+    }
     if (!(sectionId in typeErrors)) {
       typeErrors[sectionId] = {};
     }

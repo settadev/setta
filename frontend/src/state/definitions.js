@@ -26,8 +26,8 @@ export const useContextMenus = withProjectState(
   create(
     withResetFn(() => ({
       pane: { isOpen: false, x: 0, y: 0 },
-      group: { isOpen: false, x: 0, y: 0, sectionId: null },
       selection: { isOpen: false, x: 0, y: 0, nodeIds: [] },
+      typeError: { isOpen: false, x: 0, y: 0, paramInfoId: null },
     })),
   ),
 );
