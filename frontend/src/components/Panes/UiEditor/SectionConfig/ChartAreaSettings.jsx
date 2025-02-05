@@ -1,7 +1,9 @@
 import { IdNameCombobox } from "components/Utils/Combobox/IdNameCombobox";
 import C from "constants/constants.json";
 import _ from "lodash";
+import { updateColumnNameSelections } from "state/actions/artifacts";
 import { useMisc, useSectionInfos } from "state/definitions";
+import { getAllSectionArtifactIds } from "state/hooks/artifacts";
 import { JustListOfArtifacts } from "./ListOfArtifacts";
 
 export function ChartAreaSettings({ sectionId }) {
@@ -128,7 +130,7 @@ function ChartTypeSelection({ sectionId, selectedChartType }) {
       <IdNameCombobox
         allItems={chartTypes}
         value={selectedChartType}
-        onSelectedItemChange={(v) => setChartSetting(sectionId, "type", v)}
+        onSelectedItemChange={(v) => setChartType(sectionId, v)}
       />
     </>
   );
@@ -238,6 +240,14 @@ function ChartConfigToggle({ sectionId, name, value, title }) {
 function setChartSetting(sectionId, name, value) {
   useSectionInfos.setState((state) => {
     state.x[sectionId].chartSettings[name] = value;
+  });
+}
+
+function setChartType(sectionId, chartType) {
+  useSectionInfos.setState((state) => {
+    state.x[sectionId].chartSettings.type = chartType;
+    const artifactIds = getAllSectionArtifactIds(sectionId, state);
+    updateColumnNameSelections(Array.from(artifactIds), sectionId, state);
   });
 }
 

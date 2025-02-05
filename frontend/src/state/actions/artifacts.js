@@ -199,25 +199,29 @@ function getActiveArtifactGroupId(sectionId, sectionTypeName, state) {
 
 function actionAfterSettingSectionArtifacts(artifactIds, sectionId, state) {
   const sectionTypeName = getSectionType(sectionId, state);
-  const { chartSettings } = state.x[sectionId];
   if (sectionTypeName === C.CHART) {
-    const artifactValue = processChartArtifacts(
-      artifactIds.map((a) => useArtifacts.getState().x[a]),
-      chartSettings.type,
-    );
-    const seriesNames = Object.keys(artifactValue);
-    useMisc.setState((state) => ({
-      chartDisplayedSeriesNames: {
-        ...state.chartDisplayedSeriesNames,
-        [sectionId]: seriesNames,
-      },
-    }));
-    if (seriesNames === 0) {
-      return;
-    }
-    if (!seriesNames.includes(chartSettings.xAxisColumn)) {
-      chartSettings.xAxisColumn = seriesNames[0];
-    }
+    updateColumnNameSelections(artifactIds, sectionId, state);
+  }
+}
+
+export function updateColumnNameSelections(artifactIds, sectionId, state) {
+  const { chartSettings } = state.x[sectionId];
+  const artifactValue = processChartArtifacts(
+    artifactIds.map((a) => useArtifacts.getState().x[a]),
+    chartSettings.type,
+  );
+  const seriesNames = Object.keys(artifactValue);
+  useMisc.setState((state) => ({
+    chartDisplayedSeriesNames: {
+      ...state.chartDisplayedSeriesNames,
+      [sectionId]: seriesNames,
+    },
+  }));
+  if (seriesNames === 0) {
+    return;
+  }
+  if (!seriesNames.includes(chartSettings.xAxisColumn)) {
+    chartSettings.xAxisColumn = seriesNames[0];
   }
 }
 

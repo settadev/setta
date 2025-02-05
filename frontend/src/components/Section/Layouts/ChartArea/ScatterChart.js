@@ -48,7 +48,13 @@ export function updateScatterChartWithNewData({
   const artifactValue = processChartArtifacts(artifacts, "scatter");
 
   let categoryValue = "No Category";
-  const firstColumnLength = Object.values(artifactValue)[0].length;
+  const firstColumnLength = Object.values(artifactValue)[0]?.length;
+
+  // artifactValue might be an empty object if no artifacts are selected
+  if (!firstColumnLength) {
+    return { datasets: [] };
+  }
+
   const categoryColumn = chartSettings.categoryColumn;
   let xAxisColumn = Object.keys(artifactValue)[0];
   if (chartSettings.xAxisColumn) {
@@ -57,6 +63,14 @@ export function updateScatterChartWithNewData({
   const yAxisColumn = Object.keys(artifactValue).find(
     (a) => ![categoryColumn, xAxisColumn].includes(a),
   );
+
+  // yAxisColumn might be undefined if categoryColumn and xAxisColumn
+  // are using the only available columns
+  // TODO: maybe this should be guaranteed to be avoided by 
+  // updating axis column names in processChartArtifacts
+  if (!yAxisColumn) {
+    return { datasets: [] };
+  }
 
   const groupedData = {};
   for (let i = 0; i < firstColumnLength; i++) {
