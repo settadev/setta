@@ -227,10 +227,6 @@ export async function makeReplacements(
   codeInfoReplacements,
   paramEVReplacements,
 ) {
-  console.log("codeAreaReplacements", codeAreaReplacements);
-  console.log("codeInfoReplacements", codeInfoReplacements);
-  console.log("paramEVReplacements", paramEVReplacements);
-
   const res = await dbMakeEVRefTemplateVarReplacements(
     codeAreaReplacements,
     codeInfoReplacements,
