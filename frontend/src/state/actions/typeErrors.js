@@ -38,3 +38,11 @@ export function processTypeErrors(content) {
   useTypeErrors.getState().reset();
   useTypeErrors.setState({ errors: typeErrors });
 }
+
+export function removeTypeErrorsForParam(paramInfoId, state) {
+  for (const section of Object.values(state.errors)) {
+    if (paramInfoId in section) {
+      delete section[paramInfoId];
+    }
+  }
+}

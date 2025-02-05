@@ -1,7 +1,12 @@
 import { Item } from "components/Utils/atoms/dropdown/item";
 import _ from "lodash";
 import { closeAllContextMenus } from "state/actions/contextMenus";
-import { useContextMenus, useSectionInfos } from "state/definitions";
+import { removeTypeErrorsForParam } from "state/actions/typeErrors";
+import {
+  useContextMenus,
+  useSectionInfos,
+  useTypeErrors,
+} from "state/definitions";
 import { ContextMenuCore } from "./ContextMenuCore";
 
 export function TypeErrorContextMenu() {
@@ -15,9 +20,17 @@ export function TypeErrorContextMenu() {
   );
 
   function onClick() {
+    let ignoreTypeErrors;
     useSectionInfos.setState((state) => {
-      state.codeInfo[paramInfoId].ignoreTypeErrors = !currIgnoreTypeErrors;
+      ignoreTypeErrors = !currIgnoreTypeErrors;
+      state.codeInfo[paramInfoId].ignoreTypeErrors = ignoreTypeErrors;
     });
+    if (ignoreTypeErrors) {
+      useTypeErrors.setState((state) => {
+        removeTypeErrorsForParam(paramInfoId, state);
+      });
+    }
+
     closeAllContextMenus();
   }
 
