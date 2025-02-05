@@ -16,17 +16,6 @@ import { ParamTextLabel } from "./ParamItems/ParamTextLabel";
 function _ParamSwitch(props) {
   const { sectionId, paramInfoId } = props;
 
-  const { paramIsSelected, isKwarg, ignoreTypeErrors, paramChildren } =
-    useSectionInfos((x) => {
-      const codeInfoChildren = getDisplayedCodeInfoCol(sectionId, x).children;
-      return {
-        paramIsSelected: x.codeInfo[paramInfoId].isSelected,
-        isKwarg: x.codeInfo[paramInfoId].editable,
-        ignoreTypeErrors: x.codeInfo[paramInfoId].ignoreTypeErrors,
-        paramChildren: codeInfoChildren[paramInfoId] ?? [],
-      };
-    }, _.isEqual);
-
   const maybeErrorMessage = useTypeErrors(
     (x) => x.errors[sectionId]?.[paramInfoId],
   );
@@ -39,6 +28,15 @@ function _ParamSwitch(props) {
       isSearchResult: x.lookup.has(
         createProjectSearchLookupKey(sectionId, paramInfoId),
       ),
+    };
+  }, _.isEqual);
+
+  const { paramIsSelected, isKwarg, paramChildren } = useSectionInfos((x) => {
+    const codeInfoChildren = getDisplayedCodeInfoCol(sectionId, x).children;
+    return {
+      paramIsSelected: x.codeInfo[paramInfoId].isSelected,
+      isKwarg: x.codeInfo[paramInfoId].editable,
+      paramChildren: codeInfoChildren[paramInfoId] ?? [],
     };
   }, _.isEqual);
 
