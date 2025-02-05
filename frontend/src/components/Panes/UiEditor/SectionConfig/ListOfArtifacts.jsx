@@ -6,7 +6,7 @@ import { BiPaint } from "react-icons/bi";
 import { FaObjectGroup } from "react-icons/fa6";
 import { FiChevronDown, FiTrash2 } from "react-icons/fi";
 import { dbLoadAvailableArtifacts } from "requests/artifacts";
-import { maybeAddArtifactGroupAndSetArtifactId } from "state/actions/artifacts";
+import { updateArtifactGroupAndSetArtifactId } from "state/actions/artifacts";
 import { useArtifacts, useSectionInfos } from "state/definitions";
 import {
   getAllSectionArtifactIds,
@@ -357,11 +357,12 @@ export function JustListOfArtifacts({ sectionId, sectionTypeName }) {
 
   function onClick(artifactId, artifactType) {
     useSectionInfos.setState((state) => {
-      maybeAddArtifactGroupAndSetArtifactId({
+      updateArtifactGroupAndSetArtifactId({
         sectionId,
         sectionTypeName,
         artifactId,
         artifactType,
+        add: !selectedArtifactIds.has(artifactId),
         state,
       });
     });

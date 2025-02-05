@@ -100,12 +100,13 @@ export function addDrawAreaLayer(sectionId, state) {
   state.x[sectionId].canvasSettings.activeLayerId = artifactGroupId;
 }
 
-export function maybeAddArtifactGroupAndSetArtifactId({
+export function updateArtifactGroupAndSetArtifactId({
   sectionId,
   sectionTypeName,
   artifactId,
   artifactType,
   createNewArtifactGroup = false,
+  add,
   state,
 }) {
   let artifactGroupId = getActiveArtifactGroupId(
@@ -113,31 +114,45 @@ export function maybeAddArtifactGroupAndSetArtifactId({
     sectionTypeName,
     state,
   );
+  let currArtifactGroup;
 
-  if (!artifactGroupId || createNewArtifactGroup) {
-    artifactGroupId = createNewId();
-    state.artifactGroups[artifactGroupId] = newLayer({});
-    state.x[sectionId].artifactGroupIds.unshift(artifactGroupId);
-  }
+  if (add) {
+    if (!artifactGroupId || createNewArtifactGroup) {
+      artifactGroupId = createNewId();
+      state.artifactGroups[artifactGroupId] = newLayer({});
+      state.x[sectionId].artifactGroupIds.unshift(artifactGroupId);
+    }
 
-  const artifactTransform = newArtifactTransform(
-    artifactId,
-    sectionTypeName,
-    artifactType,
-  );
+    const artifactTransform = newArtifactTransform(
+      artifactId,
+      sectionTypeName,
+      artifactType,
+    );
 
-  const currArtifactGroup = state.artifactGroups[artifactGroupId];
-  if (sectionTypeName === C.DRAW || sectionTypeName === C.CHART) {
-    currArtifactGroup.artifactTransforms.push(artifactTransform);
+    currArtifactGroup = state.artifactGroups[artifactGroupId];
+    if (sectionTypeName === C.DRAW || sectionTypeName === C.CHART) {
+      currArtifactGroup.artifactTransforms.push(artifactTransform);
+    } else {
+      currArtifactGroup.artifactTransforms = [artifactTransform];
+    }
   } else {
-    currArtifactGroup.artifactTransforms = [artifactTransform];
+    // remove artifactId
+    currArtifactGroup = state.artifactGroups[artifactGroupId];
+    if (currArtifactGroup) {
+      currArtifactGroup.artifactTransforms =
+        currArtifactGroup.artifactTransforms.filter(
+          (t) => t.artifactId !== artifactId,
+        );
+    }
   }
 
-  actionAfterSettingSectionArtifacts(
-    currArtifactGroup.artifactTransforms.map((x) => x.artifactId),
-    sectionId,
-    state,
-  );
+  if (currArtifactGroup) {
+    actionAfterSettingSectionArtifacts(
+      currArtifactGroup.artifactTransforms.map((x) => x.artifactId),
+      sectionId,
+      state,
+    );
+  }
 }
 
 export async function addArtifactAndMaybeCreateNewArtifactGroup({
@@ -160,12 +175,13 @@ export async function addArtifactAndMaybeCreateNewArtifactGroup({
   }));
   useSectionInfos.setState((state) => {
     const sectionTypeName = getSectionType(sectionId, state);
-    maybeAddArtifactGroupAndSetArtifactId({
+    updateArtifactGroupAndSetArtifactId({
       sectionId,
       sectionTypeName,
       artifactId,
       artifactType,
       createNewArtifactGroup,
+      add: true,
       state,
     });
   });

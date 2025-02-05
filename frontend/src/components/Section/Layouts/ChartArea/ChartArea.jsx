@@ -116,7 +116,7 @@ function _ChartAreaCore({ sectionId }) {
 
   useDeepCompareEffect(() => {
     const artifacts = Object.values(loadedArtifacts);
-    if (artifacts.length === 0 || !chartRef.current) {
+    if (!chartRef.current) {
       return;
     }
 
