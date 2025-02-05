@@ -1,8 +1,7 @@
 import { IdNameCombobox } from "components/Utils/Combobox/IdNameCombobox";
 import C from "constants/constants.json";
 import _ from "lodash";
-import { useSectionInfos } from "state/definitions";
-import { useAllSectionArtifacts } from "state/hooks/artifacts";
+import { useMisc, useSectionInfos } from "state/definitions";
 import { JustListOfArtifacts } from "./ListOfArtifacts";
 
 export function ChartAreaSettings({ sectionId }) {
@@ -20,9 +19,10 @@ function ChartConfig({ sectionId }) {
     _.isEqual,
   );
 
-  const valueHeaders = Object.values(
-    useAllSectionArtifacts(sectionId, (x) => Object.keys(x.value)),
-  )[0];
+  const valueHeaders = useMisc(
+    (x) => x.chartDisplayedSeriesNames[sectionId],
+    _.isEqual,
+  );
 
   return (
     <div className="flex flex-col gap-1">

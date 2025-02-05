@@ -28,7 +28,9 @@ function useLoadedArtifacts(sectionId, artifactIds, attrPickerFn) {
         notLoaded.push(id);
       }
     }
-    loadArtifacts(sectionId, notLoaded, controller.signal);
+    if (notLoaded.length > 0) {
+      loadArtifacts(sectionId, notLoaded, controller.signal);
+    }
 
     return () => {
       controller.abort();
