@@ -2,6 +2,7 @@ import asyncio
 import errno
 import json
 import logging
+import os
 import platform
 import select
 import time
@@ -63,7 +64,7 @@ class TerminalWebsockets:
             terminal_shell = get_terminal_shell()
             if not IS_WINDOWS:
                 terminal_shell = [terminal_shell]
-            pty_process = PtyProcess.spawn(terminal_shell)
+            pty_process = PtyProcess.spawn(terminal_shell, env=os.environ.copy())
             self.PTY_PIDS[sectionId] = {
                 "pid": pty_process.pid,
                 "start": time.time(),
