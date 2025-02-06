@@ -12,6 +12,13 @@ function resetToPreviousVal(state) {
   };
 }
 
+function setSelectedItemToNull() {
+  return {
+    selectedItem: null,
+    inputValue: "",
+  };
+}
+
 function getHighlightedIndex(items, selectedItem) {
   if (selectedItem) {
     let idx = 0;
@@ -49,13 +56,25 @@ function getFirstMatch(latestItems) {
   return flattenedItems(latestItems)[0];
 }
 
-function getReducerModifications({ type, state, changes, items }) {
+function getReducerModifications({
+  type,
+  state,
+  changes,
+  items,
+  selectedItemCanBeNull,
+}) {
   const changeTypes = useCombobox.stateChangeTypes;
 
   switch (type) {
     case changeTypes.InputChange:
     case changeTypes.ToggleButtonClick:
-      return getHighlightedIndex(items, changes.selectedItem);
+      if (selectedItemCanBeNull && changes.inputValue === "") {
+        // if selectedItemCanBeNull, then we want to indicate that
+        // an empty string and pressing Enter will make the selected item null
+        return { highlightedIndex: -1 };
+      } else {
+        return getHighlightedIndex(items, changes.selectedItem);
+      }
     case changeTypes.InputKeyDownEscape:
     case changeTypes.InputBlur:
       return resetToPreviousVal(state);
@@ -76,6 +95,11 @@ function getReducerModifications({ type, state, changes, items }) {
           };
         }
       }
+      if (selectedItemCanBeNull) {
+        // this allows the user to make the combobox empty again,
+        // by deleting the text and pressing Enter.
+        return setSelectedItemToNull();
+      }
       return resetToPreviousVal(state);
     default:
       return {};
@@ -86,6 +110,7 @@ export function useComboboxStateReducerWithFilteredItems(
   allItems,
   value,
   setValue,
+  selectedItemCanBeNull,
 ) {
   const [selection, setSelection] = useState(null);
   const [filteredItems, setFilteredItems] = useState(allItems);
@@ -151,6 +176,7 @@ export function useComboboxStateReducerWithFilteredItems(
       state,
       changes,
       items: latestItems,
+      selectedItemCanBeNull,
     });
 
     return { ...changes, ...mods };

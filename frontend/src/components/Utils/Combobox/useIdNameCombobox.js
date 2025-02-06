@@ -2,7 +2,12 @@ import { useCombobox } from "downshift";
 import { useComboboxStateReducerWithFilteredItems } from "./ComboboxStateReducer";
 import { flattenedItems } from "./utils";
 
-export function useIdNameCombobox({ allItems, onSelectedItemChange, value }) {
+export function useIdNameCombobox({
+  allItems,
+  onSelectedItemChange,
+  value,
+  selectedItemCanBeNull,
+}) {
   function onKeyDown(e) {
     if (e.code === "Escape") {
       // TODO: figure out best way to blur without being annoying
@@ -17,6 +22,7 @@ export function useIdNameCombobox({ allItems, onSelectedItemChange, value }) {
       allItems,
       value,
       onSelectedItemChange,
+      selectedItemCanBeNull,
     );
 
   const localOnSelectedItemChange = ({ selectedItem }) => {

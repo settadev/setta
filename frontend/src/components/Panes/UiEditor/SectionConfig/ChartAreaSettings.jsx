@@ -80,6 +80,7 @@ function LineChartConfig({ sectionId, chartSettings, valueHeaders }) {
         sectionId={sectionId}
         valueHeaders={valueHeaders}
         selectedXAxisColumn={chartSettings.xAxisColumn}
+        xAxisCanBeNull={true}
       />
       <TogglableOptions
         sectionId={sectionId}
@@ -140,6 +141,7 @@ function XAxisColumnSelection({
   sectionId,
   valueHeaders,
   selectedXAxisColumn,
+  xAxisCanBeNull,
 }) {
   const xAxisColumnChoices = [
     {
@@ -162,6 +164,7 @@ function XAxisColumnSelection({
         onSelectedItemChange={(v) =>
           setChartSetting(sectionId, "xAxisColumn", v)
         }
+        selectedItemCanBeNull={xAxisCanBeNull}
       />
     </>
   );
