@@ -20,6 +20,7 @@ import {
   sendTerminalMessage,
 } from "state/hooks/terminals/terminal";
 import { createNewId } from "utils/idNameCreation";
+import { newEVEntry } from "utils/objs/ev";
 import { templatePrefix } from "utils/utils";
 import { addSectionInEmptySpace } from "../sections/createSections";
 import { generateParamSweepCombinations } from "./generateParamSweepCombinations";
@@ -236,7 +237,9 @@ function* getProjectVariants(project, paramSweepSectionVariantIds) {
         const sectionVariant = variant.sectionVariants[forSectionVariantId];
         sectionVariant.selectedItem = selectedItem;
         if (paramInfoId) {
-          sectionVariant.values[paramInfoId].value = value;
+          const evEntry = sectionVariant.values[paramInfoId] ?? newEVEntry();
+          evEntry.value = value;
+          sectionVariant.values[paramInfoId] = evEntry;
         }
       }
       yield variant;
