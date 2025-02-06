@@ -3,7 +3,8 @@ import _ from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { HiCheck, HiOutlineDuplicate } from "react-icons/hi";
 import { addSectionInEmptySpace } from "state/actions/sections/createSections";
-import { useSettings } from "state/definitions";
+import { maybeIncrementProjectStateVersion } from "state/actions/undo";
+import { useSectionInfos, useSettings } from "state/definitions";
 import { positiveMod, shortcutPrettified } from "utils/utils";
 import { create } from "zustand";
 
@@ -263,15 +264,19 @@ export function getConvertFloatingBoxToSectionFn(renderMarkdown) {
       const content = item.title
         ? `## ${item.title}\n\n${item.content}`
         : item.content;
-      addSectionInEmptySpace({
-        type: C.INFO,
-        sectionProps: {
-          name: s.title,
-          size: { width: 300, height: 300 },
-          renderMarkdown,
-        },
-        sectionVariantProps: { description: content },
+      useSectionInfos.setState((state) => {
+        addSectionInEmptySpace({
+          type: C.INFO,
+          sectionProps: {
+            name: s.title,
+            size: { width: 300, height: 300 },
+            renderMarkdown,
+          },
+          sectionVariantProps: { description: content },
+          state,
+        });
       });
+      maybeIncrementProjectStateVersion(true);
     }
     // if converting a frozen floating box, then we need to remove it
     removeFrozenFloatingBox();

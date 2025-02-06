@@ -16,7 +16,10 @@ import { initRunGroup } from "../runGroups/runGroups";
 import { setSectionVariantChildren } from "../sectionInfos";
 
 export function addRegularSectionInEmptySpace() {
-  const newId = addSectionInEmptySpace({ type: C.SECTION });
+  let newId;
+  useSectionInfos.setState((state) => {
+    newId = addSectionInEmptySpace({ type: C.SECTION, state });
+  });
   setActiveSectionIdAndUpdateZIndex(newId);
   const unsub = useSectionRefs.subscribe(
     (state) => state.selfOnly[newId],
@@ -27,15 +30,23 @@ export function addRegularSectionInEmptySpace() {
       unsub();
     },
   );
+  maybeIncrementProjectStateVersion(true);
 }
 
 export function addGroupInEmptySpace() {
-  const newId = addSectionInEmptySpace({ type: C.GROUP });
+  let newId;
+  useSectionInfos.setState((state) => {
+    newId = addSectionInEmptySpace({ type: C.GROUP, state });
+  });
   setActiveSectionIdAndUpdateZIndex(newId);
+  maybeIncrementProjectStateVersion(true);
 }
 
 export function addTerminalInEmptySpace() {
-  return addSectionInEmptySpace({ type: C.TERMINAL });
+  useSectionInfos.setState((state) => {
+    addSectionInEmptySpace({ type: C.TERMINAL, state });
+  });
+  maybeIncrementProjectStateVersion(true);
 }
 
 export function addSectionInEmptySpace({
@@ -43,6 +54,7 @@ export function addSectionInEmptySpace({
   sectionProps = {},
   sectionVariantProps = {},
   positionOffset = { x: 10, y: 10 },
+  state,
 }) {
   const {
     transform: [_x, _y, zoom],
@@ -54,18 +66,13 @@ export function addSectionInEmptySpace({
 
   const position = { x: x + positionOffset.x, y: y + positionOffset.y };
 
-  let newId;
-  useSectionInfos.setState((state) => {
-    newId = addSectionAtPosition({
-      type,
-      sectionProps,
-      sectionVariantProps,
-      position,
-      state,
-    });
+  return addSectionAtPosition({
+    type,
+    sectionProps,
+    sectionVariantProps,
+    position,
+    state,
   });
-  maybeIncrementProjectStateVersion(true);
-  return newId;
 }
 
 export function addSectionAtPosition({
@@ -119,22 +126,7 @@ export function addChildrenToSeries(isRoot, calledBy, numChildren) {
   return newIds;
 }
 
-export function addChild({ id, parentId, type, sectionProps }) {
-  useSectionInfos.setState((state) => {
-    createSectionInfo({
-      sectionProps: {
-        id,
-        parentId,
-        uiTypeId: BASE_UI_TYPE_IDS[type],
-        ...sectionProps,
-      },
-      state,
-    });
-    setSectionVariantChildren(parentId, (x) => [...x, id], state);
-  });
-}
-
-function createSectionInfo({
+export function createSectionInfo({
   sectionProps = {},
   sectionVariantProps = {},
   numSections = 1,

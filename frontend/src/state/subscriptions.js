@@ -142,7 +142,8 @@ function singletonSectionsSubscriptionFn(state) {
     if (
       output[C.GLOBAL_VARIABLES] &&
       output[C.GLOBAL_PARAM_SWEEP] &&
-      output.inMemoryFnStdoutTerminal
+      output.inMemoryFnStdoutTerminal &&
+      output.temporaryTerminalGroup
     ) {
       break;
     }
@@ -158,6 +159,10 @@ function singletonSectionsSubscriptionFn(state) {
       s.isReadOnlyTerminal
     ) {
       output.inMemoryFnStdoutTerminal = s.id;
+    }
+    // TODO: need better way of knowing if it's the temporaryTerminalGroup
+    if (!output.temporaryTerminalGroup && uiType === C.GROUP && s.isTemporary) {
+      output.temporaryTerminalGroup = s.id;
     }
   }
   return output;

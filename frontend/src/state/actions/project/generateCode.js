@@ -17,12 +17,13 @@ import {
 import { getForSectionId } from "state/hooks/paramSweep";
 import {
   addTerminalInitialMessage,
+  createTemporaryTerminal,
+  maybeCreateTemporaryTerminalGroup,
   sendTerminalMessage,
 } from "state/hooks/terminals/terminal";
 import { createNewId } from "utils/idNameCreation";
 import { newEVEntry } from "utils/objs/ev";
 import { templatePrefix } from "utils/utils";
-import { addSectionInEmptySpace } from "../sections/createSections";
 import { generateParamSweepCombinations } from "./generateParamSweepCombinations";
 import { generateSectionParamSweepVersionCombinations } from "./generateSectionParamSweepVersionCombinations";
 import { getProjectData } from "./saveProject";
@@ -76,10 +77,9 @@ export async function sendRunCodeMessage(project, messageIdx = 0) {
     } else {
       const id = createNewId();
       addTerminalInitialMessage(id, message);
-      addSectionInEmptySpace({
-        type: C.TERMINAL,
-        sectionProps: { id, isTemporary: true },
-        positionOffset: { x: messageIdx * 100, y: 0 },
+      useSectionInfos.setState((state) => {
+        const groupId = maybeCreateTemporaryTerminalGroup(state);
+        createTemporaryTerminal(id, groupId, state);
       });
     }
   }
