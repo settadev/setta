@@ -8,6 +8,12 @@ import uuid
 from setta.tasks.fns.utils import TaskDefinition
 from setta.utils.constants import CWD
 from setta.utils.utils import nested_access
+import queue
+import threading
+import logging
+import asyncio
+logger = logging.getLogger(__name__)
+
 
 
 def import_code_from_string(code_string, module_name=None, add_to_sys_modules=True):
@@ -40,12 +46,19 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
 
 
 class SettaInMemoryFnSubprocess:
-    def __init__(self):
+    def __init__(self, stop_event, websockets):
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
         self.process = multiprocessing.Process(target=self._subprocess_main)
         self.stdout_parent_conn, self.stdout_child_conn = multiprocessing.Pipe()
         self.process.daemon = True  # Ensure process dies with parent
         self.process.start()
+
+        self.stop_event = stop_event
+        self.websockets = websockets
+        self.stdout_queue = queue.Queue()
+        self.stdout_processor_task = None
+        self.stdout_thread = threading.Thread(target=self.stdout_listener, daemon=True)
+        self.stdout_thread.start()
 
     def _subprocess_main(self):
         """Main loop in subprocess that handles all requests"""
@@ -136,6 +149,10 @@ class SettaInMemoryFnSubprocess:
         self.child_conn.close()
         self.stdout_parent_conn.close()
         self.stdout_child_conn.close()
+        
+        self.stdout_thread.join()
+        if self.stdout_processor_task:
+            self.stdout_processor_task.cancel()
 
     def process_message(self, fn_name, message, cache):
         if fn_name in cache:
@@ -146,6 +163,53 @@ class SettaInMemoryFnSubprocess:
                 p_dict[key] = v
             message.content = exporter_obj.output
         return message.content
+
+    def start_stdout_processor_task(self):
+        if self.stdout_processor_task is None or self.stdout_processor_task.done():
+            self.stdout_processor_task = asyncio.create_task(
+                self.process_stdout_queue()
+            )
+
+    async def stop_stdout_processor_task(self):
+        if self.stdout_processor_task and not self.stdout_processor_task.done():
+            self.stdout_processor_task.cancel()
+            try:
+                await self.stdout_processor_task
+            except asyncio.CancelledError:
+                pass
+            self.stdout_processor_task = None
+
+    async def process_stdout_queue(self):
+        while not self.stop_event.is_set():
+            try:
+                if self.stop_event.is_set():
+                    break
+                if len(self.websockets) > 0:
+                    stdout_data = self.stdout_queue.get_nowait()
+                    stdout_data = stdout_data.replace("\n", "\r\n")
+                    for w in self.websockets:
+                        await w.send_text(stdout_data)
+                    self.stdout_queue.task_done()
+            except queue.Empty:
+                await asyncio.sleep(0.1)  # Check for connection every 100ms
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                if self.stop_event.is_set():
+                    break
+                logger.debug(f"Error processing stdout: {e}")
+
+    def stdout_listener(self):
+        while not self.stop_event.is_set():
+            try:
+                stdout_data = self.stdout_parent_conn.recv()
+                self.stdout_queue.put(stdout_data)  # simple put, no async needed
+            except Exception as e:
+                if self._stop_event.is_set():
+                    break
+                logger.debug(f"Error in stdout listener: {e}")
+
+
 
 
 def add_fns_from_module(fns_dict, module, module_name=None):
