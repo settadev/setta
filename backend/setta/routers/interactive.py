@@ -4,7 +4,8 @@ from pydantic import BaseModel
 
 from setta.code_gen.create_runnable_scripts import (
     generate_final_code_for_sections,
-    prune_and_topological_sort,
+    get_import_order_for_top_node,
+    prune_and_find_top_nodes,
     sanitize_section_path_full_name,
 )
 from setta.code_gen.export_selected import (
@@ -62,21 +63,21 @@ async def route_update_interactive_code(
         template_var_replacement_values=template_var_replacement_values,
     )
 
-    to_import, _ = prune_and_topological_sort(code_dict, p["importCodeBlocks"])
-    to_import = to_import[::-1]  # we want to import the dependencies first
-    code_list = []
-    for section_id in to_import:
-        v = code_dict[section_id]
-        task_name = create_in_memory_module_name(p, section_id)
-        code_list.append(
+    top_node_ids, dependencies = prune_and_find_top_nodes(
+        code_dict, p["importCodeBlocks"]
+    )
+    code_graph = []
+    for section_id in top_node_ids:
+        code_graph.append(
             {
-                "code": v["code"],
-                "module_name": task_name,
+                "code": code_dict[section_id]["code"],
+                "imports": get_import_order_for_top_node(section_id, dependencies),
+                "module_name": create_in_memory_module_name(p, section_id),
             }
         )
 
     metadata, error_msgs, content = await tasks.add_custom_fns(
-        code_list,
+        code_graph,
         to_cache=exporter_obj_in_memory,
     )
     return {"metadata": metadata, "errorMsgs": error_msgs, "content": content}

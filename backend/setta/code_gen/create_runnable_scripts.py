@@ -402,8 +402,46 @@ def prune_and_topological_sort(code_dict, to_keep):
     return topological_sort(section_dependencies), section_dependencies
 
 
+# TODO: eliminate redundancy between this and prune_and_topological_sort
+def prune_and_find_top_nodes(code_dict, to_keep):
+    section_dependencies = {k: v["section_dependencies"] for k, v in code_dict.items()}
+    section_dependencies = prune_dict(section_dependencies, to_keep)
+    return find_top_nodes(section_dependencies), section_dependencies
+
+
+def get_import_order_for_top_node(top_node, dependency_dict):
+    # Build a subgraph consisting of top_node and all its descendants.
+    subgraph = get_subgraph(top_node, dependency_dict)
+    # Get a topologically sorted list where each dependency comes before the node that depends on it.
+    sorted_nodes = topological_sort(subgraph)
+    # Because you plan to import starting from the end of the list and work backwards,
+    # reverse the topological order so that the deepest dependency is imported first.
+    import_order = sorted_nodes[::-1]
+    return import_order
+
+
+def find_top_nodes(dependency_dict):
+    all_nodes = set(dependency_dict.keys())
+    all_deps = {dep for deps in dependency_dict.values() for dep in deps}
+    return all_nodes - all_deps
+
+
+def get_subgraph(top_node, dependency_dict):
+    visited = set()
+
+    def dfs(node):
+        if node not in visited:
+            visited.add(node)
+            for dep in dependency_dict.get(node, []):
+                dfs(dep)
+
+    dfs(top_node)
+    return {node: dependency_dict.get(node, []) for node in visited}
+
+
+# TODO: is this function actually necessary anymore?
 def topological_sort(objects):
-    graph = {id: refs for id, refs in objects.items()}
+    graph = {node: refs for node, refs in objects.items()}
     visiting, visited = set(), set()
     order = []
 
@@ -412,16 +450,15 @@ def topological_sort(objects):
             raise ValueError("Circular reference detected")
         if node not in visited:
             visiting.add(node)
-            for neighbour in graph[node]:
-                dfs(neighbour)
+            for neighbor in graph.get(node, []):
+                dfs(neighbor)
             visiting.remove(node)
             visited.add(node)
             order.append(node)
 
-    for id in objects.keys():
-        if id not in visited:
-            dfs(id)
-
+    for node in graph.keys():
+        if node not in visited:
+            dfs(node)
     return order[::-1]
 
 

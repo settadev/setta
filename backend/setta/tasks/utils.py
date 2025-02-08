@@ -1,19 +1,19 @@
+import asyncio
 import importlib.util
 import json
+import logging
 import multiprocessing
+import queue
 import sys
+import threading
 import traceback
 import uuid
 
 from setta.tasks.fns.utils import TaskDefinition
 from setta.utils.constants import CWD
 from setta.utils.utils import nested_access
-import queue
-import threading
-import logging
-import asyncio
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 
 def import_code_from_string(code_string, module_name=None, add_to_sys_modules=True):
@@ -149,7 +149,7 @@ class SettaInMemoryFnSubprocess:
         self.child_conn.close()
         self.stdout_parent_conn.close()
         self.stdout_child_conn.close()
-        
+
         self.stdout_thread.join()
         if self.stdout_processor_task:
             self.stdout_processor_task.cancel()
@@ -208,8 +208,6 @@ class SettaInMemoryFnSubprocess:
                 if self._stop_event.is_set():
                     break
                 logger.debug(f"Error in stdout listener: {e}")
-
-
 
 
 def add_fns_from_module(fns_dict, module, module_name=None):

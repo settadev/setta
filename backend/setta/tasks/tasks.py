@@ -1,6 +1,5 @@
 import asyncio
 import logging
-
 from typing import Dict
 
 from setta.database.utils import create_new_id
@@ -20,7 +19,7 @@ class Tasks:
         self.cache = {}
         self.fns: Dict[str, TaskDefinition] = {}
         self.in_memory_subprocesses = {}
-        self.websockets = [] 
+        self.websockets = []
         self.stop_event = asyncio.Event()
         add_fns_from_module(self.fns, fns)
 
@@ -55,12 +54,8 @@ class Tasks:
 
     async def call_in_memory_subprocess_fn(self, fn_name, message: TaskMessage):
         sp = self.in_memory_subprocesses[fn_name]
-        sp.parent_conn.send(
-            {"type": "call", "fn_name": fn_name, "message": message}
-        )
-        result = await self.task_runner.run(
-            sp.parent_conn.recv, [], RunType.THREAD
-        )
+        sp.parent_conn.send({"type": "call", "fn_name": fn_name, "message": message})
+        result = await self.task_runner.run(sp.parent_conn.recv, [], RunType.THREAD)
         if result["status"] != "success":
             result["content"] = {}
 
@@ -68,22 +63,26 @@ class Tasks:
 
     # TODO: pass in dependency graph
     # Create a separate subprocess for each "root" of the graph (i.e. code blocks that aren't imported by other code blocks)
-    async def add_custom_fns(self, code_list, to_cache):
+    async def add_custom_fns(self, code_graph, to_cache):
         error_msgs = {}
         task_metadata = {}
         initial_content = []
-        for c in code_list:
-            self.in_memory_subprocess.parent_conn.send(
+        for c in code_graph:
+            module_name = c["module_name"]
+            sp = self.in_memory_subprocesses.get(module_name)
+            if not sp:
+                sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
+                self.in_memory_subprocesses[module_name] = sp
+
+            sp.parent_conn.send(
                 {
                     "type": "import",
                     "code": c["code"],
-                    "module_name": c["module_name"],
+                    "module_name": module_name,
                     "to_cache": to_cache,
                 }
             )
-            result = await self.task_runner.run(
-                self.in_memory_subprocess.parent_conn.recv, [], RunType.THREAD
-            )
+            result = await self.task_runner.run(sp.parent_conn.recv, [], RunType.THREAD)
             if result["status"] == "success":
                 task_metadata.update(result["content"])
             else:
@@ -93,10 +92,10 @@ class Tasks:
             task_output = await self(k, TaskMessage(id=create_new_id(), content={}))
             initial_content.extend(task_output["content"])
 
+        print("self.in_memory_subprocesses.keys()", self.in_memory_subprocesses.keys(), flush=True)
         return task_metadata, error_msgs, initial_content
 
     def close(self):
         self.stop_event.set()
         for v in self.in_memory_subprocesses.values():
             v.close()
-
