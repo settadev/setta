@@ -1,13 +1,10 @@
 import { findCandidateTemplateVars } from "components/Utils/CodeMirror/utils";
 import C from "constants/constants.json";
-import { getProjectDataForInteractive } from "state/actions/project/projectDataForInteractive";
 import { getProjectData } from "state/actions/project/saveProject";
 import { getSectionType, getSectionVariant } from "state/actions/sectionInfos";
 import { post } from "./utils";
 
-export async function dbImportCodeBlocks(sectionIds) {
-  const project = await getProjectDataForInteractive();
-  project.importCodeBlocks = sectionIds;
+export async function dbImportCodeBlocks(project) {
   return await post({
     body: { project },
     address: C.ROUTE_UPDATE_INTERACTIVE_CODE,

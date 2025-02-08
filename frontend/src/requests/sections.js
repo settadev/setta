@@ -5,21 +5,21 @@ import {
   findCandidateTemplateVars,
 } from "components/Utils/CodeMirror/utils";
 import C from "constants/constants.json";
-import _ from "lodash";
 import { setNotificationMessage } from "state/actions/notification";
 import { getProjectDataToGenerateCode } from "state/actions/project/generateCode";
 import { getSectionInfo } from "state/actions/sectionInfos";
 import { sendMessageAndWait } from "state/actions/temporaryMiscState";
 import { useProjectConfig, useTypeErrors } from "state/definitions";
 import { createNewId } from "utils/idNameCreation";
+import { asyncDebounce } from "utils/utils";
 import { sendMessage } from "./websocket";
 
-export function dbRequestTypeCheck(userRequested = false) {
+export async function dbRequestTypeCheck(userRequested = false) {
   if (userRequested) {
     setNotificationMessage("Checking types...");
     useTypeErrors.setState({ userRequested });
   }
-  const project = getProjectDataToGenerateCode({});
+  const project = await getProjectDataToGenerateCode({});
   sendMessage({
     content: project,
     id: createNewId(),
@@ -27,7 +27,7 @@ export function dbRequestTypeCheck(userRequested = false) {
   });
 }
 
-export const debouncedTypeCheckRequest = _.debounce(dbRequestTypeCheck, 500);
+export const debouncedTypeCheckRequest = asyncDebounce(dbRequestTypeCheck, 500);
 
 export async function dbParametersRequest({ sectionId, fullText, position }) {
   return await dbTextFieldCompletion({
@@ -40,7 +40,7 @@ export async function dbParametersRequest({ sectionId, fullText, position }) {
 }
 
 export async function dbTextFieldInitializeCode({ sectionId, paramInfoId }) {
-  const project = getProjectDataToGenerateCode({});
+  const project = await getProjectDataToGenerateCode({});
   await sendMessage({
     id: createNewId(),
     messageType: "textFieldInitializeCode",
@@ -49,7 +49,7 @@ export async function dbTextFieldInitializeCode({ sectionId, paramInfoId }) {
 }
 
 export async function dbCodeAreaInitializeCode(sectionId) {
-  const project = getProjectDataToGenerateCode({});
+  const project = await getProjectDataToGenerateCode({});
   return await sendMessageAndWait({
     id: createNewId(),
     messageType: "codeAreaInitializeCode",

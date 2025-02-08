@@ -24,15 +24,17 @@ import {
 import { createNewId } from "utils/idNameCreation";
 import { newEVEntry } from "utils/objs/ev";
 import { templatePrefix } from "utils/utils";
+import { requestBase64FromCanvas } from "../temporaryMiscState";
 import { generateParamSweepCombinations } from "./generateParamSweepCombinations";
 import { generateSectionParamSweepVersionCombinations } from "./generateSectionParamSweepVersionCombinations";
 import { getProjectData } from "./saveProject";
 
-export function getProjectDataToGenerateCode({
+export async function getProjectDataToGenerateCode({
   includeFullNameToInfo = true,
   includeInfoToFullName = true,
   includeFullNameToSectionId = true,
   includeSectionPathFullNames = true,
+  includeDrawings = false,
 }) {
   const project = getProjectData({});
   if (includeFullNameToInfo) {
@@ -53,6 +55,18 @@ export function getProjectDataToGenerateCode({
         useSectionInfos.getState(),
       );
     }
+  }
+  if (includeDrawings) {
+    const sectionInfosState = useSectionInfos.getState().x;
+    const sections = {};
+    for (const x of Object.values(sectionInfosState)) {
+      const currSection = _.cloneDeep(x);
+      if (getSectionTypee(x.id) === C.DRAW) {
+        currSection.drawing = await requestBase64FromCanvas(x.id);
+      }
+      sections[x.id] = currSection;
+    }
+    project.sections = sections;
   }
   return project;
 }
