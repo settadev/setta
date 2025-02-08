@@ -263,6 +263,8 @@ function* getProjectVariants(project, paramSweepSectionVariantIds) {
   }
 }
 
+
+// TODO: refine this logic. Has to be really clear what happens in each case.
 function getRunCodeBlocks(project, isRunGroup) {
   if (isRunGroup) {
     // use all code sections when running a run group

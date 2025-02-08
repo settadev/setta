@@ -64,7 +64,7 @@ async def route_update_interactive_code(
     )
 
     top_node_ids, dependencies = prune_and_find_top_nodes(
-        code_dict, p["importCodeBlocks"]
+        code_dict, p["runCodeBlocks"]
     )
     code_graph = []
     project_config_id = x.project["projectConfig"]["id"]

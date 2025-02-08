@@ -17,14 +17,10 @@ import {
 } from "./project/generateCode";
 import { getSectionInfo, getSectionType } from "./sectionInfos";
 
-export async function importCodeBlocks(sectionIds) {
-  if (sectionIds.length === 0) {
-    return;
-  }
-
+export async function importCodeBlocks(sectionIds, withSweep = false) {
   setNotificationMessage("Importing your code...");
-  const project = await getProjectDataToGenerateCode({});
-  project.importCodeBlocks = sectionIds;
+  const project = await getProjectDataToGenerateCode({ includeDrawings: true });
+  project.runCodeBlocks = sectionIds;
   const res = await dbImportCodeBlocks(project);
   if (res.status === 200) {
     for (const metadata of Object.values(res.data.metadata)) {
@@ -43,13 +39,18 @@ export async function importCodeBlocks(sectionIds) {
   }
 }
 
-export async function runCodeBlocks(sectionIds) {
-  if (sectionIds.length === 0) {
-    return;
-  }
+export async function runCodeBlocks(sectionIds, withSweep = false) {
   const project = await getProjectDataToGenerateCode({});
-  project.runCodeBlocks = sectionIds;
-  await sendRunCodeMessage(project);
+  if (withSweep) {
+    let count = 0;
+    for (const projectVariant of getProjectRuns(project)) {
+      await sendRunCodeMessage(projectVariant, count);
+      count += 1;
+    }
+  } else {
+    project.runCodeBlocks = sectionIds;
+    await sendRunCodeMessage(project);
+  }
 }
 
 export async function runOrImportAllCode() {
@@ -62,15 +63,12 @@ export async function runOrImportAllCode() {
     asSubprocess.length > 0 ||
     (inMemory.length === 0 && asSubprocess.length === 0)
   ) {
-    const project = await getProjectDataToGenerateCode({});
-    let count = 0;
-    for (const projectVariant of getProjectRuns(project)) {
-      await sendRunCodeMessage(projectVariant, count);
-      count += 1;
-    }
+    runCodeBlocks(asSubprocess, true);
   }
 
-  importCodeBlocks(inMemory);
+  if (inMemory.length > 0) {
+    importCodeBlocks(inMemory, true);
+  }
 }
 
 export function runOrImportActiveCode() {
