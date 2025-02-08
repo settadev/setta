@@ -27,8 +27,9 @@ class Tasks:
         # Accept the new connection
         await websocket.accept()
         self.websockets.append(websocket)
-        for v in self.in_memory_subprocesses.values():
+        for k, v in self.in_memory_subprocesses.items():
             v.start_stdout_processor_task()
+            logger.debug(f"listening to subprocess {k}")
 
     async def disconnect(self, websocket):
         self.websockets.remove(websocket)
@@ -68,11 +69,13 @@ class Tasks:
         task_metadata = {}
         initial_content = []
         for c in code_graph:
+            subprocess_key = f'{c["project_config_id"]}-{c["section_id"]}'
             module_name = c["module_name"]
-            sp = self.in_memory_subprocesses.get(module_name)
+            sp = self.in_memory_subprocesses.get(subprocess_key)
             if not sp:
+                logger.debug(f"Creating new subprocess for {module_name}")
                 sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
-                self.in_memory_subprocesses[module_name] = sp
+                self.in_memory_subprocesses[subprocess_key] = sp
 
             sp.parent_conn.send(
                 {
@@ -86,12 +89,15 @@ class Tasks:
             if result["status"] == "success":
                 task_metadata.update(result["content"])
             else:
-                error_msgs[c["module_name"]] = result["error"]
+                error_msgs[module_name] = result["error"]
 
         for k in task_metadata.keys():
             task_output = await self(k, TaskMessage(id=create_new_id(), content={}))
             initial_content.extend(task_output["content"])
 
+        logger.debug(
+            f"self.in_memory_subprocesses keys: {self.in_memory_subprocesses.keys()}"
+        )
         return task_metadata, error_msgs, initial_content
 
     def close(self):

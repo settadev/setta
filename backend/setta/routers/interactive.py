@@ -67,9 +67,12 @@ async def route_update_interactive_code(
         code_dict, p["importCodeBlocks"]
     )
     code_graph = []
+    project_config_id = x.project["projectConfig"]["id"]
     for section_id in top_node_ids:
         code_graph.append(
             {
+                "project_config_id": project_config_id,
+                "section_id": section_id,
                 "code": code_dict[section_id]["code"],
                 "imports": get_import_order_for_top_node(section_id, dependencies),
                 "module_name": create_in_memory_module_name(p, section_id),
