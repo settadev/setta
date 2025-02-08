@@ -92,7 +92,6 @@ class Tasks:
             task_output = await self(k, TaskMessage(id=create_new_id(), content={}))
             initial_content.extend(task_output["content"])
 
-        print("self.in_memory_subprocesses.keys()", self.in_memory_subprocesses.keys(), flush=True)
         return task_metadata, error_msgs, initial_content
 
     def close(self):

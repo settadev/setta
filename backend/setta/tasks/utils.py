@@ -60,6 +60,9 @@ class SettaInMemoryFnSubprocess:
         self.stdout_thread = threading.Thread(target=self.stdout_listener, daemon=True)
         self.stdout_thread.start()
 
+        if len(self.websockets) > 0:
+            self.start_stdout_processor_task()
+
     def _subprocess_main(self):
         """Main loop in subprocess that handles all requests"""
         # Initialize store for imported modules
