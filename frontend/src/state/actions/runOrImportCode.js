@@ -20,21 +20,27 @@ import { getSectionInfo, getSectionType } from "./sectionInfos";
 export async function importCodeBlocks(sectionIds, withSweep = false) {
   setNotificationMessage("Importing your code...");
   const project = await getProjectDataToGenerateCode({ includeDrawings: true });
-  project.runCodeBlocks = sectionIds;
-  const res = await dbImportCodeBlocks(project);
+  let projects = [];
+  if (withSweep) {
+    projects.push(...getProjectRuns(project));
+  } else {
+    project.runCodeBlocks = sectionIds;
+    projects.push(project);
+  }
+  const res = await dbImportCodeBlocks(projects);
   if (res.status === 200) {
-    for (const metadata of Object.values(res.data.metadata)) {
-      if (metadata.dependencies !== null) {
-        metadata.dependencies = new Set(
-          metadata.dependencies.map((d) => JSON.stringify(d)),
-        );
-      }
-    }
-    useInMemoryFn.setState((state) => ({
-      metadata: { ...state.metadata, ...res.data.metadata },
-    }));
-    await maybeGetNewArtifactIds(res.data.content);
-    await updateInteractiveArtifacts(res.data.content);
+    // for (const metadata of Object.values(res.data.metadata)) {
+    //   if (metadata.dependencies !== null) {
+    //     metadata.dependencies = new Set(
+    //       metadata.dependencies.map((d) => JSON.stringify(d)),
+    //     );
+    //   }
+    // }
+    // useInMemoryFn.setState((state) => ({
+    //   metadata: { ...state.metadata, ...res.data.metadata },
+    // }));
+    // await maybeGetNewArtifactIds(res.data.content);
+    // await updateInteractiveArtifacts(res.data.content);
     setNotificationMessage("Done importing");
   }
 }

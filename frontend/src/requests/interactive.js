@@ -4,9 +4,9 @@ import { getProjectData } from "state/actions/project/saveProject";
 import { getSectionType, getSectionVariant } from "state/actions/sectionInfos";
 import { post } from "./utils";
 
-export async function dbImportCodeBlocks(project) {
+export async function dbImportCodeBlocks(projects) {
   return await post({
-    body: { project },
+    body: { projects },
     address: C.ROUTE_UPDATE_INTERACTIVE_CODE,
   });
 }

@@ -24,7 +24,7 @@ router = APIRouter()
 
 
 class UpdateInteractiveCodeRequest(BaseModel):
-    project: dict
+    projects: list
 
 
 class FormatCodeRequest(BaseModel):
@@ -38,7 +38,11 @@ async def route_update_interactive_code(
     tasks=Depends(get_tasks),
     lsp_writers=Depends(get_lsp_writers),
 ):
-    p = x.project
+    for p in x.projects:
+        await update_interactive_code(p, tasks, lsp_writers)
+
+
+async def update_interactive_code(p, tasks, lsp_writers):
     exporter_obj = export_selected(
         p, always_export_args_objs=False, force_include_template_var=True
     )
@@ -67,7 +71,7 @@ async def route_update_interactive_code(
         code_dict, p["runCodeBlocks"]
     )
     code_graph = []
-    project_config_id = x.project["projectConfig"]["id"]
+    project_config_id = p["projectConfig"]["id"]
     for section_id in top_node_ids:
         code_graph.append(
             {

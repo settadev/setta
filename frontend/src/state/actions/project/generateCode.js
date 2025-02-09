@@ -7,6 +7,7 @@ import { sendMessage } from "requests/websocket";
 import {
   getSectionInfo,
   getSectionPathFullName,
+  getSectionType,
 } from "state/actions/sectionInfos";
 import {
   useEVRefRegex,
@@ -61,7 +62,7 @@ export async function getProjectDataToGenerateCode({
     const sections = {};
     for (const x of Object.values(sectionInfosState)) {
       const currSection = _.cloneDeep(x);
-      if (getSectionTypee(x.id) === C.DRAW) {
+      if (getSectionType(x.id) === C.DRAW) {
         currSection.drawing = await requestBase64FromCanvas(x.id);
       }
       sections[x.id] = currSection;
@@ -262,7 +263,6 @@ function* getProjectVariants(project, paramSweepSectionVariantIds) {
     yield project;
   }
 }
-
 
 // TODO: refine this logic. Has to be really clear what happens in each case.
 function getRunCodeBlocks(project, isRunGroup) {
