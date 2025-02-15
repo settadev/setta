@@ -142,7 +142,9 @@ class Tasks:
                 # TODO: store error message and display on frontend?
                 pass
 
-        all_dependencies = set.union(*sp_info["dependencies"].values())
+        all_dependencies = set()
+        for d in sp_info["dependencies"].values():
+            all_dependencies.update(d)
         initial_result = await self.call_in_memory_subprocess_fn(
             TaskMessage(id=create_new_id(), content={}), call_all=True
         )
