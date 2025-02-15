@@ -28,9 +28,7 @@ export async function formatCode() {
 export function sendToInteractiveTasks(sourceInfo, value) {
   const key = JSON.stringify(sourceInfo);
   const dependencies = useInMemoryFn.getState().dependencies;
-  console.log("sendToInteractiveTasks", dependencies);
   if (dependencies.has(null) || dependencies.has(key)) {
-    console.log("sending message");
     sendMessage({
       id: createNewId(),
       content: { [key]: value },

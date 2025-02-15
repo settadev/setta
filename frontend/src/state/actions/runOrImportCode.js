@@ -28,7 +28,6 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
     projects.push(project);
   }
   const res = await dbImportCodeBlocks(projects);
-  console.log("res", res);
   if (res.status === 200) {
     useInMemoryFn.setState({
       dependencies: new Set(

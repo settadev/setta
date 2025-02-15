@@ -14,6 +14,7 @@ from setta.code_gen.export_selected import (
     get_section_code,
     get_section_type,
 )
+from setta.code_gen.find_placeholders import parse_template_var
 from setta.tasks.fns.utils import replace_template_vars_with_random_names
 from setta.utils.constants import C
 from setta.utils.utils import multireplace
@@ -59,11 +60,11 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
     template_var_replacement_values = {}
     for variant in p["sectionVariants"].values():
         for t in variant["templateVars"]:
-            if not t["sectionId"]:
-                continue
-            template_var_replacement_values[
-                t["keyword"]
-            ] = create_in_memory_module_name(p, t["sectionId"])
+            _, keyword_type = parse_template_var(t["keyword"])
+            if t["sectionId"] and keyword_type == C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX:
+                template_var_replacement_values[
+                    t["keyword"]
+                ] = create_in_memory_module_name(p, t["sectionId"])
 
     code_dict = await generate_final_code_for_sections(
         p,
