@@ -138,23 +138,40 @@ class SettaInMemoryFnSubprocess:
 
     def close(self):
         try:
+            logger.debug("sending shutdown request")
             self.parent_conn.send({"type": "shutdown"})
-            self.process.join(timeout=1.0)
-        except:
-            pass
+            logger.debug("calling join()")
+            self.process.join(timeout=2)  # Add timeout to process join
 
-        if self.process.is_alive():
-            self.process.terminate()
-            self.process.join()
+            if self.process.is_alive():
+                logger.debug("process is alive, terminating")
+                self.process.terminate()
+                logger.debug("calling join again")
+                self.process.join(timeout=1)
+        except Exception as e:
+            logger.debug(f"Error during process shutdown: {e}")
 
-        # Close both sets of connections
+        # Set stop event before closing pipes
+        self.stop_event.set()
+
+        # Close all connections
+        logger.debug("closing parent_conn")
         self.parent_conn.close()
+        logger.debug("closing child_conn")
         self.child_conn.close()
+        logger.debug("closing stdout_parent_conn")
         self.stdout_parent_conn.close()
+        logger.debug("closing stdout_child_conn")
         self.stdout_child_conn.close()
 
-        self.stdout_thread.join()
+        logger.debug("calling stdout_thread.join()")
+        self.stdout_thread.join(timeout=2)  # Add timeout to thread join
+
+        if self.stdout_thread.is_alive():
+            logger.debug("stdout_thread is still alive after timeout")
+
         if self.stdout_processor_task:
+            logger.debug("calling stdout_processor_task.cancel()")
             self.stdout_processor_task.cancel()
 
     def process_message(self, fn_name, message, cache):
@@ -204,13 +221,19 @@ class SettaInMemoryFnSubprocess:
 
     def stdout_listener(self):
         while not self.stop_event.is_set():
-            try:
-                stdout_data = self.stdout_parent_conn.recv()
-                self.stdout_queue.put(stdout_data)  # simple put, no async needed
-            except Exception as e:
+            if self.stdout_parent_conn.poll(0.1):  # Check for data with timeout
+                try:
+                    stdout_data = self.stdout_parent_conn.recv()
+                    self.stdout_queue.put(stdout_data)
+                except EOFError:  # Pipe was closed
+                    break
+                except Exception as e:
+                    logger.debug(f"Error in stdout listener: {e}")
+                    if self.stop_event.is_set():
+                        break
+            else:  # No data available within timeout
                 if self.stop_event.is_set():
                     break
-                logger.debug(f"Error in stdout listener: {e}")
 
 
 def add_fns_from_module(fns_dict, module, module_name=None):
