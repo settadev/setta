@@ -22,8 +22,9 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
         module_name = f"setta_dynamic_module_{uuid.uuid4().hex}"
 
     # Add current directory to sys.path if it's not already there
-    if CWD not in sys.path:
-        sys.path.insert(0, CWD)
+    current_dir = str(CWD)
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
 
     spec = importlib.util.spec_from_loader(module_name, loader=None)
 
@@ -207,7 +208,7 @@ class SettaInMemoryFnSubprocess:
                 stdout_data = self.stdout_parent_conn.recv()
                 self.stdout_queue.put(stdout_data)  # simple put, no async needed
             except Exception as e:
-                if self._stop_event.is_set():
+                if self.stop_event.is_set():
                     break
                 logger.debug(f"Error in stdout listener: {e}")
 
