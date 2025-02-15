@@ -59,7 +59,6 @@ class Tasks:
     async def call_in_memory_subprocess_fn(
         self, message: TaskMessage, websocket_manager=None, call_all=False
     ):
-        print("message", message, flush=True)
         # Create a list of tasks to run concurrently
         tasks = []
         results = []
@@ -95,7 +94,6 @@ class Tasks:
             return {}
 
         content = []
-        print("results", results, flush=True)
         for r in results:
             if r["content"]:
                 content.extend(r["content"])
@@ -144,7 +142,6 @@ class Tasks:
                 # TODO: store error message and display on frontend?
                 pass
 
-        print(sp_info["dependencies"].values())
         all_dependencies = set.union(*sp_info["dependencies"].values())
         initial_result = await self.call_in_memory_subprocess_fn(
             TaskMessage(id=create_new_id(), content={}), call_all=True
