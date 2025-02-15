@@ -75,17 +75,34 @@ class LSPEventHandler(FileSystemEventHandler):
         self.callback = callback
         self.loop = loop
 
-    def on_any_event(self, event: FileSystemEvent):
+    def on_created(self, event: FileSystemEvent):
         if event.is_directory:
             return
+        changes = [{"uri": self._path_to_uri(event.src_path), "type": 1}]
+        self._send_changes(changes)
 
-        changes = [
-            {
-                "uri": self._path_to_uri(event.src_path),
-                "type": self._get_change_type(event),
-            }
-        ]
+    def on_modified(self, event: FileSystemEvent):
+        if event.is_directory:
+            return
+        changes = [{"uri": self._path_to_uri(event.src_path), "type": 2}]
+        self._send_changes(changes)
 
+    def on_deleted(self, event: FileSystemEvent):
+        if event.is_directory:
+            return
+        changes = [{"uri": self._path_to_uri(event.src_path), "type": 3}]
+        self._send_changes(changes)
+
+    def on_moved(self, event: FileSystemEvent):
+        if event.is_directory:
+            return
+        # Treat move as deletion of the old path and creation of the new path.
+        changes_del = [{"uri": self._path_to_uri(event.src_path), "type": 3}]
+        changes_cre = [{"uri": self._path_to_uri(event.dest_path), "type": 1}]
+        self._send_changes(changes_del)
+        self._send_changes(changes_cre)
+
+    def _send_changes(self, changes):
         if asyncio.iscoroutinefunction(self.callback):
             self.loop.call_soon_threadsafe(
                 lambda: self.loop.create_task(self.callback(changes))
@@ -94,20 +111,4 @@ class LSPEventHandler(FileSystemEventHandler):
             self.callback(changes)
 
     def _path_to_uri(self, path: str) -> str:
-        """Convert file path to URI format."""
         return Path(path).as_uri()
-
-    def _get_change_type(self, event: FileSystemEvent) -> int:
-        """
-        Convert watchdog event type to LSP change type.
-        1: Created
-        2: Changed
-        3: Deleted
-        """
-        if event.event_type == "created":
-            return 1
-        elif event.event_type == "modified":
-            return 2
-        elif event.event_type == "deleted":
-            return 3
-        return 2  # Default to changed

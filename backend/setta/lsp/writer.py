@@ -268,7 +268,7 @@ class LanguageServerWriter(LanguageServerInteractor):
         asyncio.create_task(async_task)
 
     def get_workspace_uri(self):
-        return f"file://{self.workspace_folder}".lower()
+        return f"file://{self.workspace_folder}"
 
     def get_base_uri(self, code_id):
         return self.code_folder / f"{code_id}.py"
@@ -277,7 +277,7 @@ class LanguageServerWriter(LanguageServerInteractor):
     def get_uri(self, code_id, virtual):
         base_uri = self.get_base_uri(code_id)
         prefix = "untitled:" if virtual else "file://"
-        uri = f"{prefix}{base_uri}".lower()
+        uri = f"{prefix}{base_uri}"
         if platform.system() == "Windows":
             uri += "/"  # need trailing slash on Windows for some reason
         return uri
