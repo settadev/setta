@@ -27,13 +27,15 @@ export async function formatCode() {
 
 export function sendToInteractiveTasks(sourceInfo, value) {
   const key = JSON.stringify(sourceInfo);
-  const content = { [key]: value };
-  for (const [fnName, metadata] of Object.entries(
-    useInMemoryFn.getState().metadata,
-  )) {
-    if (metadata.dependencies === null || metadata.dependencies.has(key)) {
-      sendMessage({ id: createNewId(), content, messageType: fnName });
-    }
+  const dependencies = useInMemoryFn.getState().dependencies;
+  console.log("sendToInteractiveTasks", dependencies);
+  if (dependencies.has(null) || dependencies.has(key)) {
+    console.log("sending message");
+    sendMessage({
+      id: createNewId(),
+      content: { [key]: value },
+      messageType: "inMemoryFn",
+    });
   }
 }
 

@@ -43,7 +43,9 @@ class WebsocketManager:
             if wid == self.server_cli_id:
                 # process task and send any results back to requester
                 result = await tasks(
-                    message["messageType"], TaskMessage.parse_obj(message)
+                    message["messageType"],
+                    TaskMessage.parse_obj(message),
+                    websocket_manager=self,
                 )
                 if "content" in result:
                     websocket = self.sockets[fromWebsocketId]["websocket"]
@@ -64,10 +66,13 @@ class WebsocketManager:
         if "location" in message:
             self.sockets[fromWebsocketId]["location"] = message["location"]
 
-    async def send_message_to_requester(self, id, content):
+    async def send_message_to_requester(self, id, content, messageType=None):
         # just send data to target websocket
         websocket = self.sockets[self.message_id_to_sender_id[id]]["websocket"]
-        await websocket.send_text(json.dumps({"id": id, "content": content}))
+        return_val = {"id": id, "content": content}
+        if messageType:
+            return_val["messageType"] = messageType
+        await websocket.send_text(json.dumps(return_val))
 
     async def send_message_to_location(self, content, messageType, location):
         for w in self.sockets.values():

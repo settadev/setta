@@ -28,19 +28,15 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
     projects.push(project);
   }
   const res = await dbImportCodeBlocks(projects);
+  console.log("res", res);
   if (res.status === 200) {
-    // for (const metadata of Object.values(res.data.metadata)) {
-    //   if (metadata.dependencies !== null) {
-    //     metadata.dependencies = new Set(
-    //       metadata.dependencies.map((d) => JSON.stringify(d)),
-    //     );
-    //   }
-    // }
-    // useInMemoryFn.setState((state) => ({
-    //   metadata: { ...state.metadata, ...res.data.metadata },
-    // }));
-    // await maybeGetNewArtifactIds(res.data.content);
-    // await updateInteractiveArtifacts(res.data.content);
+    useInMemoryFn.setState({
+      dependencies: new Set(
+        res.data.dependencies.map((d) => (d === null ? d : JSON.stringify(d))),
+      ),
+    });
+    await maybeGetNewArtifactIds(res.data.content);
+    await updateInteractiveArtifacts(res.data.content);
     setNotificationMessage("Done importing");
   }
 }
@@ -79,8 +75,12 @@ export async function runOrImportAllCode() {
 
 export function runOrImportActiveCode() {
   const { inMemory, asSubprocess } = getInMemoryAndAsSubprocessCodeBlocks(true);
-  importCodeBlocks(inMemory);
-  runCodeBlocks(asSubprocess);
+  if (inMemory.length > 0) {
+    importCodeBlocks(inMemory);
+  }
+  if (asSubprocess.length > 0) {
+    runCodeBlocks(asSubprocess);
+  }
 }
 
 function getInMemoryAndAsSubprocessCodeBlocks(onlyActiveSections = false) {

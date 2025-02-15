@@ -38,11 +38,19 @@ async def route_update_interactive_code(
     tasks=Depends(get_tasks),
     lsp_writers=Depends(get_lsp_writers),
 ):
+    idx = 0
+    dependencies = set()
+    content = []
     for p in x.projects:
-        await update_interactive_code(p, tasks, lsp_writers)
+        result = await update_interactive_code(p, tasks, lsp_writers, idx)
+        dependencies.update(result["dependencies"])
+        content.extend(result["content"])
+        idx += 1
+    dependencies = list(dependencies)
+    return {"dependencies": dependencies, "content": content}
 
 
-async def update_interactive_code(p, tasks, lsp_writers):
+async def update_interactive_code(p, tasks, lsp_writers, idx):
     exporter_obj = export_selected(
         p, always_export_args_objs=False, force_include_template_var=True
     )
@@ -67,7 +75,7 @@ async def update_interactive_code(p, tasks, lsp_writers):
         template_var_replacement_values=template_var_replacement_values,
     )
 
-    top_node_ids, dependencies = prune_and_find_top_nodes(
+    top_node_ids, section_dependencies = prune_and_find_top_nodes(
         code_dict, p["runCodeBlocks"]
     )
     code_graph = []
@@ -75,19 +83,21 @@ async def update_interactive_code(p, tasks, lsp_writers):
     for section_id in top_node_ids:
         code_graph.append(
             {
-                "project_config_id": project_config_id,
-                "section_id": section_id,
+                "subprocess_key": f"{project_config_id}-{section_id}-{idx}",
                 "code": code_dict[section_id]["code"],
-                "imports": get_import_order_for_top_node(section_id, dependencies),
+                "imports": get_import_order_for_top_node(
+                    section_id, section_dependencies
+                ),
                 "module_name": create_in_memory_module_name(p, section_id),
             }
         )
 
-    metadata, error_msgs, content = await tasks.add_custom_fns(
+    dependencies, content = await tasks.add_custom_fns(
         code_graph,
         to_cache=exporter_obj_in_memory,
     )
-    return {"metadata": metadata, "errorMsgs": error_msgs, "content": content}
+
+    return {"dependencies": dependencies, "content": content}
 
 
 @router.post(C.ROUTE_FORMAT_CODE)

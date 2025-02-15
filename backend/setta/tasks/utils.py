@@ -22,9 +22,8 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
         module_name = f"setta_dynamic_module_{uuid.uuid4().hex}"
 
     # Add current directory to sys.path if it's not already there
-    current_dir = CWD
-    if current_dir not in sys.path:
-        sys.path.insert(0, current_dir)
+    if CWD not in sys.path:
+        sys.path.insert(0, CWD)
 
     spec = importlib.util.spec_from_loader(module_name, loader=None)
 
@@ -233,11 +232,11 @@ def add_fns_from_module(fns_dict, module, module_name=None):
 def get_task_metadata(in_memory_fn, exporter_obj):
     # None means run the task on every change
     if in_memory_fn.dependencies is None:
-        dependencies = None
+        dependencies = set([None])
     # Empty array means only run when the task imported.
     # Non-empty array means run when specified dependencies update.
     else:
-        dependencies = [
+        dependencies = set(
             exporter_obj.var_name_reverse_mapping[d] for d in in_memory_fn.dependencies
-        ]
-    return {"dependencies": dependencies}
+        )
+    return dependencies

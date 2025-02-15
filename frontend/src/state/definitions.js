@@ -69,7 +69,7 @@ export const useHomePageSearch = create(
 
 export const useInMemoryFn = create(
   withResetFn(() => ({
-    metadata: {},
+    dependencies: new Set(),
   })),
 );
 
