@@ -138,15 +138,13 @@ class SettaInMemoryFnSubprocess:
 
     def close(self):
         try:
-            logger.debug("sending shutdown request")
+            logger.debug("Initiating shutdown sequence")
             self.parent_conn.send({"type": "shutdown"})
-            logger.debug("calling join()")
             self.process.join(timeout=2)  # Add timeout to process join
 
             if self.process.is_alive():
-                logger.debug("process is alive, terminating")
+                logger.debug("Process still alive after timeout, forcing termination")
                 self.process.terminate()
-                logger.debug("calling join again")
                 self.process.join(timeout=1)
         except Exception as e:
             logger.debug(f"Error during process shutdown: {e}")
@@ -155,23 +153,20 @@ class SettaInMemoryFnSubprocess:
         self.stop_event.set()
 
         # Close all connections
-        logger.debug("closing parent_conn")
-        self.parent_conn.close()
-        logger.debug("closing child_conn")
-        self.child_conn.close()
-        logger.debug("closing stdout_parent_conn")
-        self.stdout_parent_conn.close()
-        logger.debug("closing stdout_child_conn")
-        self.stdout_child_conn.close()
+        for conn in [
+            self.parent_conn,
+            self.child_conn,
+            self.stdout_parent_conn,
+            self.stdout_child_conn,
+        ]:
+            conn.close()
 
-        logger.debug("calling stdout_thread.join()")
         self.stdout_thread.join(timeout=2)  # Add timeout to thread join
 
         if self.stdout_thread.is_alive():
-            logger.debug("stdout_thread is still alive after timeout")
+            logger.debug("Stdout thread failed to terminate within timeout")
 
         if self.stdout_processor_task:
-            logger.debug("calling stdout_processor_task.cancel()")
             self.stdout_processor_task.cancel()
 
     def process_message(self, fn_name, message, cache):
