@@ -122,8 +122,8 @@ class Tasks:
                 await self.maybe_send_latest_run_time_info(
                     subprocess_key, fn_name, msg_id, websocket_manager
                 )
-        else:
-            results.append(result)
+            else:
+                results.append(result)
 
     async def add_custom_fns(self, code_graph, to_cache):
         for c in code_graph:
