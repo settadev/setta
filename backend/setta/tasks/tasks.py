@@ -114,12 +114,16 @@ class Tasks:
             self.update_average_subprocess_fn_time(
                 subprocess_key, fn_name, elapsed_time
             )
-            if websocket_manager is not None and result["content"]:
-                await websocket_manager.send_message_to_requester(
-                    msg_id, result["content"], result["messageType"]
+            if websocket_manager is not None:
+                if result["content"]:
+                    await websocket_manager.send_message_to_requester(
+                        msg_id, result["content"], result["messageType"]
+                    )
+                await self.maybe_send_latest_run_time_info(
+                    subprocess_key, fn_name, msg_id, websocket_manager
                 )
-            else:
-                results.append(result)
+        else:
+            results.append(result)
 
     async def add_custom_fns(self, code_graph, to_cache):
         for c in code_graph:
@@ -153,6 +157,7 @@ class Tasks:
                             "dependencies": set(),
                             "averageRunTime": None,
                             "callCount": 0,
+                            "lastStatsUpdate": time.time(),
                         }
                     fnInfo[k]["dependencies"].update(v)
             else:
@@ -184,6 +189,19 @@ class Tasks:
         )
         fnInfo["averageRunTime"] = new_avg
         fnInfo["callCount"] += 1
+        fnInfo["lastStatsUpdate"] = time.time()
+
+    async def maybe_send_latest_run_time_info(
+        self, subprocess_key, fn_name, msg_id, websocket_manager
+    ):
+        fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"][fn_name]
+        if fnInfo["callCount"] % 10 == 0 or (
+            fnInfo["lastStatsUpdate"] and (time.time() - fnInfo["lastStatsUpdate"]) > 10
+        ):
+            newInfo = self.getInMemorySubprocessInfo()
+            await websocket_manager.send_message_to_requester(
+                msg_id, newInfo, C.WS_IN_MEMORY_FN_AVG_RUN_TIME
+            )
 
     def getInMemorySubprocessInfo(self):
         output = {}
