@@ -25,13 +25,13 @@ export async function formatCode() {
   }
 }
 
-export function sendToInteractiveTasks(sourceInfo, value) {
+export function sendToInteractiveTasks(sourceInfo, value, valueCallback) {
   const key = JSON.stringify(sourceInfo);
   const { throttledSendFns } = useInMemoryFn.getState();
   if (key in throttledSendFns) {
-    throttledSendFns[key](key, value);
+    throttledSendFns[key](key, value, valueCallback);
   } else if (null in throttledSendFns) {
-    throttledSendFns[null](key, value);
+    throttledSendFns[null](key, value, valueCallback);
   }
 }
 
@@ -146,10 +146,10 @@ function getNewThrottledSendFns(inMemorySubprocessInfo) {
         // key is usually the same as d, except when d is null.
         // So we have to pass key to the throttled function
         newThrottledSendFns[d] = _.throttle(
-          (key, value) => {
+          (key, value, valueCallback) => {
             sendMessage({
               id: createNewId(),
-              content: { [key]: value },
+              content: { [key]: valueCallback ? valueCallback() : value },
               messageType: "inMemoryFn",
             });
           },
