@@ -126,13 +126,14 @@ class Tasks:
             subprocess_key = c["subprocess_key"]
             module_name = c["module_name"]
             sp = self.in_memory_subprocesses.get(subprocess_key, {}).get("subprocess")
-            if not sp:
-                logger.debug(f"Creating new subprocess for {module_name}")
-                sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
-                self.in_memory_subprocesses[subprocess_key] = {
-                    "subprocess": sp,
-                    "fnInfo": {},
-                }
+            if sp:
+                sp.close()
+            logger.debug(f"Creating new subprocess for {module_name}")
+            sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
+            self.in_memory_subprocesses[subprocess_key] = {
+                "subprocess": sp,
+                "fnInfo": {},
+            }
 
             sp.parent_conn.send(
                 {

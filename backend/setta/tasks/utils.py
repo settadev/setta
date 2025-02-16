@@ -53,7 +53,8 @@ class SettaInMemoryFnSubprocess:
         self.process.daemon = True  # Ensure process dies with parent
         self.process.start()
 
-        self.stop_event = stop_event
+        self.stop_event = asyncio.Event()
+        self.tasks_stop_event = stop_event
         self.websockets = websockets
         self.stdout_queue = queue.Queue()
         self.stdout_processor_task = None
@@ -195,9 +196,9 @@ class SettaInMemoryFnSubprocess:
             self.stdout_processor_task = None
 
     async def process_stdout_queue(self):
-        while not self.stop_event.is_set():
+        while not self.should_stop():
             try:
-                if self.stop_event.is_set():
+                if self.should_stop():
                     break
                 if len(self.websockets) > 0:
                     stdout_data = self.stdout_queue.get_nowait()
@@ -210,12 +211,12 @@ class SettaInMemoryFnSubprocess:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                if self.stop_event.is_set():
+                if self.should_stop():
                     break
                 logger.debug(f"Error processing stdout: {e}")
 
     def stdout_listener(self):
-        while not self.stop_event.is_set():
+        while not self.should_stop():
             if self.stdout_parent_conn.poll(0.1):  # Check for data with timeout
                 try:
                     stdout_data = self.stdout_parent_conn.recv()
@@ -224,11 +225,14 @@ class SettaInMemoryFnSubprocess:
                     break
                 except Exception as e:
                     logger.debug(f"Error in stdout listener: {e}")
-                    if self.stop_event.is_set():
+                    if self.should_stop():
                         break
             else:  # No data available within timeout
-                if self.stop_event.is_set():
+                if self.should_stop():
                     break
+
+    def should_stop(self):
+        return self.stop_event.is_set() or self.tasks_stop_event.is_set()
 
 
 def add_fns_from_module(fns_dict, module, module_name=None):
