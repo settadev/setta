@@ -59,13 +59,19 @@ class Tasks:
         return result
 
     async def call_in_memory_subprocess_fn(
-        self, message: TaskMessage, websocket_manager=None, call_all=False
+        self,
+        message: TaskMessage,
+        websocket_manager=None,
+        call_all=False,
+        subprocess_key=None,
     ):
         # Create a list of tasks to run concurrently
         tasks = []
         results = []
 
         for sp_key, sp_info in self.in_memory_subprocesses.items():
+            if subprocess_key and sp_key != subprocess_key:
+                continue
             for fn_name, fnInfo in sp_info["fnInfo"].items():
                 if (
                     call_all
@@ -165,7 +171,9 @@ class Tasks:
                 pass
 
         initial_result = await self.call_in_memory_subprocess_fn(
-            TaskMessage(id=create_new_id(), content={}), call_all=True
+            TaskMessage(id=create_new_id(), content={}),
+            call_all=True,
+            subprocess_key=subprocess_key,
         )
 
         logger.debug(
