@@ -1,12 +1,9 @@
 import C from "constants/constants.json";
 import { dbImportCodeBlocks } from "requests/interactive";
-import {
-  useActiveSection,
-  useInMemoryFn,
-  useSectionInfos,
-} from "state/definitions";
+import { useActiveSection, useSectionInfos } from "state/definitions";
 import {
   maybeGetNewArtifactIds,
+  updateInMemorySubprocessInfo,
   updateInteractiveArtifacts,
 } from "./interactive";
 import { setNotificationMessage } from "./notification";
@@ -29,11 +26,7 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
   }
   const res = await dbImportCodeBlocks(projects);
   if (res.status === 200) {
-    useInMemoryFn.setState({
-      dependencies: new Set(
-        res.data.dependencies.map((d) => (d === null ? d : JSON.stringify(d))),
-      ),
-    });
+    updateInMemorySubprocessInfo(res.data.inMemorySubprocessInfo);
     await maybeGetNewArtifactIds(res.data.content);
     await updateInteractiveArtifacts(res.data.content);
     setNotificationMessage("Done importing");

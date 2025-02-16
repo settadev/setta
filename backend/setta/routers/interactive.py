@@ -40,15 +40,14 @@ async def route_update_interactive_code(
     lsp_writers=Depends(get_lsp_writers),
 ):
     idx = 0
-    dependencies = set()
     content = []
     for p in x.projects:
-        result = await update_interactive_code(p, tasks, lsp_writers, idx)
-        dependencies.update(result["dependencies"])
-        content.extend(result["content"])
+        initialContent = await update_interactive_code(p, tasks, lsp_writers, idx)
+        content.extend(initialContent)
         idx += 1
-    dependencies = list(dependencies)
-    return {"dependencies": dependencies, "content": content}
+
+    inMemorySubprocessInfo = tasks.getInMemorySubprocessInfo()
+    return {"inMemorySubprocessInfo": inMemorySubprocessInfo, "content": content}
 
 
 async def update_interactive_code(p, tasks, lsp_writers, idx):
@@ -93,12 +92,12 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
             }
         )
 
-    dependencies, content = await tasks.add_custom_fns(
+    initialContent = await tasks.add_custom_fns(
         code_graph,
         to_cache=exporter_obj_in_memory,
     )
 
-    return {"dependencies": dependencies, "content": content}
+    return initialContent
 
 
 @router.post(C.ROUTE_FORMAT_CODE)

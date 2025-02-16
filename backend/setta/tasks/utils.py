@@ -99,15 +99,15 @@ class SettaInMemoryFnSubprocess:
                     # Import and store module
                     module = import_code_from_string(code, module_name)
                     added_fn_names = add_fns_from_module(fns_dict, module, module_name)
-                    task_metadata = {}
+                    dependencies = {}
                     for k in added_fn_names:
                         cache[k] = msg["to_cache"]
-                        task_metadata[k] = get_task_metadata(fns_dict[k], cache[k])
+                        dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
 
                     self.child_conn.send(
                         {
                             "status": "success",
-                            "content": task_metadata,
+                            "content": dependencies,
                         }
                     )
 

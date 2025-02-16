@@ -1,5 +1,7 @@
 import asyncio
+import copy
 import logging
+import time
 from typing import Dict
 
 from setta.database.utils import create_new_id
@@ -63,12 +65,12 @@ class Tasks:
         tasks = []
         results = []
 
-        for sp_info in self.in_memory_subprocesses.values():
-            for fn_name, dependencies in sp_info["dependencies"].items():
+        for sp_key, sp_info in self.in_memory_subprocesses.items():
+            for fn_name, fnInfo in sp_info["fnInfo"].items():
                 if (
                     call_all
-                    or None in dependencies
-                    or any(k in dependencies for k in message.content.keys())
+                    or None in fnInfo["dependencies"]
+                    or any(k in fnInfo["dependencies"] for k in message.content.keys())
                 ):
                     # Send message to subprocess
                     sp_info["subprocess"].parent_conn.send(
@@ -78,6 +80,8 @@ class Tasks:
                     # Create task for receiving response
                     task = asyncio.create_task(
                         self._handle_subprocess_response(
+                            sp_key,
+                            fn_name,
                             message.id,
                             sp_info["subprocess"].parent_conn.recv,
                             websocket_manager,
@@ -100,11 +104,16 @@ class Tasks:
         return {"content": content, "messageType": C.WS_IN_MEMORY_FN_RETURN}
 
     async def _handle_subprocess_response(
-        self, msg_id, recv_fn, websocket_manager, results
+        self, subprocess_key, fn_name, msg_id, recv_fn, websocket_manager, results
     ):
         # Run the receive function in a thread
+        start_time = time.perf_counter()
         result = await self.task_runner.run(recv_fn, [], RunType.THREAD)
+        elapsed_time = time.perf_counter() - start_time
         if result["status"] == "success":
+            self.update_average_subprocess_fn_time(
+                subprocess_key, fn_name, elapsed_time
+            )
             if websocket_manager is not None and result["content"]:
                 await websocket_manager.send_message_to_requester(
                     msg_id, result["content"], result["messageType"]
@@ -122,7 +131,7 @@ class Tasks:
                 sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
                 self.in_memory_subprocesses[subprocess_key] = {
                     "subprocess": sp,
-                    "dependencies": {},
+                    "fnInfo": {},
                 }
 
             sp.parent_conn.send(
@@ -134,17 +143,21 @@ class Tasks:
                 }
             )
             result = await self.task_runner.run(sp.parent_conn.recv, [], RunType.THREAD)
-            sp_info = self.in_memory_subprocesses[subprocess_key]
+            fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"]
 
             if result["status"] == "success":
-                sp_info["dependencies"].update(result["content"])
+                for k, v in result["content"].items():
+                    if k not in fnInfo:
+                        fnInfo[k] = {
+                            "dependencies": set(),
+                            "averageRunTime": None,
+                            "callCount": 0,
+                        }
+                    fnInfo[k]["dependencies"].update(v)
             else:
                 # TODO: store error message and display on frontend?
                 pass
 
-        all_dependencies = set()
-        for d in sp_info["dependencies"].values():
-            all_dependencies.update(d)
         initial_result = await self.call_in_memory_subprocess_fn(
             TaskMessage(id=create_new_id(), content={}), call_all=True
         )
@@ -153,9 +166,28 @@ class Tasks:
             f"self.in_memory_subprocesses keys: {self.in_memory_subprocesses.keys()}"
         )
 
-        return all_dependencies, initial_result["content"]
+        return initial_result["content"]
 
     def close(self):
         self.stop_event.set()
         for v in self.in_memory_subprocesses.values():
             v["subprocess"].close()
+
+    def update_average_subprocess_fn_time(self, subprocess_key, fn_name, new_time):
+        fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"][fn_name]
+        current_avg = fnInfo["averageRunTime"]
+        new_avg = (
+            new_time
+            if current_avg is None
+            else ((0.9) * current_avg) + (0.1 * new_time)
+        )
+        fnInfo["averageRunTime"] = new_avg
+        fnInfo["callCount"] += 1
+
+    def getInMemorySubprocessInfo(self):
+        output = {}
+        for sp_key, sp_info in self.in_memory_subprocesses.items():
+            output[sp_key] = {"fnInfo": copy.deepcopy(sp_info["fnInfo"])}
+            for fnInfo in output[sp_key]["fnInfo"].values():
+                fnInfo["dependencies"] = list(fnInfo["dependencies"])
+        return output

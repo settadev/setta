@@ -69,7 +69,8 @@ export const useHomePageSearch = create(
 
 export const useInMemoryFn = create(
   withResetFn(() => ({
-    dependencies: new Set(),
+    inMemorySubprocessInfo: {},
+    throttledSendFns: {},
   })),
 );
 
