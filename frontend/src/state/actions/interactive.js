@@ -27,13 +27,11 @@ export async function formatCode() {
 
 export function sendToInteractiveTasks(sourceInfo, value) {
   const key = JSON.stringify(sourceInfo);
-  const dependencies = useInMemoryFn.getState().dependencies;
-  if (dependencies.has(null) || dependencies.has(key)) {
-    sendMessage({
-      id: createNewId(),
-      content: { [key]: value },
-      messageType: "inMemoryFn",
-    });
+  const { throttledSendFns } = useInMemoryFn.getState();
+  if (key in throttledSendFns) {
+    throttledSendFns[key](value);
+  } else if (null in throttledSendFns) {
+    throttledSendFns[null](value);
   }
 }
 
@@ -109,36 +107,8 @@ export async function updateInteractiveArtifacts(artifacts) {
 // }
 
 export function updateInMemorySubprocessInfo(inMemorySubprocessInfo) {
-  const newInfo = _.cloneDeep(inMemorySubprocessInfo);
-  const newThrottledSendFns = {};
-  // convert dependencies to Sets
-  for (const subprocessInfo of Object.values(newInfo)) {
-    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
-      const newDependencies = new Set();
-      for (const d of fnInfo.dependencies) {
-        const stringD = d === null ? d : JSON.stringify(d);
-        newDependencies.add(stringD);
-      }
-      fnInfo.dependencies = newDependencies;
-    }
-  }
-
-  for (const subprocessInfo of Object.values(newInfo)) {
-    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
-      for (const d of fnInfo.dependencies) {
-        newThrottledSendFns[d] = _.throttle(
-          (value) => {
-            sendMessage({
-              id: createNewId(),
-              content: { [d]: value },
-              messageType: "inMemoryFn",
-            });
-          },
-          getThrottleDelay(newInfo, d),
-        );
-      }
-    }
-  }
+  const newInfo = getNewInMemorySubprocessInfo(inMemorySubprocessInfo);
+  const newThrottledSendFns = getNewThrottledSendFns(newInfo);
 
   for (const fn of Object.values(useInMemoryFn.getState().throttledSendFns)) {
     fn.cancel();
@@ -152,8 +122,47 @@ export function updateInMemorySubprocessInfo(inMemorySubprocessInfo) {
   console.log(useInMemoryFn.getState());
 }
 
-function getThrottleDelay(inMemorySubprocessInfo, sourceInfo) {
-  const key = JSON.stringify(sourceInfo);
+function getNewInMemorySubprocessInfo(inMemorySubprocessInfo) {
+  const newInfo = _.cloneDeep(inMemorySubprocessInfo);
+
+  // convert dependencies to Sets
+  for (const subprocessInfo of Object.values(newInfo)) {
+    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
+      const newDependencies = new Set();
+      for (const d of fnInfo.dependencies) {
+        const stringD = d === null ? d : JSON.stringify(d);
+        newDependencies.add(stringD);
+      }
+      fnInfo.dependencies = newDependencies;
+    }
+  }
+
+  return newInfo;
+}
+
+function getNewThrottledSendFns(inMemorySubprocessInfo) {
+  const newThrottledSendFns = {};
+  for (const subprocessInfo of Object.values(inMemorySubprocessInfo)) {
+    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
+      for (const d of fnInfo.dependencies) {
+        newThrottledSendFns[d] = _.throttle(
+          (value) => {
+            sendMessage({
+              id: createNewId(),
+              content: { [d]: value },
+              messageType: "inMemoryFn",
+            });
+          },
+          getThrottleDelay(inMemorySubprocessInfo, d),
+        );
+      }
+    }
+  }
+
+  return newThrottledSendFns;
+}
+
+function getThrottleDelay(inMemorySubprocessInfo, key) {
   let maxRunTime = 0;
 
   for (const subprocessInfo of Object.values(inMemorySubprocessInfo)) {
