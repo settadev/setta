@@ -4,7 +4,7 @@
 
 # Python Without The Donkeywork
 
-https://github.com/user-attachments/assets/7ea291fa-4d50-4395-bb2b-ee9a2877ab98
+https://github.com/user-attachments/assets/82669be0-3e29-409d-ac91-fd6a1ec1bd9a
 
 ## What does Setta do?
 Setta enables you to:
