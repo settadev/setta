@@ -118,8 +118,6 @@ export function updateInMemorySubprocessInfo(inMemorySubprocessInfo) {
     inMemorySubprocessInfo: newInfo,
     throttledSendFns: newThrottledSendFns,
   });
-
-  console.log(useInMemoryFn.getState());
 }
 
 function getNewInMemorySubprocessInfo(inMemorySubprocessInfo) {
@@ -176,8 +174,6 @@ function getThrottleDelay(inMemorySubprocessInfo, key) {
       }
     }
   }
-
-  console.log("maxRunTime", maxRunTime);
 
   // maxRunTime is in seconds
   return Math.max(maxRunTime * 1000, 50); // Minimum 50ms throttle
