@@ -177,5 +177,6 @@ function getThrottleDelay(inMemorySubprocessInfo, key) {
 
   console.log("maxRunTime", maxRunTime);
 
-  return Math.max(maxRunTime, 50); // Minimum 50ms throttle
+  // maxRunTime is in seconds
+  return Math.max(maxRunTime * 1000, 50); // Minimum 50ms throttle
 }
