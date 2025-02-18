@@ -10,11 +10,11 @@ import {
   getInverseTransform,
   getXY,
   RESIZE_HANDLE_SIZE,
+  sendDrawingToInteractiveTasks,
   setGlobalArtifactTransformsAndDrawAllLayers,
   setGlobalBrushStrokesAndDrawAllLayers,
   startNewEraserStroke,
   startNewStroke,
-  sendDrawingToInteractiveTasks,
 } from "./canvasUtils";
 import { filterEraserPath } from "./eraserIntersection";
 import {

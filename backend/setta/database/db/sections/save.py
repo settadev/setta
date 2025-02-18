@@ -110,14 +110,14 @@ def save_sections(db, sections, section_variants):
     query = """
         UPDATE ArtifactGroupId
         SET originSectionId = :sectionId
-        WHERE id = :artifactId
+        WHERE id = :artifactGroupId
     """
     for s in sections.values():
         for a in s["artifactGroupIds"]:
             query_params.append(
                 {
                     "sectionId": s["id"],
-                    "artifactId": a,
+                    "artifactGroupId": a,
                 }
             )
     db.executemany(query, query_params)
