@@ -64,15 +64,13 @@ export async function prepareDataURLForRendering(type, value) {
 export function getArtifactStateForSaving() {
   const result = {};
 
-  for (const [key, value] of Object.entries(useArtifacts.getState().x)) {
-    if (typeof value !== "function") {
-      result[key] = value;
-    }
-  }
-
-  for (const artifact of Object.values(result)) {
-    if (artifact.type === "img" && artifact.value instanceof Image) {
-      artifact.value = dataURLToBase64(artifact.value.src);
+  for (const [id, artifact] of Object.entries(useArtifacts.getState().x)) {
+    if (typeof artifact === "function") {
+      continue;
+    } else if (artifact.type === "img" && artifact.value instanceof Image) {
+      result[id] = { ...artifact, value: dataURLToBase64(artifact.value.src) };
+    } else {
+      result[id] = artifact;
     }
   }
 
