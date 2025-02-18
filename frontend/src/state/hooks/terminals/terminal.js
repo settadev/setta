@@ -3,12 +3,14 @@ import _ from "lodash";
 import { useEffect, useRef } from "react";
 import { dbGetExistingTerminals } from "requests/terminals";
 import { pseudoTemplatedStr } from "requests/utils";
+import { setSectionVariantChildren } from "state/actions/sectionInfos";
 import {
-  addChild,
   addSectionInEmptySpace,
+  createSectionInfo,
 } from "state/actions/sections/createSections";
+import { maybeIncrementProjectStateVersion } from "state/actions/undo";
 import { useProjectConfig, useSectionInfos } from "state/definitions";
-import { URLS } from "utils/constants";
+import { BASE_UI_TYPE_IDS, URLS } from "utils/constants";
 import { createNewId } from "utils/idNameCreation";
 import { Terminal } from "xterm";
 import { AttachAddon } from "xterm-addon-attach";
@@ -166,33 +168,52 @@ export async function restoreTerminals() {
     if (terminalsWithoutSections.length === 0) {
       return;
     }
-    const groupId = addSectionInEmptySpace({
-      type: C.GROUP,
-      sectionProps: {
-        name: getRestoredTerminalsGroupName(),
-        isTemporary: terminalsWithoutSections.every((x) => x.isTemporary),
-      },
+    useSectionInfos.setState((state) => {
+      const groupId = maybeCreateTemporaryTerminalGroup(state);
+      for (const terminalInfo of terminalsWithoutSections) {
+        createTemporaryTerminal(terminalInfo.id, groupId, state);
+      }
     });
-    for (const terminalInfo of terminalsWithoutSections) {
-      addChild({
-        id: terminalInfo.id,
-        parentId: groupId,
-        type: C.TERMINAL,
-        sectionProps: {
-          isTemporary: terminalInfo.isTemporary,
-        },
-      });
-    }
+    maybeIncrementProjectStateVersion(true);
   }
 }
 
-function getRestoredTerminalsGroupName() {
-  const baseName = "Restored Terminals";
-  const numExisting = _.size(
-    _.pickBy(useSectionInfos.getState().x, (s) => s.name.startsWith(baseName)),
-  );
-  if (numExisting === 0) {
-    return baseName;
+export function createTemporaryTerminal(id, groupId, state) {
+  createSectionInfo({
+    sectionProps: {
+      id,
+      parentId: groupId,
+      uiTypeId: BASE_UI_TYPE_IDS[C.TERMINAL],
+      isTemporary: true,
+    },
+    state,
+  });
+  setSectionVariantChildren(groupId, (x) => [...x, id], state);
+}
+
+export function maybeCreateTemporaryTerminalGroup(state) {
+  let groupId = state.singletonSections.temporaryTerminalGroup;
+  if (!groupId) {
+    groupId = addSectionInEmptySpace({
+      type: C.GROUP,
+      sectionProps: {
+        name: getTemporaryTerminalsGroupName(),
+        isTemporary: true,
+      },
+      state,
+    });
   }
-  return `${baseName} ${numExisting + 1}`;
+  return groupId;
+}
+
+function getTemporaryTerminalsGroupName() {
+  const baseName = "Temporary Terminals";
+  const existingNames = _.map(useSectionInfos.getState().x, (s) => s.name);
+  let name = baseName;
+
+  while (existingNames.includes(name)) {
+    name = `${baseName} ${createRandomName()}`;
+  }
+
+  return name;
 }

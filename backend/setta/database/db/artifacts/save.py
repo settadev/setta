@@ -35,23 +35,28 @@ def save_artifacts(db, artifacts):
     db.executemany(query, query_params)
 
 
-def save_artifact_groups(db, artifact_groups):
+def save_artifact_groups(db, artifact_groups, sections):
     query = """
-        INSERT INTO ArtifactGroupId (id, name, data)
-        VALUES (:id, :name, :data)
+        INSERT INTO ArtifactGroupId (id, name, data, "order")
+        VALUES (:id, :name, :data, :order)
         ON CONFLICT (id)
         DO UPDATE SET
         name = :name,
-        data = :data
+        data = :data,
+        "order" = :order
     """
     query_params = []
     for k, group in artifact_groups.items():
+        order = get_artifact_group_idx(k, sections)
+        if order is None:
+            continue
         data_keys = group.keys() - {"name", "artifactTransforms"}
         query_params.append(
             {
                 "id": k,
                 "name": group["name"],
                 "data": json.dumps(filter_dict(group, data_keys)),
+                "order": order,
             }
         )
     db.executemany(query, query_params)
@@ -83,3 +88,14 @@ def save_artifact_groups(db, artifact_groups):
             )
 
     db.executemany(query, query_params)
+
+
+def get_artifact_group_idx(artifact_group_id, sections):
+    for section in sections.values():
+        try:
+            if "artifactGroupIds" in section:
+                idx = section["artifactGroupIds"].index(artifact_group_id)
+                return idx
+        except ValueError:
+            continue
+    return None

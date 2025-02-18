@@ -147,4 +147,4 @@ class LanguageServerInteractor:
         return obj["version"]
 
     def get_code_metadata(self, uri):
-        return self.code_metadata[uri.lower()]
+        return self.code_metadata[uri]

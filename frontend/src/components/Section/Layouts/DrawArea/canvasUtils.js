@@ -423,9 +423,9 @@ function maybeGetImgSizeFromArtifact(artifact) {
   return null;
 }
 
-export const throttledSendDrawingToInteractiveTasks = _.throttle(
+export const sendDrawingToInteractiveTasks = _.throttle(
   (sectionId, fnToBase64) => {
-    sendToInteractiveTasks([sectionId, "drawing"], fnToBase64());
+    sendToInteractiveTasks([sectionId, "drawing"], null, fnToBase64);
   },
   200,
 );

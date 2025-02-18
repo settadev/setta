@@ -1,4 +1,5 @@
 import { Tooltip } from "chart.js";
+import { processChartArtifacts } from "state/actions/artifacts";
 
 Tooltip.positioners.lineChartTooltipMousePosition = function (
   elements,
@@ -38,15 +39,20 @@ export function getLineChartOptionsAndPlugins() {
 
 export function updateLineChartWithNewData({
   chartRef,
-  artifactData,
+  artifacts,
   datasetHidden,
   darkMode,
   chartSettings,
 }) {
   const datasets = [];
+  const artifactValue = processChartArtifacts(artifacts, "line");
 
-  for (const [columnName, values] of Object.entries(artifactData)) {
-    if (columnName === chartSettings.xAxisColumn) continue;
+  let labels = null;
+  for (const [columnName, values] of Object.entries(artifactValue)) {
+    if (columnName === chartSettings.xAxisColumn) {
+      labels = values;
+      continue;
+    }
     datasets.push({
       label: columnName,
       data: values,
@@ -57,7 +63,13 @@ export function updateLineChartWithNewData({
     });
   }
 
-  const labels = artifactData[chartSettings.xAxisColumn];
+  if (datasets.length > 0 && !labels) {
+    // The xAxisColumn can be made empty in the side pane.
+    // In this case, none of the columns are used for the x axis.
+    // So we use row count.
+    const numRows = datasets[0].data.length;
+    labels = [...Array(numRows).keys()];
+  }
 
   chartRef.current.verticalLinePlugin.color = darkMode ? "white" : "black";
 

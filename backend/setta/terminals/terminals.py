@@ -4,6 +4,7 @@ import json
 import logging
 import platform
 import select
+import shlex
 import time
 import traceback
 from asyncio import CancelledError
@@ -44,12 +45,14 @@ def is_command_running_in_pty(pid):
 
 def get_terminal_shell():
     if USER_SETTINGS["backend"]["defaultTerminalShell"]:
-        return USER_SETTINGS["backend"]["defaultTerminalShell"]
+        return shlex.split(
+            USER_SETTINGS["backend"]["defaultTerminalShell"], posix=not IS_WINDOWS
+        )
     if IS_WINDOWS:
-        return "bash.exe"
+        return ["bash.exe"]
     if IS_MACOS:
-        return "zsh"
-    return "bash"
+        return ["zsh"]
+    return ["bash"]
 
 
 class TerminalWebsockets:
@@ -61,8 +64,6 @@ class TerminalWebsockets:
     def new_terminal(self, projectConfigId, sectionId, isTemporary):
         if sectionId not in self.PTY_PIDS:
             terminal_shell = get_terminal_shell()
-            if not IS_WINDOWS:
-                terminal_shell = [terminal_shell]
             pty_process = PtyProcess.spawn(terminal_shell)
             self.PTY_PIDS[sectionId] = {
                 "pid": pty_process.pid,

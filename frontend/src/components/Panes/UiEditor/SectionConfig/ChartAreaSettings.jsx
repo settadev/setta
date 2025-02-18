@@ -1,8 +1,9 @@
 import { IdNameCombobox } from "components/Utils/Combobox/IdNameCombobox";
 import C from "constants/constants.json";
 import _ from "lodash";
-import { useSectionInfos } from "state/definitions";
-import { useAllSectionArtifacts } from "state/hooks/artifacts";
+import { updateColumnNameSelections } from "state/actions/artifacts";
+import { useMisc, useSectionInfos } from "state/definitions";
+import { getAllSectionArtifactIds } from "state/hooks/artifacts";
 import { JustListOfArtifacts } from "./ListOfArtifacts";
 
 export function ChartAreaSettings({ sectionId }) {
@@ -20,9 +21,10 @@ function ChartConfig({ sectionId }) {
     _.isEqual,
   );
 
-  const valueHeaders = Object.values(
-    useAllSectionArtifacts(sectionId, (x) => Object.keys(x.value)),
-  )[0];
+  const valueHeaders = useMisc(
+    (x) => x.chartDisplayedSeriesNames[sectionId],
+    _.isEqual,
+  );
 
   return (
     <div className="flex flex-col gap-1">
@@ -78,6 +80,7 @@ function LineChartConfig({ sectionId, chartSettings, valueHeaders }) {
         sectionId={sectionId}
         valueHeaders={valueHeaders}
         selectedXAxisColumn={chartSettings.xAxisColumn}
+        xAxisCanBeNull={true}
       />
       <TogglableOptions
         sectionId={sectionId}
@@ -128,7 +131,7 @@ function ChartTypeSelection({ sectionId, selectedChartType }) {
       <IdNameCombobox
         allItems={chartTypes}
         value={selectedChartType}
-        onSelectedItemChange={(v) => setChartSetting(sectionId, "type", v)}
+        onSelectedItemChange={(v) => setChartType(sectionId, v)}
       />
     </>
   );
@@ -138,6 +141,7 @@ function XAxisColumnSelection({
   sectionId,
   valueHeaders,
   selectedXAxisColumn,
+  xAxisCanBeNull,
 }) {
   const xAxisColumnChoices = [
     {
@@ -160,6 +164,7 @@ function XAxisColumnSelection({
         onSelectedItemChange={(v) =>
           setChartSetting(sectionId, "xAxisColumn", v)
         }
+        selectedItemCanBeNull={xAxisCanBeNull}
       />
     </>
   );
@@ -238,6 +243,14 @@ function ChartConfigToggle({ sectionId, name, value, title }) {
 function setChartSetting(sectionId, name, value) {
   useSectionInfos.setState((state) => {
     state.x[sectionId].chartSettings[name] = value;
+  });
+}
+
+function setChartType(sectionId, chartType) {
+  useSectionInfos.setState((state) => {
+    state.x[sectionId].chartSettings.type = chartType;
+    const artifactIds = getAllSectionArtifactIds(sectionId, state);
+    updateColumnNameSelections(Array.from(artifactIds), sectionId, state);
   });
 }
 

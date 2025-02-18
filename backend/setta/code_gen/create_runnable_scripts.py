@@ -1,15 +1,15 @@
 import copy
-import os
 from datetime import datetime
 from pathlib import Path
 
 from setta.code_gen.export_selected import (
     export_selected,
     get_gen_code_template_var,
+    get_section_name,
     get_section_type,
     get_selected_section_variant,
 )
-from setta.code_gen.find_placeholders import remove_tp, tp
+from setta.code_gen.find_placeholders import parse_template_var, tp
 from setta.code_gen.python.generate_code import (
     convert_var_names_to_readable_form,
     generate_code,
@@ -23,6 +23,7 @@ from setta.code_gen.utils import process_refs
 from setta.utils.constants import (
     CODE_FOLDER,
     CODE_FOLDER_ENV_VARIABLE,
+    CWD,
     USER_SETTINGS,
     C,
 )
@@ -56,13 +57,13 @@ async def runCode(message, lsp_writers):
     id_to_relpath = {}
     for sid in to_write:
         curr_code = code_dict[sid]
-        rel_path = write_code_to_file(
+        rel_path_str = write_code_to_file(
             folder_path,
             curr_code["sanitized_full_name"],
             curr_code["code"],
             curr_code["codeLanguage"],
         )
-        id_to_relpath[sid] = rel_path
+        id_to_relpath[sid] = rel_path_str
 
     # Only run code that isn't referenced by other code
     run_order = [
@@ -71,8 +72,8 @@ async def runCode(message, lsp_writers):
 
     # create a wrapper script if there are multiple files to run
     if len(run_order) > 1:
-        rel_path = create_wrapper_bash_script(folder_path, run_order, code_dict)
-        command = codeCallStr(rel_path, "bash")
+        rel_path_str = create_wrapper_bash_script(folder_path, run_order, code_dict)
+        command = codeCallStr(rel_path_str, "bash")
     else:
         sid = run_order[0]
         command = codeCallStr(id_to_relpath[sid], code_dict[sid]["codeLanguage"])
@@ -280,15 +281,39 @@ def get_template_var_replacement_value_fn(
                     chars_before_template_var,
                 )
             else:
-                section_dependencies.append(template_var["sectionId"])
-                keyword = remove_tp(keyword)
-                return construct_module_path(folder_path, keyword)
+                return process_non_hardcoded_template_var(
+                    keyword,
+                    template_var,
+                    exporter_obj,
+                    section_dependencies,
+                    folder_path,
+                )
+
         elif codeLanguage == "bash":
-            section_dependencies.append(template_var["sectionId"])
-            keyword = sanitize_section_path_full_name(remove_tp(keyword))
-            return codePathStr(Path(os.path.relpath(folder_path)), keyword, "python")
+            return process_non_hardcoded_template_var(
+                keyword, template_var, exporter_obj, section_dependencies, folder_path
+            )
 
     return get_template_var_replacement_value
+
+
+def process_non_hardcoded_template_var(
+    keyword, template_var, exporter_obj, section_dependencies, folder_path
+):
+    keyword, keyword_type = parse_template_var(keyword)
+    if keyword_type == C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX:
+        section_dependencies.append(template_var["sectionId"])
+        return construct_module_path(folder_path, keyword)
+    elif keyword_type == C.TEMPLATE_VAR_VERSION_SUFFIX:
+        version_name = get_selected_section_variant(
+            exporter_obj.p, template_var["sectionId"]
+        )["name"]
+        section_name = get_section_name(exporter_obj.p, template_var["sectionId"])
+        return f'"{section_name}@{version_name}"'
+    elif keyword_type == C.TEMPLATE_VAR_FILE_PATH_SUFFIX:
+        section_dependencies.append(template_var["sectionId"])
+        keyword = sanitize_section_path_full_name(keyword)
+        return f'"{codePathStr(folder_path, keyword, "python")}"'
 
 
 def get_absolute_decl_position_from_rel_position(
@@ -337,7 +362,7 @@ def preprocess_template_vars(code, evRefs, templateVars, cursor_position):
 
 
 def convert_folder_path_to_module_path(folder_path):
-    return os.path.relpath(folder_path).replace("/", ".").replace("\\", ".")
+    return folder_path.relative_to(CWD).as_posix().replace("/", ".").replace("\\", ".")
 
 
 def languageToExtension(x):
@@ -351,7 +376,7 @@ def languageToCall(x):
 def codePathStr(folder_path, filename, codeLanguage):
     extension = languageToExtension(codeLanguage)
     output = folder_path / f"{filename}{extension}"
-    return os.path.relpath(output).replace(os.sep, "/")
+    return output.relative_to(CWD).as_posix()
 
 
 def codeCallStr(filepath, codeLanguage):
@@ -377,8 +402,46 @@ def prune_and_topological_sort(code_dict, to_keep):
     return topological_sort(section_dependencies), section_dependencies
 
 
+# TODO: eliminate redundancy between this and prune_and_topological_sort
+def prune_and_find_top_nodes(code_dict, to_keep):
+    section_dependencies = {k: v["section_dependencies"] for k, v in code_dict.items()}
+    section_dependencies = prune_dict(section_dependencies, to_keep)
+    return find_top_nodes(section_dependencies), section_dependencies
+
+
+def get_import_order_for_top_node(top_node, dependency_dict):
+    # Build a subgraph consisting of top_node and all its descendants.
+    subgraph = get_subgraph(top_node, dependency_dict)
+    # Get a topologically sorted list where each dependency comes before the node that depends on it.
+    sorted_nodes = topological_sort(subgraph)
+    # Because you plan to import starting from the end of the list and work backwards,
+    # reverse the topological order so that the deepest dependency is imported first.
+    import_order = sorted_nodes[::-1]
+    return import_order
+
+
+def find_top_nodes(dependency_dict):
+    all_nodes = set(dependency_dict.keys())
+    all_deps = {dep for deps in dependency_dict.values() for dep in deps}
+    return all_nodes - all_deps
+
+
+def get_subgraph(top_node, dependency_dict):
+    visited = set()
+
+    def dfs(node):
+        if node not in visited:
+            visited.add(node)
+            for dep in dependency_dict.get(node, []):
+                dfs(dep)
+
+    dfs(top_node)
+    return {node: dependency_dict.get(node, []) for node in visited}
+
+
+# TODO: is this function actually necessary anymore?
 def topological_sort(objects):
-    graph = {id: refs for id, refs in objects.items()}
+    graph = {node: refs for node, refs in objects.items()}
     visiting, visited = set(), set()
     order = []
 
@@ -387,16 +450,15 @@ def topological_sort(objects):
             raise ValueError("Circular reference detected")
         if node not in visited:
             visiting.add(node)
-            for neighbour in graph[node]:
-                dfs(neighbour)
+            for neighbor in graph.get(node, []):
+                dfs(neighbor)
             visiting.remove(node)
             visited.add(node)
             order.append(node)
 
-    for id in objects.keys():
-        if id not in visited:
-            dfs(id)
-
+    for node in graph.keys():
+        if node not in visited:
+            dfs(node)
     return order[::-1]
 
 
@@ -407,28 +469,19 @@ def create_timestamped_folder(base_dir, prefix=""):
     folder_name = f"_{prefix}{timestamp}"
     # Full path for the new folder
     folder_path = Path(base_dir) / folder_name
-
-    if not os.path.exists(folder_path):
-        try:
-            os.makedirs(folder_path)
-        except FileExistsError:
-            pass
-
+    folder_path.mkdir(parents=True, exist_ok=True)
     return folder_path
 
 
 def write_code_to_file(folder_path, filename, code, codeLanguage):
     extension = languageToExtension(codeLanguage)
     filepath = write_string_to_file(folder_path, f"{filename}{extension}", code)
-    return os.path.relpath(filepath).replace(os.sep, "/")
+    return filepath.relative_to(CWD).as_posix()
 
 
 def write_string_to_file(folder, filename, content):
-    # Full path to the file
-    file_path = os.path.join(folder, filename)
-    # Write the content to the file
-    with open(file_path, "w") as file:
-        file.write(content)
+    file_path = Path(folder) / filename
+    file_path.write_text(content)
     return file_path
 
 

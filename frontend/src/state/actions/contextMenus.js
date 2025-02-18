@@ -18,6 +18,10 @@ export function openSelectionContextMenu(e, nodeIds) {
   openContextMenu(e, "selection", { nodeIds });
 }
 
+export function openTypeErrorContextMenu(e, paramInfoId) {
+  openContextMenu(e, "typeError", { paramInfoId });
+}
+
 export function closeAllContextMenus() {
   useContextMenus.getState().reset();
 }

@@ -10,11 +10,11 @@ import {
   getInverseTransform,
   getXY,
   RESIZE_HANDLE_SIZE,
+  sendDrawingToInteractiveTasks,
   setGlobalArtifactTransformsAndDrawAllLayers,
   setGlobalBrushStrokesAndDrawAllLayers,
   startNewEraserStroke,
   startNewStroke,
-  throttledSendDrawingToInteractiveTasks,
 } from "./canvasUtils";
 import { filterEraserPath } from "./eraserIntersection";
 import {
@@ -82,7 +82,7 @@ export function useDrawModeMouseHandlers({
     onMouseDown = (...props) => {
       didChange = onMouseDownCore(...props);
       if (didChange) {
-        throttledSendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
+        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -105,7 +105,7 @@ export function useDrawModeMouseHandlers({
     onMouseMove = (...props) => {
       didChange = onMouseMoveCore(...props);
       if (didChange) {
-        throttledSendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
+        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -126,7 +126,7 @@ export function useDrawModeMouseHandlers({
     onMouseUp = (...props) => {
       didChange = onMouseUpCore(...props);
       if (didChange) {
-        throttledSendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
+        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -154,7 +154,7 @@ export function useDrawModeMouseHandlers({
           { [activeLayerId]: localArtifactTransformsRef.current },
           { [activeLayerId]: resizeHandleCorners.current },
         );
-        throttledSendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
+        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -180,7 +180,7 @@ export function useDrawModeMouseHandlers({
           { [activeLayerId]: localArtifactTransformsRef.current },
           { [activeLayerId]: resizeHandleCorners.current },
         );
-        throttledSendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
+        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -198,7 +198,7 @@ export function useDrawModeMouseHandlers({
 
     onMouseUp = (...props) => {
       onMouseUpCore(...props);
-      throttledSendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
+      sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
     };
 
     onMouseEnter = () => {};

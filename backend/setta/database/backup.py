@@ -1,5 +1,4 @@
 import logging
-import os
 import shutil
 import time
 from datetime import datetime
@@ -54,7 +53,7 @@ def create_backup(db_path):
     ensure_backup_dir_exists()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_filename = f"backup_{timestamp}.db"
-    backup_path = os.path.join(DB_BACKUP_FOLDER, backup_filename)
+    backup_path = DB_BACKUP_FOLDER / backup_filename
     logger.debug(f"creating backup: {backup_path}")
 
     shutil.copy2(db_path, backup_path)

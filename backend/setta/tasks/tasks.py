@@ -1,10 +1,11 @@
 import asyncio
+import copy
 import logging
-import queue
-import threading
+import time
 from typing import Dict
 
 from setta.database.utils import create_new_id
+from setta.utils.constants import C
 
 from . import fns
 from .fns.utils import TaskDefinition, TaskMessage
@@ -20,75 +21,31 @@ class Tasks:
         self.task_runner = TaskRunner()
         self.cache = {}
         self.fns: Dict[str, TaskDefinition] = {}
-        self.in_memory_subprocess = SettaInMemoryFnSubprocess()
-        self.websockets = []  # Store the websocket connections
+        self.in_memory_subprocesses = {}
+        self.websockets = []
+        self.stop_event = asyncio.Event()
         add_fns_from_module(self.fns, fns)
 
-        # Start stdout listener thread
-        self._stop_event = asyncio.Event()
-        self.stdout_queue = queue.Queue()  # regular Queue
-        self._stdout_processor_task = None
-        self.stdout_thread = threading.Thread(target=self._stdout_listener, daemon=True)
-        self.stdout_thread.start()
-
-    # Backend Changes (Tasks class)
     async def connect(self, websocket):
         # Accept the new connection
         await websocket.accept()
         self.websockets.append(websocket)
-
-        # Start the processor task if it's not running
-        if self._stdout_processor_task is None or self._stdout_processor_task.done():
-            self._stdout_processor_task = asyncio.create_task(
-                self._process_stdout_queue()
-            )
+        for k, v in self.in_memory_subprocesses.items():
+            v["subprocess"].start_stdout_processor_task()
+            logger.debug(f"listening to subprocess {k}")
 
     async def disconnect(self, websocket):
         self.websockets.remove(websocket)
         if len(self.websockets) == 0:
-            # Cancel the processor task
-            if self._stdout_processor_task and not self._stdout_processor_task.done():
-                self._stdout_processor_task.cancel()
-                try:
-                    await self._stdout_processor_task
-                except asyncio.CancelledError:
-                    pass
-                self._stdout_processor_task = None
+            for v in self.in_memory_subprocesses.values():
+                await v["subprocess"].stop_stdout_processor_task()
 
-    def _stdout_listener(self):
-        while not self._stop_event.is_set():
-            try:
-                stdout_data = self.in_memory_subprocess.stdout_parent_conn.recv()
-                self.stdout_queue.put(stdout_data)  # simple put, no async needed
-            except Exception as e:
-                if self._stop_event.is_set():
-                    break
-                logger.debug(f"Error in stdout listener: {e}")
-
-    async def _process_stdout_queue(self):
-        while not self._stop_event.is_set():
-            try:
-                if self._stop_event.is_set():
-                    break
-                if len(self.websockets) > 0:
-                    stdout_data = self.stdout_queue.get_nowait()
-                    stdout_data = stdout_data.replace("\n", "\r\n")
-                    for w in self.websockets:
-                        await w.send_text(stdout_data)
-                    self.stdout_queue.task_done()
-            except queue.Empty:
-                await asyncio.sleep(0.1)  # Check for connection every 100ms
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                if self._stop_event.is_set():
-                    break
-                logger.debug(f"Error processing stdout: {e}")
-
-    async def __call__(self, fn_name, message: TaskMessage):
-        if fn_name in self.fns:
-            return await self.call_regular_fn(fn_name, message)
-        return await self.call_in_memory_subprocess_fn(fn_name, message)
+    async def __call__(
+        self, message_type, message: TaskMessage, websocket_manager=None
+    ):
+        if message_type == "inMemoryFn":
+            return await self.call_in_memory_subprocess_fn(message, websocket_manager)
+        return await self.call_regular_fn(message_type, message)
 
     async def call_regular_fn(self, fn_name, message: TaskMessage):
         fn = self.fns[fn_name]
@@ -101,52 +58,163 @@ class Tasks:
         result["messageType"] = fn.return_message_type
         return result
 
-    async def call_in_memory_subprocess_fn(self, fn_name, message: TaskMessage):
-        self.in_memory_subprocess.parent_conn.send(
-            {"type": "call", "fn_name": fn_name, "message": message}
-        )
-        result = await self.task_runner.run(
-            self.in_memory_subprocess.parent_conn.recv, [], RunType.THREAD
-        )
-        # if result["status"] == "success":
-        # for x in result["content"]:
-        # x.setdefault("sectionType", default_section_type(x["type"]))
-        if result["status"] != "success":
-            result["content"] = {}
+    async def call_in_memory_subprocess_fn(
+        self,
+        message: TaskMessage,
+        websocket_manager=None,
+        call_all=False,
+        subprocess_key=None,
+    ):
+        # Create a list of tasks to run concurrently
+        tasks = []
+        results = []
 
-        return {"content": result["content"], "messageType": result["messageType"]}
+        for sp_key, sp_info in self.in_memory_subprocesses.items():
+            if subprocess_key and sp_key != subprocess_key:
+                continue
+            for fn_name, fnInfo in sp_info["fnInfo"].items():
+                if (
+                    call_all
+                    or None in fnInfo["dependencies"]
+                    or any(k in fnInfo["dependencies"] for k in message.content.keys())
+                ):
+                    # Send message to subprocess
+                    sp_info["subprocess"].parent_conn.send(
+                        {"type": "call", "fn_name": fn_name, "message": message}
+                    )
 
-    async def add_custom_fns(self, code_list, to_cache):
-        error_msgs = {}
-        task_metadata = {}
-        initial_content = []
-        for c in code_list:
-            # Send import request to subprocess
-            self.in_memory_subprocess.parent_conn.send(
+                    # Create task for receiving response
+                    task = asyncio.create_task(
+                        self._handle_subprocess_response(
+                            sp_key,
+                            fn_name,
+                            message.id,
+                            sp_info["subprocess"].parent_conn.recv,
+                            websocket_manager,
+                            results,
+                        )
+                    )
+                    tasks.append(task)
+
+        # Wait for all tasks to complete concurrently
+        if tasks:
+            await asyncio.gather(*tasks)
+
+        if websocket_manager:
+            return {}
+
+        content = []
+        for r in results:
+            if r["content"]:
+                content.extend(r["content"])
+        return {"content": content, "messageType": C.WS_IN_MEMORY_FN_RETURN}
+
+    async def _handle_subprocess_response(
+        self, subprocess_key, fn_name, msg_id, recv_fn, websocket_manager, results
+    ):
+        # Run the receive function in a thread
+        start_time = time.perf_counter()
+        result = await self.task_runner.run(recv_fn, [], RunType.THREAD)
+        elapsed_time = time.perf_counter() - start_time
+        if result["status"] == "success":
+            self.update_average_subprocess_fn_time(
+                subprocess_key, fn_name, elapsed_time
+            )
+            if websocket_manager is not None:
+                if result["content"]:
+                    await websocket_manager.send_message_to_requester(
+                        msg_id, result["content"], result["messageType"]
+                    )
+                await self.maybe_send_latest_run_time_info(
+                    subprocess_key, fn_name, msg_id, websocket_manager
+                )
+            else:
+                results.append(result)
+
+    async def add_custom_fns(self, code_graph, to_cache):
+        for c in code_graph:
+            subprocess_key = c["subprocess_key"]
+            module_name = c["module_name"]
+            sp = self.in_memory_subprocesses.get(subprocess_key, {}).get("subprocess")
+            if sp:
+                sp.close()
+            logger.debug(f"Creating new subprocess for {module_name}")
+            sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
+            self.in_memory_subprocesses[subprocess_key] = {
+                "subprocess": sp,
+                "fnInfo": {},
+            }
+
+            sp.parent_conn.send(
                 {
                     "type": "import",
                     "code": c["code"],
-                    "module_name": c["module_name"],
+                    "module_name": module_name,
                     "to_cache": to_cache,
                 }
             )
-            result = await self.task_runner.run(
-                self.in_memory_subprocess.parent_conn.recv, [], RunType.THREAD
-            )
+            result = await self.task_runner.run(sp.parent_conn.recv, [], RunType.THREAD)
+            fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"]
+
             if result["status"] == "success":
-                task_metadata.update(result["content"])
+                for k, v in result["content"].items():
+                    if k not in fnInfo:
+                        fnInfo[k] = {
+                            "dependencies": set(),
+                            "averageRunTime": None,
+                            "callCount": 0,
+                            "lastStatsUpdate": time.time(),
+                        }
+                    fnInfo[k]["dependencies"].update(v)
             else:
-                error_msgs[c["module_name"]] = result["error"]
+                # TODO: store error message and display on frontend?
+                pass
 
-        for k in task_metadata.keys():
-            task_output = await self(k, TaskMessage(id=create_new_id(), content={}))
-            initial_content.extend(task_output["content"])
+        initial_result = await self.call_in_memory_subprocess_fn(
+            TaskMessage(id=create_new_id(), content={}),
+            call_all=True,
+            subprocess_key=subprocess_key,
+        )
 
-        return task_metadata, error_msgs, initial_content
+        logger.debug(
+            f"self.in_memory_subprocesses keys: {self.in_memory_subprocesses.keys()}"
+        )
+
+        return initial_result["content"]
 
     def close(self):
-        self._stop_event.set()
-        self.in_memory_subprocess.close()
-        self.stdout_thread.join()
-        if self._stdout_processor_task:
-            self._stdout_processor_task.cancel()
+        self.stop_event.set()
+        for v in self.in_memory_subprocesses.values():
+            v["subprocess"].close()
+
+    def update_average_subprocess_fn_time(self, subprocess_key, fn_name, new_time):
+        fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"][fn_name]
+        current_avg = fnInfo["averageRunTime"]
+        new_avg = (
+            new_time
+            if current_avg is None
+            else ((0.9) * current_avg) + (0.1 * new_time)
+        )
+        fnInfo["averageRunTime"] = new_avg
+        fnInfo["callCount"] += 1
+        fnInfo["lastStatsUpdate"] = time.time()
+
+    async def maybe_send_latest_run_time_info(
+        self, subprocess_key, fn_name, msg_id, websocket_manager
+    ):
+        fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"][fn_name]
+        if fnInfo["callCount"] % 10 == 0 or (
+            fnInfo["lastStatsUpdate"] and (time.time() - fnInfo["lastStatsUpdate"]) > 10
+        ):
+            newInfo = self.getInMemorySubprocessInfo()
+            await websocket_manager.send_message_to_requester(
+                msg_id, newInfo, C.WS_IN_MEMORY_FN_AVG_RUN_TIME
+            )
+
+    def getInMemorySubprocessInfo(self):
+        output = {}
+        for sp_key, sp_info in self.in_memory_subprocesses.items():
+            output[sp_key] = {"fnInfo": copy.deepcopy(sp_info["fnInfo"])}
+            for fnInfo in output[sp_key]["fnInfo"].values():
+                fnInfo["dependencies"] = list(fnInfo["dependencies"])
+        return output

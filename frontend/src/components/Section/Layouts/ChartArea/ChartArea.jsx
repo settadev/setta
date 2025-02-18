@@ -37,7 +37,7 @@ function _ChartArea({ sectionId }) {
 
 function _ChartAreaCore({ sectionId }) {
   const loadedArtifacts = useAllSectionArtifacts(sectionId, (x) =>
-    _.pick(x, ["value"]),
+    _.pick(x, ["name", "value"]),
   );
   const [darkMode] = localStorageFns.darkMode.hook();
   const size = useSectionInfos((x) => x.x[sectionId].size, _.isEqual);
@@ -115,15 +115,15 @@ function _ChartAreaCore({ sectionId }) {
   }, [chartSettings.type]);
 
   useDeepCompareEffect(() => {
-    const artifactData = Object.values(loadedArtifacts)[0]?.value;
-    if (!artifactData || !chartRef.current) {
+    const artifacts = Object.values(loadedArtifacts);
+    if (!chartRef.current) {
       return;
     }
 
     const updateFn = getUpdaterFn(chartSettings.type);
     const newData = updateFn({
       chartRef,
-      artifactData,
+      artifacts,
       datasetHidden,
       darkMode,
       chartSettings,

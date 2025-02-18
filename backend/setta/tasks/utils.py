@@ -1,13 +1,19 @@
+import asyncio
 import importlib.util
 import json
+import logging
 import multiprocessing
-import os
+import queue
 import sys
+import threading
 import traceback
 import uuid
 
 from setta.tasks.fns.utils import TaskDefinition
+from setta.utils.constants import CWD
 from setta.utils.utils import nested_access
+
+logger = logging.getLogger(__name__)
 
 
 def import_code_from_string(code_string, module_name=None, add_to_sys_modules=True):
@@ -16,7 +22,7 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
         module_name = f"setta_dynamic_module_{uuid.uuid4().hex}"
 
     # Add current directory to sys.path if it's not already there
-    current_dir = os.getcwd()
+    current_dir = str(CWD)
     if current_dir not in sys.path:
         sys.path.insert(0, current_dir)
 
@@ -40,12 +46,23 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
 
 
 class SettaInMemoryFnSubprocess:
-    def __init__(self):
+    def __init__(self, stop_event, websockets):
         self.parent_conn, self.child_conn = multiprocessing.Pipe()
         self.process = multiprocessing.Process(target=self._subprocess_main)
         self.stdout_parent_conn, self.stdout_child_conn = multiprocessing.Pipe()
         self.process.daemon = True  # Ensure process dies with parent
         self.process.start()
+
+        self.stop_event = asyncio.Event()
+        self.tasks_stop_event = stop_event
+        self.websockets = websockets
+        self.stdout_queue = queue.Queue()
+        self.stdout_processor_task = None
+        self.stdout_thread = threading.Thread(target=self.stdout_listener, daemon=True)
+        self.stdout_thread.start()
+
+        if len(self.websockets) > 0:
+            self.start_stdout_processor_task()
 
     def _subprocess_main(self):
         """Main loop in subprocess that handles all requests"""
@@ -83,15 +100,15 @@ class SettaInMemoryFnSubprocess:
                     # Import and store module
                     module = import_code_from_string(code, module_name)
                     added_fn_names = add_fns_from_module(fns_dict, module, module_name)
-                    task_metadata = {}
+                    dependencies = {}
                     for k in added_fn_names:
                         cache[k] = msg["to_cache"]
-                        task_metadata[k] = get_task_metadata(fns_dict[k], cache[k])
+                        dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
 
                     self.child_conn.send(
                         {
                             "status": "success",
-                            "content": task_metadata,
+                            "content": dependencies,
                         }
                     )
 
@@ -122,20 +139,36 @@ class SettaInMemoryFnSubprocess:
 
     def close(self):
         try:
+            logger.debug("Initiating shutdown sequence")
             self.parent_conn.send({"type": "shutdown"})
-            self.process.join(timeout=1.0)
-        except:
-            pass
+            self.process.join(timeout=2)  # Add timeout to process join
 
-        if self.process.is_alive():
-            self.process.terminate()
-            self.process.join()
+            if self.process.is_alive():
+                logger.debug("Process still alive after timeout, forcing termination")
+                self.process.terminate()
+                self.process.join(timeout=1)
+        except Exception as e:
+            logger.debug(f"Error during process shutdown: {e}")
 
-        # Close both sets of connections
-        self.parent_conn.close()
-        self.child_conn.close()
-        self.stdout_parent_conn.close()
-        self.stdout_child_conn.close()
+        # Set stop event before closing pipes
+        self.stop_event.set()
+
+        # Close all connections
+        for conn in [
+            self.parent_conn,
+            self.child_conn,
+            self.stdout_parent_conn,
+            self.stdout_child_conn,
+        ]:
+            conn.close()
+
+        self.stdout_thread.join(timeout=2)  # Add timeout to thread join
+
+        if self.stdout_thread.is_alive():
+            logger.debug("Stdout thread failed to terminate within timeout")
+
+        if self.stdout_processor_task:
+            self.stdout_processor_task.cancel()
 
     def process_message(self, fn_name, message, cache):
         if fn_name in cache:
@@ -146,6 +179,60 @@ class SettaInMemoryFnSubprocess:
                 p_dict[key] = v
             message.content = exporter_obj.output
         return message.content
+
+    def start_stdout_processor_task(self):
+        if self.stdout_processor_task is None or self.stdout_processor_task.done():
+            self.stdout_processor_task = asyncio.create_task(
+                self.process_stdout_queue()
+            )
+
+    async def stop_stdout_processor_task(self):
+        if self.stdout_processor_task and not self.stdout_processor_task.done():
+            self.stdout_processor_task.cancel()
+            try:
+                await self.stdout_processor_task
+            except asyncio.CancelledError:
+                pass
+            self.stdout_processor_task = None
+
+    async def process_stdout_queue(self):
+        while not self.should_stop():
+            try:
+                if self.should_stop():
+                    break
+                if len(self.websockets) > 0:
+                    stdout_data = self.stdout_queue.get_nowait()
+                    stdout_data = stdout_data.replace("\n", "\r\n")
+                    for w in self.websockets:
+                        await w.send_text(stdout_data)
+                    self.stdout_queue.task_done()
+            except queue.Empty:
+                await asyncio.sleep(0.1)  # Check for connection every 100ms
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                if self.should_stop():
+                    break
+                logger.debug(f"Error processing stdout: {e}")
+
+    def stdout_listener(self):
+        while not self.should_stop():
+            if self.stdout_parent_conn.poll(0.1):  # Check for data with timeout
+                try:
+                    stdout_data = self.stdout_parent_conn.recv()
+                    self.stdout_queue.put(stdout_data)
+                except EOFError:  # Pipe was closed
+                    break
+                except Exception as e:
+                    logger.debug(f"Error in stdout listener: {e}")
+                    if self.should_stop():
+                        break
+            else:  # No data available within timeout
+                if self.should_stop():
+                    break
+
+    def should_stop(self):
+        return self.stop_event.is_set() or self.tasks_stop_event.is_set()
 
 
 def add_fns_from_module(fns_dict, module, module_name=None):
@@ -168,11 +255,11 @@ def add_fns_from_module(fns_dict, module, module_name=None):
 def get_task_metadata(in_memory_fn, exporter_obj):
     # None means run the task on every change
     if in_memory_fn.dependencies is None:
-        dependencies = None
+        dependencies = set([None])
     # Empty array means only run when the task imported.
     # Non-empty array means run when specified dependencies update.
     else:
-        dependencies = [
+        dependencies = set(
             exporter_obj.var_name_reverse_mapping[d] for d in in_memory_fn.dependencies
-        ]
-    return {"dependencies": dependencies}
+        )
+    return dependencies

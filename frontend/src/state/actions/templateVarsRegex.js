@@ -13,10 +13,16 @@ export function getTemplateVarsRegexAndColorMap(state) {
   }
 
   const sectionState = useSectionInfos.getState();
-  for (const sectionId of state.templateVarEligibleSections) {
-    const fullName = getSectionPathFullName(sectionId, sectionState);
-    names.push(escapeRegExp(fullName));
-    fullRawNameToSectionId[fullName] = sectionId;
+  // TODO: make this better instead of 3 for loops
+  for (const [sectionId, suffixes] of Object.entries(
+    state.templateVarEligibleSections,
+  )) {
+    const sectionFullName = getSectionPathFullName(sectionId, sectionState);
+    for (const suffix of suffixes) {
+      const fullName = sectionFullName + `${C.TEMPLATE_PREFIX}${suffix}`;
+      names.push(escapeRegExp(fullName));
+      fullRawNameToSectionId[fullName] = sectionId;
+    }
   }
 
   const fullNameToSectionId = _.mapKeys(fullRawNameToSectionId, (v, k) =>

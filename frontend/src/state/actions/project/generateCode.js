@@ -7,6 +7,7 @@ import { sendMessage } from "requests/websocket";
 import {
   getSectionInfo,
   getSectionPathFullName,
+  getSectionType,
 } from "state/actions/sectionInfos";
 import {
   useEVRefRegex,
@@ -17,20 +18,24 @@ import {
 import { getForSectionId } from "state/hooks/paramSweep";
 import {
   addTerminalInitialMessage,
+  createTemporaryTerminal,
+  maybeCreateTemporaryTerminalGroup,
   sendTerminalMessage,
 } from "state/hooks/terminals/terminal";
 import { createNewId } from "utils/idNameCreation";
+import { newEVEntry } from "utils/objs/ev";
 import { templatePrefix } from "utils/utils";
-import { addSectionInEmptySpace } from "../sections/createSections";
+import { requestBase64FromCanvas } from "../temporaryMiscState";
 import { generateParamSweepCombinations } from "./generateParamSweepCombinations";
 import { generateSectionParamSweepVersionCombinations } from "./generateSectionParamSweepVersionCombinations";
 import { getProjectData } from "./saveProject";
 
-export function getProjectDataToGenerateCode({
+export async function getProjectDataToGenerateCode({
   includeFullNameToInfo = true,
   includeInfoToFullName = true,
   includeFullNameToSectionId = true,
   includeSectionPathFullNames = true,
+  includeDrawings = false,
 }) {
   const project = getProjectData({});
   if (includeFullNameToInfo) {
@@ -52,12 +57,23 @@ export function getProjectDataToGenerateCode({
       );
     }
   }
+  if (includeDrawings) {
+    const sectionInfosState = useSectionInfos.getState().x;
+    const sections = {};
+    for (const x of Object.values(sectionInfosState)) {
+      const currSection = _.cloneDeep(x);
+      if (getSectionType(x.id) === C.DRAW) {
+        currSection.drawing = await requestBase64FromCanvas(x.id);
+      }
+      sections[x.id] = currSection;
+    }
+    project.sections = sections;
+  }
   return project;
 }
 
 export async function sendRunCodeMessage(project, messageIdx = 0) {
   const codeRunId = createNewId();
-  project.infoToFullName = computeInfoToFullName(project);
   let message = {
     id: codeRunId,
     messageType: C.WS_RUN_CODE,
@@ -76,10 +92,9 @@ export async function sendRunCodeMessage(project, messageIdx = 0) {
     } else {
       const id = createNewId();
       addTerminalInitialMessage(id, message);
-      addSectionInEmptySpace({
-        type: C.TERMINAL,
-        sectionProps: { id, isTemporary: true },
-        positionOffset: { x: messageIdx * 100, y: 0 },
+      useSectionInfos.setState((state) => {
+        const groupId = maybeCreateTemporaryTerminalGroup(state);
+        createTemporaryTerminal(id, groupId, state);
       });
     }
   }
@@ -146,7 +161,6 @@ export function* getProjectRuns(project) {
             paramSweepSectionVariantIds[paramSweepSectionId] = c.paramSweepId;
           }
         }
-
         variant.runCodeBlocks = getRunCodeBlocks(project, true);
         yield* getProjectVariants(variant, paramSweepSectionVariantIds);
       }
@@ -238,7 +252,9 @@ function* getProjectVariants(project, paramSweepSectionVariantIds) {
         const sectionVariant = variant.sectionVariants[forSectionVariantId];
         sectionVariant.selectedItem = selectedItem;
         if (paramInfoId) {
-          sectionVariant.values[paramInfoId].value = value;
+          const evEntry = sectionVariant.values[paramInfoId] ?? newEVEntry();
+          evEntry.value = value;
+          sectionVariant.values[paramInfoId] = evEntry;
         }
       }
       yield variant;
@@ -248,6 +264,7 @@ function* getProjectVariants(project, paramSweepSectionVariantIds) {
   }
 }
 
+// TODO: refine this logic. Has to be really clear what happens in each case.
 function getRunCodeBlocks(project, isRunGroup) {
   if (isRunGroup) {
     // use all code sections when running a run group
@@ -259,7 +276,9 @@ function getRunCodeBlocks(project, isRunGroup) {
         ids.push(s.id);
       }
     }
-    return ids;
+    if (ids.length > 0) {
+      return ids;
+    }
   } else {
     // use only the section with the gen code template var
     for (const s of Object.values(project.sections)) {

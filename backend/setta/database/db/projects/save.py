@@ -25,7 +25,7 @@ def save_project_details(db, p):
     save_json_source_data(p)
     remove_json_source_data(p)
     save_artifacts(db, p["artifacts"])
-    save_artifact_groups(db, p["artifactGroups"])
+    save_artifact_groups(db, p["artifactGroups"], p["sections"])
     save_code_info(db, p["codeInfo"])
     save_code_info_col(db, p["codeInfoCols"])
     save_ui_types(db, p["uiTypes"])

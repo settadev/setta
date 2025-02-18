@@ -4,7 +4,8 @@ from pydantic import BaseModel
 
 from setta.code_gen.create_runnable_scripts import (
     generate_final_code_for_sections,
-    prune_and_topological_sort,
+    get_import_order_for_top_node,
+    prune_and_find_top_nodes,
     sanitize_section_path_full_name,
 )
 from setta.code_gen.export_selected import (
@@ -13,6 +14,7 @@ from setta.code_gen.export_selected import (
     get_section_code,
     get_section_type,
 )
+from setta.code_gen.find_placeholders import parse_template_var
 from setta.tasks.fns.utils import replace_template_vars_with_random_names
 from setta.utils.constants import C
 from setta.utils.utils import multireplace
@@ -23,7 +25,7 @@ router = APIRouter()
 
 
 class UpdateInteractiveCodeRequest(BaseModel):
-    project: dict
+    projects: list
 
 
 class FormatCodeRequest(BaseModel):
@@ -37,7 +39,18 @@ async def route_update_interactive_code(
     tasks=Depends(get_tasks),
     lsp_writers=Depends(get_lsp_writers),
 ):
-    p = x.project
+    idx = 0
+    content = []
+    for p in x.projects:
+        initialContent = await update_interactive_code(p, tasks, lsp_writers, idx)
+        content.extend(initialContent)
+        idx += 1
+
+    inMemorySubprocessInfo = tasks.getInMemorySubprocessInfo()
+    return {"inMemorySubprocessInfo": inMemorySubprocessInfo, "content": content}
+
+
+async def update_interactive_code(p, tasks, lsp_writers, idx):
     exporter_obj = export_selected(
         p, always_export_args_objs=False, force_include_template_var=True
     )
@@ -46,11 +59,11 @@ async def route_update_interactive_code(
     template_var_replacement_values = {}
     for variant in p["sectionVariants"].values():
         for t in variant["templateVars"]:
-            if not t["sectionId"]:
-                continue
-            template_var_replacement_values[
-                t["keyword"]
-            ] = create_in_memory_module_name(p, t["sectionId"])
+            _, keyword_type = parse_template_var(t["keyword"])
+            if t["sectionId"] and keyword_type == C.TEMPLATE_VAR_IMPORT_PATH_SUFFIX:
+                template_var_replacement_values[
+                    t["keyword"]
+                ] = create_in_memory_module_name(p, t["sectionId"])
 
     code_dict = await generate_final_code_for_sections(
         p,
@@ -62,24 +75,29 @@ async def route_update_interactive_code(
         template_var_replacement_values=template_var_replacement_values,
     )
 
-    to_import, _ = prune_and_topological_sort(code_dict, p["importCodeBlocks"])
-    to_import = to_import[::-1]  # we want to import the dependencies first
-    code_list = []
-    for section_id in to_import:
-        v = code_dict[section_id]
-        task_name = create_in_memory_module_name(p, section_id)
-        code_list.append(
+    top_node_ids, section_dependencies = prune_and_find_top_nodes(
+        code_dict, p["runCodeBlocks"]
+    )
+    code_graph = []
+    project_config_id = p["projectConfig"]["id"]
+    for section_id in top_node_ids:
+        code_graph.append(
             {
-                "code": v["code"],
-                "module_name": task_name,
+                "subprocess_key": f"{project_config_id}-{section_id}-{idx}",
+                "code": code_dict[section_id]["code"],
+                "imports": get_import_order_for_top_node(
+                    section_id, section_dependencies
+                ),
+                "module_name": create_in_memory_module_name(p, section_id),
             }
         )
 
-    metadata, error_msgs, content = await tasks.add_custom_fns(
-        code_list,
+    initialContent = await tasks.add_custom_fns(
+        code_graph,
         to_cache=exporter_obj_in_memory,
     )
-    return {"metadata": metadata, "errorMsgs": error_msgs, "content": content}
+
+    return initialContent
 
 
 @router.post(C.ROUTE_FORMAT_CODE)

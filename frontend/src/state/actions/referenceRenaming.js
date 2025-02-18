@@ -1,5 +1,6 @@
 import {
   computeInfoToFullName,
+  extractTemplateVarSuffix,
   keyForInfoToFullName,
 } from "components/Utils/CodeMirror/utils";
 import { dbMakeEVRefTemplateVarReplacements } from "requests/infoToEVReferrer";
@@ -121,9 +122,11 @@ function setTemplateVarReplacements(variantId, codeAreaReplacements, state) {
         (s) => s.id === originalTemplateVar.sectionId,
       );
       if (matchingSection) {
-        const newName = templatePrefix(
+        const suffix = extractTemplateVarSuffix(originalTemplateVar.keyword);
+        // TODO: THIS IS INCORRECT
+        const newName = `${templatePrefix(
           getSectionPathFullName(matchingSection.id, state),
-        );
+        )}${suffix}`;
         curr.replacements.push({ originalTemplateVar, newName });
         if (originalTemplateVar.keyword !== newName) {
           atLeastOneReplacement = true;

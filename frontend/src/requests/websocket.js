@@ -1,6 +1,9 @@
 import C from "constants/constants.json";
 import _ from "lodash";
-import { updateInteractiveArtifacts } from "state/actions/interactive";
+import {
+  updateInMemorySubprocessInfo,
+  updateInteractiveArtifacts,
+} from "state/actions/interactive";
 import { setNotificationMessage } from "state/actions/notification";
 import { setTemporaryMiscState } from "state/actions/temporaryMiscState";
 import { processTypeErrors } from "state/actions/typeErrors";
@@ -61,6 +64,8 @@ function receiveMessage(message) {
     m.messageType === C.WS_IN_MEMORY_FN_RETURN
   ) {
     updateInteractiveArtifacts(m.content);
+  } else if (m.messageType === C.WS_IN_MEMORY_FN_AVG_RUN_TIME) {
+    updateInMemorySubprocessInfo(m.content);
   } else if (m.id) {
     setTemporaryMiscState(m.id, m.content);
   }

@@ -10,8 +10,10 @@ CONSTANTS_FOLDER = (
     Path("../../../constants") if is_dev_mode() else Path("../static/constants")
 )
 SEED_FOLDER = Path("../../../seed") if is_dev_mode() else Path("../static/seed")
-CODE_FOLDER = "setta_code"
-DB_BACKUP_FOLDER = ".setta_backups"
+CWD = Path.cwd()
+SETTA_FILES_FOLDER = CWD / "setta_files"
+CODE_FOLDER = SETTA_FILES_FOLDER / "code"
+DB_BACKUP_FOLDER = SETTA_FILES_FOLDER / "backups"
 CODE_FOLDER_ENV_VARIABLE = "SETTA_CODE_FOLDER"
 HOST_ENV_VARIABLE = "SETTA_HOST"
 PORT_ENV_VARIABLE = "SETTA_PORT"
@@ -99,6 +101,7 @@ CODE_INFO_TABLE_DATA_JSON_FIELDS = set(
         "positionalOnly",
         "isPinned",
         "isFrozen",
+        "ignoreTypeErrors",
     )
 )
 

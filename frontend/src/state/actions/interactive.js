@@ -25,15 +25,13 @@ export async function formatCode() {
   }
 }
 
-export function sendToInteractiveTasks(sourceInfo, value) {
+export function sendToInteractiveTasks(sourceInfo, value, valueCallback) {
   const key = JSON.stringify(sourceInfo);
-  const content = { [key]: value };
-  for (const [fnName, metadata] of Object.entries(
-    useInMemoryFn.getState().metadata,
-  )) {
-    if (metadata.dependencies === null || metadata.dependencies.has(key)) {
-      sendMessage({ id: createNewId(), content, messageType: fnName });
-    }
+  const { throttledSendFns } = useInMemoryFn.getState();
+  if (key in throttledSendFns) {
+    throttledSendFns[key](key, value, valueCallback);
+  } else if (null in throttledSendFns) {
+    throttledSendFns[null](key, value, valueCallback);
   }
 }
 
@@ -107,3 +105,76 @@ export async function updateInteractiveArtifacts(artifacts) {
 //     sectionProps: { artifactIds: [artifactId] },
 //   });
 // }
+
+export function updateInMemorySubprocessInfo(inMemorySubprocessInfo) {
+  const newInfo = getNewInMemorySubprocessInfo(inMemorySubprocessInfo);
+  const newThrottledSendFns = getNewThrottledSendFns(newInfo);
+
+  for (const fn of Object.values(useInMemoryFn.getState().throttledSendFns)) {
+    fn.cancel();
+  }
+
+  useInMemoryFn.setState({
+    inMemorySubprocessInfo: newInfo,
+    throttledSendFns: newThrottledSendFns,
+  });
+}
+
+function getNewInMemorySubprocessInfo(inMemorySubprocessInfo) {
+  const newInfo = _.cloneDeep(inMemorySubprocessInfo);
+
+  // convert dependencies to Sets
+  for (const subprocessInfo of Object.values(newInfo)) {
+    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
+      const newDependencies = new Set();
+      for (const d of fnInfo.dependencies) {
+        const stringD = d === null ? d : JSON.stringify(d);
+        newDependencies.add(stringD);
+      }
+      fnInfo.dependencies = newDependencies;
+    }
+  }
+
+  return newInfo;
+}
+
+function getNewThrottledSendFns(inMemorySubprocessInfo) {
+  const newThrottledSendFns = {};
+  for (const subprocessInfo of Object.values(inMemorySubprocessInfo)) {
+    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
+      for (const d of fnInfo.dependencies) {
+        // key is usually the same as d, except when d is null.
+        // So we have to pass key to the throttled function
+        newThrottledSendFns[d] = _.throttle(
+          (key, value, valueCallback) => {
+            sendMessage({
+              id: createNewId(),
+              content: { [key]: valueCallback ? valueCallback() : value },
+              messageType: "inMemoryFn",
+            });
+          },
+          getThrottleDelay(inMemorySubprocessInfo, d),
+        );
+      }
+    }
+  }
+
+  return newThrottledSendFns;
+}
+
+function getThrottleDelay(inMemorySubprocessInfo, key) {
+  let maxRunTime = 0;
+
+  for (const subprocessInfo of Object.values(inMemorySubprocessInfo)) {
+    for (const fnInfo of Object.values(subprocessInfo.fnInfo)) {
+      if (fnInfo.dependencies.has(key) || fnInfo.dependencies.has(null)) {
+        if (fnInfo.averageRunTime > maxRunTime) {
+          maxRunTime = fnInfo.averageRunTime;
+        }
+      }
+    }
+  }
+
+  // maxRunTime is in seconds
+  return Math.max(maxRunTime * 1000, 50); // Minimum 50ms throttle
+}
