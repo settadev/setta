@@ -87,14 +87,19 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
     code_graph = []
     project_config_id = p["projectConfig"]["id"]
     for section_id in top_node_ids:
+        import_order = get_import_order_for_top_node(section_id, section_dependencies)
+        imports = [
+            {
+                "code": code_dict[s]["code"],
+                "module_name": create_in_memory_module_name(p, s),
+            }
+            for s in import_order
+        ]
+
         code_graph.append(
             {
+                "imports": imports,
                 "subprocess_key": f"{project_config_id}-{section_id}-{idx}",
-                "code": code_dict[section_id]["code"],
-                "imports": get_import_order_for_top_node(
-                    section_id, section_dependencies
-                ),
-                "module_name": create_in_memory_module_name(p, section_id),
                 "subprocessStartMethod": p["sections"][section_id][
                     "subprocessStartMethod"
                 ],

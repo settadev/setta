@@ -99,15 +99,18 @@ class SettaInMemoryFnSubprocess:
 
             try:
                 if msg_type == "import":
-                    code = msg["code"]
-                    module_name = msg["module_name"]
-                    # Import and store module
-                    module = import_code_from_string(code, module_name)
-                    added_fn_names = add_fns_from_module(fns_dict, module, module_name)
                     dependencies = {}
-                    for k in added_fn_names:
-                        cache[k] = msg["to_cache"]
-                        dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
+                    for to_import in msg["imports"]:
+                        code = to_import["code"]
+                        module_name = to_import["module_name"]
+                        # Import and store module
+                        module = import_code_from_string(code, module_name)
+                        added_fn_names = add_fns_from_module(
+                            fns_dict, module, module_name
+                        )
+                        for k in added_fn_names:
+                            cache[k] = msg["to_cache"]
+                            dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
 
                     self.child_conn.send(
                         {
