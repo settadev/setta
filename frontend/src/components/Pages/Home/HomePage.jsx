@@ -9,6 +9,7 @@ import { BiPlus } from "react-icons/bi";
 import { HiHome } from "react-icons/hi";
 import { IoMdCheckmark } from "react-icons/io";
 import { IoClose, IoSettingsOutline } from "react-icons/io5";
+import { LuPenLine } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { dbSetAsDefaultProject } from "requests/projects";
 import { openDeleteProjectWarningModal } from "state/actions/modal";
@@ -32,7 +33,7 @@ export function HomePage() {
   }, [doRefresh]);
 
   return (
-    <GridWrapper gridStyles="bg-setta-100 dark:bg-setta-900">
+    <GridWrapper gridStyles="bg-setta-100 dark:bg-setta-850">
       <RightColumn
         projects={projects}
         defaultProjectName={defaultProjectName}
@@ -139,20 +140,31 @@ function ProjectItems({
   });
 
   const gridStyles =
-    "grid grid-cols-[repeat(minmax(0, 1fr))] md:grid-cols-[repeat(auto-fit,_minmax(15rem,_1fr))] xl:grid-cols-[repeat(auto-fill,_minmax(20rem,_1fr))] gap-8 pt-7 justify-items-start";
+    filteredProjects === 0
+      ? "relative"
+      : "grid grid-cols-[repeat(minmax(0, 1fr))] md:grid-cols-[repeat(auto-fit,_minmax(15rem,_1fr))] xl:grid-cols-[repeat(auto-fill,_minmax(20rem,_1fr))] gap-8 pt-7 justify-items-start";
 
   return (
     <div className={gridStyles}>
-      {filteredProjects.map((x, i) => (
-        <ProjectItem
-          project={x}
-          isDefault={x.name === defaultProjectName}
-          key={`Project ${i} ${x.name}`}
-          isSelected={selectedProjects.includes(x.id)}
-          onSelectProject={onSelectProject}
-          inSelectionMode={selectedProjects.length > 0}
-        />
-      ))}
+      {filteredProjects.length === 0 ? (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+          <LuPenLine className="mx-auto h-32 w-32 text-setta-200 dark:text-setta-700/30" />
+          <p className="text-center font-semibold text-setta-300 dark:text-setta-700">
+            Create a New Config!
+          </p>
+        </div>
+      ) : (
+        filteredProjects.map((x, i) => (
+          <ProjectItem
+            project={x}
+            isDefault={x.name === defaultProjectName}
+            key={`Project ${i} ${x.name}`}
+            isSelected={selectedProjects.includes(x.id)}
+            onSelectProject={onSelectProject}
+            inSelectionMode={selectedProjects.length > 0}
+          />
+        ))
+      )}
     </div>
   );
 }
