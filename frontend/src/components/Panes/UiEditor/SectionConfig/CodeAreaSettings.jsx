@@ -12,9 +12,10 @@ export function CodeAreaSettings({ sectionId }) {
   const subprocessStartMethod = useSectionInfos(
     (x) => x.x[sectionId].subprocessStartMethod,
   );
+
   function setSubprocessStartMethod(v) {
     useSectionInfos.setState((state) => {
-      state.x[sectionId].subprocessStartMethod = subprocessStartMethod;
+      state.x[sectionId].subprocessStartMethod = v;
     });
   }
 

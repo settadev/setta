@@ -95,6 +95,9 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
                     section_id, section_dependencies
                 ),
                 "module_name": create_in_memory_module_name(p, section_id),
+                "subprocessStartMethod": p["sections"][section_id][
+                    "subprocessStartMethod"
+                ],
             }
         )
 

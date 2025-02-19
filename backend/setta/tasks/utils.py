@@ -46,7 +46,10 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
 
 
 class SettaInMemoryFnSubprocess:
-    def __init__(self, stop_event, websockets, start_method="spawn"):
+    def __init__(self, stop_event, websockets, start_method):
+        logger.debug(
+            f"Creating SettaInMemoryFnSubprocess using {start_method} start_method"
+        )
         ctx = multiprocessing.get_context(start_method)
         self.parent_conn, self.child_conn = ctx.Pipe()
         self.process = ctx.Process(target=self._subprocess_main)

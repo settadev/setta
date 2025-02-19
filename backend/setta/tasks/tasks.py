@@ -139,7 +139,9 @@ class Tasks:
             if sp:
                 sp.close()
             logger.debug(f"Creating new subprocess for {module_name}")
-            sp = SettaInMemoryFnSubprocess(self.stop_event, self.websockets)
+            sp = SettaInMemoryFnSubprocess(
+                self.stop_event, self.websockets, c["subprocessStartMethod"]
+            )
             self.in_memory_subprocesses[subprocess_key] = {
                 "subprocess": sp,
                 "fnInfo": {},
