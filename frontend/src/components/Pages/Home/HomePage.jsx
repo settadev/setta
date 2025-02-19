@@ -33,7 +33,7 @@ export function HomePage() {
   }, [doRefresh]);
 
   return (
-    <GridWrapper gridStyles="bg-setta-100 dark:bg-setta-850">
+    <GridWrapper gridStyles="bg-setta-100 dark:bg-setta-dark">
       <RightColumn
         projects={projects}
         defaultProjectName={defaultProjectName}
@@ -87,14 +87,14 @@ function RightColumn({ projects, defaultProjectName, setDoRefresh }) {
       <div className="flex justify-between gap-4">
         <div className="flex gap-4">
           <StandardButton
-            twClasses="py-2 px-4 rounded-full font-bold  text-white bg-setta-600  hover:bg-blue-500 gap-2"
+            twClasses="py-2 px-4 rounded-full font-bold  text-white bg-setta-600  hover:bg-blue-500 dark:hover:bg-blue-700 gap-2"
             onClick={createAndGoToProjectConfig}
           >
             <BiPlus />
             New Config
           </StandardButton>
           <StandardButton
-            twClasses="py-2 px-4 rounded-full font-medium text-white dark:text-white/75 bg-setta-400 dark:bg-setta-500/25 hover:!bg-green-500 hover:text-white gap-2"
+            twClasses="py-2 px-4 rounded-full font-medium text-white dark:text-white/75 bg-setta-400 dark:bg-setta-500/25 hover:!bg-green-500 dark:hover:!bg-green-700 hover:text-white gap-2"
             onClick={onClickMakeDefault}
             disabled={selectedProjects.length !== 1}
           >
@@ -112,7 +112,7 @@ function RightColumn({ projects, defaultProjectName, setDoRefresh }) {
         </div>
         <Link
           to={SETTINGS_ROUTER_PATH}
-          className="nodrag inline-flex cursor-pointer items-center gap-2 rounded-full bg-setta-600 px-4 py-2  font-bold text-white  hover:bg-blue-500 focus-visible:ring-2 "
+          className="nodrag inline-flex cursor-pointer items-center gap-2 rounded-full bg-setta-600 px-4 py-2  font-bold text-white  hover:bg-blue-500 focus-visible:ring-2 dark:hover:bg-blue-700 "
         >
           <IoSettingsOutline />
           Settings
@@ -198,7 +198,7 @@ const ProjectItem = forwardRef(
             isSelected={isSelected}
             onSelectProject={onSelectProject}
           />
-          <div className="col-start-1 col-end-2 row-start-2 row-end-3 w-full place-self-end bg-white px-5 py-4 dark:bg-setta-800">
+          <div className="col-start-1 col-end-2 row-start-2 row-end-3 w-full place-self-end bg-white px-5 py-4 dark:bg-setta-860">
             <div className="flex items-center justify-between">
               <p className="text-sm text-setta-600 dark:text-setta-100">
                 {project.name}
