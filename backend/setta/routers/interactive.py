@@ -75,8 +75,14 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
         template_var_replacement_values=template_var_replacement_values,
     )
 
+    runCodeBlocks = p["runCodeBlocks"]
+    if runCodeBlocks is None:
+        runCodeBlocks = [
+            k for k in p["sections"].keys() if get_section_type(p, k) == C.CODE
+        ]
+
     top_node_ids, section_dependencies = prune_and_find_top_nodes(
-        code_dict, p["runCodeBlocks"]
+        code_dict, runCodeBlocks
     )
     code_graph = []
     project_config_id = p["projectConfig"]["id"]

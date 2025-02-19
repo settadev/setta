@@ -24,6 +24,7 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
     project.runCodeBlocks = sectionIds;
     projects.push(project);
   }
+  console.log("projects", projects)
   const res = await dbImportCodeBlocks(projects);
   if (res.status === 200) {
     updateInMemorySubprocessInfo(res.data.inMemorySubprocessInfo);
