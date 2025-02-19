@@ -81,7 +81,7 @@ const LayersList = ({
           >
             <header className="flex gap-1">
               <FaObjectGroup className="text-setta-300 dark:text-setta-600" />
-              <h4 className="text-xs font-bold uppercase text-setta-600 dark:text-setta-400">
+              <h4 className="truncate text-xs font-bold uppercase text-setta-600 dark:text-setta-400">
                 {layer.name}
               </h4>
             </header>
@@ -190,7 +190,7 @@ function ImageArtifactObjects({
                   <p className="truncate text-xs font-bold text-setta-600 dark:text-setta-200">
                     {item.name}
                   </p>
-                  <p className="ml-2 text-xs text-setta-500 dark:text-setta-400">
+                  <p className="ml-2 truncate text-xs text-setta-500 dark:text-setta-400">
                     {item.type}
                   </p>
                 </header>
@@ -257,7 +257,7 @@ function ChartArtifactObjects({
                   <p className="truncate text-xs font-bold text-setta-600 dark:text-setta-200">
                     {item.name}
                   </p>
-                  <p className="ml-2 text-xs text-setta-500 dark:text-setta-400">
+                  <p className="ml-2 truncate text-xs text-setta-500 dark:text-setta-400">
                     {item.type}
                   </p>
                 </header>
@@ -325,7 +325,7 @@ export function LayerListAndListOfArtifacts({ sectionId, sectionTypeName }) {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-1 overflow-y-scroll [&>*]:mx-[2px]">
+    <div className="flex flex-1 flex-col gap-1 overflow-x-clip overflow-y-scroll [&>*]:mx-[2px]">
       <LayersList
         sectionId={sectionId}
         availableArtifacts={availableArtifacts}

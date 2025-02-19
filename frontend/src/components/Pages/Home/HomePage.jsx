@@ -148,7 +148,7 @@ function ProjectItems({
     <div className={gridStyles}>
       {filteredProjects.length === 0 ? (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-          <LuPenLine className="mx-auto h-32 w-32 text-setta-200 dark:text-setta-700/30" />
+          <LuPenLine className="mx-auto h-32 w-32 text-setta-200 dark:text-setta-700/50" />
           <p className="text-center font-semibold text-setta-300 dark:text-setta-700">
             Create a New Config!
           </p>
