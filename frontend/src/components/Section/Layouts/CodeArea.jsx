@@ -119,6 +119,8 @@ function CoreCodeArea({ sectionId, language, completionsFn, keywordStylizer }) {
     isDisabled: variantIsFrozen,
   });
 
+  // TODO: replace the arbitrary inline tailwind styles with something more elegant
+
   return (
     <article
       ref={wrapperRef}
