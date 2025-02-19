@@ -1,3 +1,5 @@
+import asyncio
+
 import black
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -39,12 +41,17 @@ async def route_update_interactive_code(
     tasks=Depends(get_tasks),
     lsp_writers=Depends(get_lsp_writers),
 ):
-    idx = 0
-    content = []
-    for p in x.projects:
-        initialContent = await update_interactive_code(p, tasks, lsp_writers, idx)
-        content.extend(initialContent)
-        idx += 1
+    # Create list of coroutines to run in parallel
+    update_tasks = [
+        update_interactive_code(p, tasks, lsp_writers, idx)
+        for idx, p in enumerate(x.projects)
+    ]
+
+    # Run all updates in parallel and gather results
+    all_content = await asyncio.gather(*update_tasks)
+
+    # Flatten the list of content
+    content = [item for sublist in all_content for item in sublist]
 
     inMemorySubprocessInfo = tasks.getInMemorySubprocessInfo()
     return {"inMemorySubprocessInfo": inMemorySubprocessInfo, "content": content}
