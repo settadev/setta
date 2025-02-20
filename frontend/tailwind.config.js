@@ -23,7 +23,7 @@ module.exports = {
           950: "hsl(220, 25%, 3%)",
           975: "hsl(220, 33%, 0.5%)",
           light: "#94a3b8",
-          dark: "hsl(220, 27%, 13%)",
+          dark: "hsl(220, 27%, 15%)",
         },
       },
       fontFamily: {

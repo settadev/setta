@@ -51,36 +51,40 @@ export function setCanvasSize({
   artifactIdUsedToSetCanvasSize,
   state,
 }) {
-  const sectionState = useSectionInfos.getState();
-  const artifactState = useArtifacts.getState().x;
-  let imgSize = maybeGetImgSizeFromArtifact(
-    artifactState[artifactIdUsedToSetCanvasSize],
-  );
+  // TODO: decide if we want to uncomment this stuff which uses image size to set section/canvas size.
+  // const sectionState = useSectionInfos.getState();
+  // const artifactState = useArtifacts.getState().x;
+  // let imgSize = maybeGetImgSizeFromArtifact(
+  //   artifactState[artifactIdUsedToSetCanvasSize],
+  // );
+  // let isNewImg = false;
+
+  // if (!imgSize) {
+  //   for (const layerId of sectionState.x[sectionId].artifactGroupIds) {
+  //     const layer = sectionState.artifactGroups[layerId];
+
+  //     for (const t of layer.artifactTransforms) {
+  //       const id = t.artifactId;
+  //       if (!(id in artifactState)) {
+  //         continue;
+  //       }
+  //       const artifact = artifactState[id];
+  //       imgSize = maybeGetImgSizeFromArtifact(artifact);
+  //       if (imgSize) {
+  //         state.x[sectionId].canvasSettings.artifactIdUsedToSetCanvasSize = id;
+  //         isNewImg = true;
+  //         break;
+  //       }
+  //     }
+
+  //     if (imgSize) {
+  //       break;
+  //     }
+  //   }
+  // }
+
+  let imgSize = null;
   let isNewImg = false;
-
-  if (!imgSize) {
-    for (const layerId of sectionState.x[sectionId].artifactGroupIds) {
-      const layer = sectionState.artifactGroups[layerId];
-
-      for (const t of layer.artifactTransforms) {
-        const id = t.artifactId;
-        if (!(id in artifactState)) {
-          continue;
-        }
-        const artifact = artifactState[id];
-        imgSize = maybeGetImgSizeFromArtifact(artifact);
-        if (imgSize) {
-          state.x[sectionId].canvasSettings.artifactIdUsedToSetCanvasSize = id;
-          isNewImg = true;
-          break;
-        }
-      }
-
-      if (imgSize) {
-        break;
-      }
-    }
-  }
 
   const canvasSize = setDrawAreaSectionSize({
     sectionId,

@@ -46,10 +46,14 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
 
 
 class SettaInMemoryFnSubprocess:
-    def __init__(self, stop_event, websockets):
-        self.parent_conn, self.child_conn = multiprocessing.Pipe()
-        self.process = multiprocessing.Process(target=self._subprocess_main)
-        self.stdout_parent_conn, self.stdout_child_conn = multiprocessing.Pipe()
+    def __init__(self, stop_event, websockets, start_method):
+        logger.debug(
+            f"Creating SettaInMemoryFnSubprocess using {start_method} start_method"
+        )
+        ctx = multiprocessing.get_context(start_method)
+        self.parent_conn, self.child_conn = ctx.Pipe()
+        self.process = ctx.Process(target=self._subprocess_main)
+        self.stdout_parent_conn, self.stdout_child_conn = ctx.Pipe()
         self.process.daemon = True  # Ensure process dies with parent
         self.process.start()
 
@@ -95,15 +99,18 @@ class SettaInMemoryFnSubprocess:
 
             try:
                 if msg_type == "import":
-                    code = msg["code"]
-                    module_name = msg["module_name"]
-                    # Import and store module
-                    module = import_code_from_string(code, module_name)
-                    added_fn_names = add_fns_from_module(fns_dict, module, module_name)
                     dependencies = {}
-                    for k in added_fn_names:
-                        cache[k] = msg["to_cache"]
-                        dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
+                    for to_import in msg["imports"]:
+                        code = to_import["code"]
+                        module_name = to_import["module_name"]
+                        # Import and store module
+                        module = import_code_from_string(code, module_name)
+                        added_fn_names = add_fns_from_module(
+                            fns_dict, module, module_name
+                        )
+                        for k in added_fn_names:
+                            cache[k] = msg["to_cache"]
+                            dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
 
                     self.child_conn.send(
                         {

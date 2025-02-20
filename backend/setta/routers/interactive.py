@@ -1,3 +1,5 @@
+import asyncio
+
 import black
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -39,12 +41,17 @@ async def route_update_interactive_code(
     tasks=Depends(get_tasks),
     lsp_writers=Depends(get_lsp_writers),
 ):
-    idx = 0
-    content = []
-    for p in x.projects:
-        initialContent = await update_interactive_code(p, tasks, lsp_writers, idx)
-        content.extend(initialContent)
-        idx += 1
+    # Create list of coroutines to run in parallel
+    update_tasks = [
+        update_interactive_code(p, tasks, lsp_writers, idx)
+        for idx, p in enumerate(x.projects)
+    ]
+
+    # Run all updates in parallel and gather results
+    all_content = await asyncio.gather(*update_tasks)
+
+    # Flatten the list of content
+    content = [item for sublist in all_content for item in sublist]
 
     inMemorySubprocessInfo = tasks.getInMemorySubprocessInfo()
     return {"inMemorySubprocessInfo": inMemorySubprocessInfo, "content": content}
@@ -75,20 +82,34 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
         template_var_replacement_values=template_var_replacement_values,
     )
 
+    runCodeBlocks = p["runCodeBlocks"]
+    if runCodeBlocks is None:
+        runCodeBlocks = [
+            k for k in p["sections"].keys() if get_section_type(p, k) == C.CODE
+        ]
+
     top_node_ids, section_dependencies = prune_and_find_top_nodes(
-        code_dict, p["runCodeBlocks"]
+        code_dict, runCodeBlocks
     )
     code_graph = []
     project_config_id = p["projectConfig"]["id"]
     for section_id in top_node_ids:
+        import_order = get_import_order_for_top_node(section_id, section_dependencies)
+        imports = [
+            {
+                "code": code_dict[s]["code"],
+                "module_name": create_in_memory_module_name(p, s),
+            }
+            for s in import_order
+        ]
+
         code_graph.append(
             {
+                "imports": imports,
                 "subprocess_key": f"{project_config_id}-{section_id}-{idx}",
-                "code": code_dict[section_id]["code"],
-                "imports": get_import_order_for_top_node(
-                    section_id, section_dependencies
-                ),
-                "module_name": create_in_memory_module_name(p, section_id),
+                "subprocessStartMethod": p["sections"][section_id][
+                    "subprocessStartMethod"
+                ],
             }
         )
 

@@ -122,6 +122,7 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "columnWidth",
         "renderedValue",
         "isReadOnlyTerminal",
+        "subprocessStartMethod",
     )
 )
 
