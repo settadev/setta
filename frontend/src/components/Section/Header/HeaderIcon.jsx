@@ -63,7 +63,9 @@ export function HeaderIcon({
       );
     case C.IFRAME:
       return (
-        <i className="gg-code-slash !rotate-[14deg] !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff] " />
+        <div className="relative flex w-2 justify-center">
+          <i className="gg-code-slash !rotate-[14deg] !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]" />
+        </div>
       );
     case C.SOCIAL:
       return <SocialIcon sectionId={sectionId} />;
