@@ -5,7 +5,7 @@
 <div align="center">
   
 [![PyPI version](https://img.shields.io/pypi/v/setta?color=bright-green)](https://pypi.org/project/setta)
-[![License](https://img.shields.io/pypi/l/setta)](https://github.com/settadev/setta/blob/main/LICENSE)
+[![License](https://img.shields.io/pypi/l/setta?color=bright-green)](https://github.com/settadev/setta/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-7389D8?logo=discord&logoColor=white)](https://discord.gg/MmHJz75bZ5)
 
 </div>
