@@ -60,10 +60,9 @@ Documentation is in progress: https://docs.setta.dev/
 
 ## Examples
 
-https://github.com/settadev/examples
+Our examples are easy to run: https://github.com/settadev/examples
 
-
-
+The current examples are focused on AI, like LLM training and image generation. We'll soon be adding examples for other domains too.
 
 
 
