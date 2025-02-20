@@ -266,18 +266,19 @@ class Exporter:
                 "section": section_details,
                 "sectionVariant": section_variant,
             }
+        self.types_to_process = [
+            C.SECTION,
+            C.LIST_ROOT,
+            C.DICT_ROOT,
+            C.GROUP,
+            C.CODE,
+            C.GLOBAL_VARIABLES,
+        ]
 
     def export(self):
         remove_unneeded_sections(
             self.p,
-            [
-                C.SECTION,
-                C.LIST_ROOT,
-                C.DICT_ROOT,
-                C.GROUP,
-                C.CODE,
-                C.GLOBAL_VARIABLES,
-            ],
+            self.types_to_process,
         )
         self.export_sections(list(self.p["projectConfig"]["children"].keys()))
 
@@ -333,10 +334,12 @@ class Exporter:
                 children = [
                     c
                     for c in children
-                    if get_section_type(self.p, c)
-                    in [C.SECTION, C.LIST_ROOT, C.DICT_ROOT, C.GROUP]
+                    if get_section_type(self.p, c) in self.types_to_process
                 ]
-                info["value"] = self.export_sections(children)
+                # some sections (like CODE) don't get added to self.output
+                info["value"] = [
+                    x for x in self.export_sections(children) if x in self.output
+                ]
                 info["dependencies"] = info["value"]
                 info[
                     "ref_var_name_positions"
