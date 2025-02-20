@@ -53,7 +53,9 @@ export function HeaderIcon({
       return <InfoIcon sectionId={sectionId} />;
     case C.IMAGE:
       return (
-        <i className="gg-image !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff] " />
+        <div className="relative">
+          <i className="gg-image absolute inset-0 !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]" />
+        </div>
       );
     case C.DRAW:
       return (
