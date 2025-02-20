@@ -10,7 +10,7 @@
 
 </div>
 
-# News
+## News
 
 **February 20**: v0.0.4
 - Allow subprocess start method to be specified (fork, spawn, forkserver)
@@ -24,23 +24,48 @@
 - First release!
 
 
-
-# Python Without The Donkeywork
-
-https://github.com/user-attachments/assets/0599b754-1fbc-470b-ad6f-ac44b01da761
-
-
 ## What does Setta do?
-Setta enables you to:
-- Streamline your code. 
+
+Setta is a developer tool that streamlines Python coding, configuration, UI creation, and onboarding.
+
+It enables you to:
 - Skip the boilerplate parsers and frontend. 
 - Effortlessly expose your Python functions as a flexible UI. 
 - Configure, interact, and share with ease.
 
-## What Setta Is Not
-Setta is **not**:
-- A frontend framework.
-- A visual programming system.
+Here's a short intro video:
+
+https://github.com/user-attachments/assets/0599b754-1fbc-470b-ad6f-ac44b01da761
+
+## Getting started
+
+Run this command in your terminal:
+
+```
+pip install setta
+```
+
+Then go to your project folder and enter:
+
+```
+setta
+```
+
+The Setta UI will now be available in your web browser at http://127.0.0.1:8000/.
+
+
+## Documentation
+
+Documentation is in progress: https://docs.setta.dev/
+
+## Examples
+
+https://github.com/settadev/examples
+
+
+
+
+
 
 ## Why Setta Is Betta
 
@@ -115,19 +140,7 @@ Setta is **not**:
 </table>
 
 
-## Installation
 
-```
-pip install setta
-```
-
-## Documentation
-
-Documentation is in progress: https://docs.setta.dev/
-
-## Examples
-
-Examples showing how to use Setta will be here: https://github.com/settadev/examples
 
 
 ## Contributors
