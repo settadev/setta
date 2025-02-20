@@ -58,7 +58,7 @@
     "gridPattern": "Dots",
     "gridPatternSize": 2,
     "gridColor": "#afbacf",
-    "gridColorDarkMode": "#222a3a",
+    "gridColorDarkMode": "#2b364a",
     "defaultZoomLevel": 1,
     "minZoom": 0.1,
     "maxZoom": 10,

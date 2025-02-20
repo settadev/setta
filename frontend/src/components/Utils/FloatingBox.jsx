@@ -68,7 +68,7 @@ export const FloatingBox = () => {
     <div
       id={TOOLTIP_DIV_ID}
       ref={boxRef}
-      className={`fixed left-0 top-0 z-50 flex max-h-96 w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
+      className={`fixed left-0 top-0 z-50 flex max-h-96 w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
       style={{
         transform: `translate(${position.x}px, ${position.y}px)`,
       }}
