@@ -2,13 +2,33 @@
 ![Setta Logo](images/setta-github-dark.png#gh-dark-mode-only)
 
 
+<div align="center">
+  
+[![PyPI version](https://img.shields.io/pypi/v/setta?color=bright-green)](https://pypi.org/project/setta)
+[![License](https://img.shields.io/pypi/l/setta)](https://github.com/settadev/setta/blob/main/LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Join-7389D8?logo=discord&logoColor=white)](https://discord.gg/MmHJz75bZ5)
+
+</div>
+
+# News
+
+**February 20**: v0.0.4
+- Allow subprocess start method to be specified (fork, spawn, forkserver)
+- When doing a param sweep of in-memory functions, import them in parallel.
+- Various style improvements
+
+**February 18**: v0.0.3
+- Big improvements to charts and in-memory functions
+
+**February 2**: v0.0.2
+- First release!
+
+
+
 # Python Without The Donkeywork
 
 https://github.com/user-attachments/assets/0599b754-1fbc-470b-ad6f-ac44b01da761
 
-[![PyPI version](https://badge.fury.io/py/setta.svg)](https://badge.fury.io/py/setta)
-[![License](https://img.shields.io/pypi/l/setta)](https://github.com/settadev/setta/blob/main/LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Join-7389D8?logo=discord&logoColor=white)](https://discord.gg/MmHJz75bZ5)
 
 ## What does Setta do?
 Setta enables you to:
