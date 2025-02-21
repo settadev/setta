@@ -12,13 +12,13 @@
 
 ## News
 
-**February 21**: v0.0.5
+**February 21**: [v0.0.5](https://github.com/settadev/setta/releases/tag/v0.0.5)
 - Mostly styling updates.
 
-**February 20**: v0.0.4
+**February 20**: [v0.0.4](https://github.com/settadev/setta/releases/tag/v0.0.4)
 - Improvements to subprocesses and param sweeps.
 
-**February 18**: v0.0.3
+**February 18**: [v0.0.3](https://github.com/settadev/setta/releases/tag/v0.0.3)
 - Big improvements to charts and in-memory functions.
 
 
