@@ -218,9 +218,10 @@ export function updateColumnNameSelections(artifactIds, sectionId, state) {
   if (seriesNames === 0) {
     return;
   }
-  if (!seriesNames.includes(chartSettings.xAxisColumn)) {
-    chartSettings.xAxisColumn = seriesNames[0];
-  }
+  // TODO: think about whether we need this
+  // if (!seriesNames.includes(chartSettings.xAxisColumn)) {
+  //   chartSettings.xAxisColumn = seriesNames[0];
+  // }
 }
 
 // doesn't need whole artifacts, just name and value
