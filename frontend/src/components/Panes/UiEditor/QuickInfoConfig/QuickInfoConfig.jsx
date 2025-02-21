@@ -63,7 +63,6 @@ function _UIElement({ paramInfo }) {
         value={description}
         onChange={(e) => {
           useSectionInfos.setState((state) => {
-            console.log("onCHange");
             state.codeInfo[id].description = e.target.value;
           });
         }}
