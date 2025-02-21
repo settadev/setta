@@ -12,16 +12,15 @@
 
 ## News
 
+**February 21**: v0.0.5
+- Mostly styling updates.
+
 **February 20**: v0.0.4
-- Allow subprocess start method to be specified (fork, spawn, forkserver)
-- When doing a param sweep of in-memory functions, import them in parallel.
-- Various style improvements
+- Improvements to subprocesses and param sweeps.
 
 **February 18**: v0.0.3
-- Big improvements to charts and in-memory functions
+- Big improvements to charts and in-memory functions.
 
-**February 2**: v0.0.2
-- First release!
 
 
 ## What does Setta do?
