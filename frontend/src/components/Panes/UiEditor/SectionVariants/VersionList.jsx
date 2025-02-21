@@ -103,12 +103,12 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
     <li
       onMouseEnter={() => onMouseEnterSetPreviewVariantId(sectionId, id)}
       onClick={() => onClickSetVariantId(sectionId, id)}
-      className="section-key-value group/versionitem -my-[0.125rem] flex h-min cursor-pointer items-center justify-between rounded-sm border-b border-transparent px-1 py-[0.125rem] text-xs hover:bg-setta-200/30 dark:hover:bg-setta-800/50"
+      className={`section-key-value group/versionitem -my-[0.125rem] flex h-min cursor-pointer items-center justify-between rounded-sm border-b border-transparent px-1 py-[0.125rem] text-xs hover:bg-setta-200/30 dark:hover:bg-setta-700/50 ${isCurr ? "bg-blue-500 dark:bg-blue-700" : ""}`}
     >
       <p
         className={`section-key truncate ${
           isCurr
-            ? "font-medium text-setta-600 group-hover/versionitem:text-setta-800 dark:text-setta-300 group-hover/versionitem:dark:text-setta-100"
+            ? "font-medium text-white group-hover/versionitem:text-setta-800 group-hover/versionitem:dark:text-setta-100"
             : "text-setta-400 dark:text-setta-400"
         } `}
       >

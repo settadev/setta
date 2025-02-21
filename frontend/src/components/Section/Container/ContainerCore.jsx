@@ -105,7 +105,7 @@ function ContainerGroup({
       style={style}
     >
       <div
-        className={`outline outline-4 ${outlineColor} transition-radius absolute left-0 right-0 top-0 z-0 h-full w-full ${positionAndSizeLocked ? "rounded-sm border-setta-400/90 dark:border-setta-975" : "rounded-3xl border-setta-50/50 dark:border-setta-700"}  border border-solid  bg-setta-100/60 outline outline-2 outline-transparent   dark:bg-setta-950/70`}
+        className={`outline outline-4 ${outlineColor} transition-radius absolute left-0 right-0 top-0 z-0 h-full w-full ${positionAndSizeLocked ? "rounded-sm border-setta-400/90 dark:border-setta-975/35" : "rounded-3xl border-setta-50/50 dark:border-setta-700"}  border border-solid  bg-setta-100/40 outline outline-2 outline-transparent   backdrop-blur-[1px] dark:bg-setta-950/20`}
       />
       <div className="z-10 flex min-h-10 w-full items-center">
         <MenuButton
