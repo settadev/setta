@@ -113,6 +113,8 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "runInMemory",
         "isFrozen",
         "jsonSource",
+        "hideParams",
+        "hideSearch",
         "hideUnpinnedParams",
         "displayMode",
         "canvasSettings",

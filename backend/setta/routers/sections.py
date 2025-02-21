@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ class ParamSweepSectionToYamlRequest(BaseModel):
 
 
 class GlobalParamSweepSectionToYamlRequest(BaseModel):
-    runGroup: dict | None
+    runGroup: Optional[dict]
     sections: dict
     sectionVariants: dict
 
