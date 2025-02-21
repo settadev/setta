@@ -92,7 +92,7 @@ const TooltipPage = React.memo(({ item, isFrozen }) => {
         </h3>
       )}
       <article
-        className={`flex-1 overflow-y-auto break-words text-sm text-setta-700 dark:text-setta-300 ${item.contentClassName}`}
+        className={`flex-1 overflow-y-auto whitespace-pre-line break-words text-sm text-setta-700 dark:text-setta-300 ${item.contentClassName}`}
       >
         {item.content}
       </article>
