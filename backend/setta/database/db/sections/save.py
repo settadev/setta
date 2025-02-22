@@ -155,8 +155,6 @@ def save_sections(db, sections, section_variants):
     db.execute(query, query_params)
 
     run_group_query_params = []
-    run_group_versions_query_params = []
-    run_group_param_sweeps_query_params = []
     for idid, variant in section_variants.items():
         variant = replace_null_keys_with_none(variant)
         for sectionId, detailsForSection in variant["runGroup"].items():
@@ -170,35 +168,13 @@ def save_sections(db, sections, section_variants):
                     {
                         **base_query_params,
                         "selected": detailsForParentVariant["selected"],
+                        "versionId": detailsForParentVariant["version"],
+                        "sweepId": detailsForParentVariant["paramSweep"],
                     }
                 )
-                for versionId, selected in detailsForParentVariant["versions"].items():
-                    run_group_versions_query_params.append(
-                        {
-                            **base_query_params,
-                            "versionId": versionId,
-                            "selected": selected,
-                        }
-                    )
-                for sweepId, selected in detailsForParentVariant["paramSweeps"].items():
-                    run_group_param_sweeps_query_params.append(
-                        {**base_query_params, "sweepId": sweepId, "selected": selected}
-                    )
 
     query = """
         INSERT INTO SectionVariantRunGroup (idid, sectionId, parentVariantId, selected)
         VALUES (:idid, :sectionId, :parentVariantId, :selected)
     """
     db.executemany(query, run_group_query_params)
-
-    query = """
-        INSERT INTO SectionVariantRunGroupVersions (idid, sectionId, parentVariantId, versionId, selected)
-        VALUES (:idid, :sectionId, :parentVariantId, :versionId, :selected)
-    """
-    db.executemany(query, run_group_versions_query_params)
-
-    query = """
-        INSERT INTO SectionVariantRunGroupParamSweeps (idid, sectionId, parentVariantId, sweepId, selected)
-        VALUES (:idid, :sectionId, :parentVariantId, :sweepId, :selected)
-    """
-    db.executemany(query, run_group_param_sweeps_query_params)

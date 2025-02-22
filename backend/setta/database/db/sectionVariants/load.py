@@ -81,27 +81,11 @@ def load_section_variants(db, ids):
             SectionVariantRunGroup.sectionId,
             SectionVariantRunGroup.parentVariantId,
             SectionVariantRunGroup.selected,
-            SectionVariantRunGroupVersions.versionId,
-            SectionVariantRunGroupVersions.selected as version_selected,
-            SectionVariantRunGroupParamSweeps.sweepId,
-            SectionVariantRunGroupParamSweeps.selected as sweep_selected
+            SectionVariantRunGroup.versionId,
+            SectionVariantRunGroup.sweepId
         FROM SectionVariantId
         LEFT JOIN SectionVariantRunGroup
             ON SectionVariantId.id = SectionVariantRunGroup.idid
-        LEFT JOIN SectionVariantRunGroupVersions
-            ON SectionVariantRunGroup.idid = SectionVariantRunGroupVersions.idid
-            AND SectionVariantRunGroup.sectionId = SectionVariantRunGroupVersions.sectionId
-            AND (
-                (SectionVariantRunGroup.parentVariantId IS NULL AND SectionVariantRunGroupVersions.parentVariantId IS NULL)
-                OR SectionVariantRunGroup.parentVariantId = SectionVariantRunGroupVersions.parentVariantId
-            )
-        LEFT JOIN SectionVariantRunGroupParamSweeps
-            ON SectionVariantRunGroup.idid = SectionVariantRunGroupParamSweeps.idid
-            AND SectionVariantRunGroup.sectionId = SectionVariantRunGroupParamSweeps.sectionId
-            AND (
-                (SectionVariantRunGroup.parentVariantId IS NULL AND SectionVariantRunGroupParamSweeps.parentVariantId IS NULL)
-                OR SectionVariantRunGroup.parentVariantId = SectionVariantRunGroupParamSweeps.parentVariantId
-            )
         WHERE SectionVariantId.id in ({placeholders})
     """
     db.execute(query, ids)
@@ -120,20 +104,8 @@ def load_section_variants(db, ids):
         if row["parentVariantId"] not in curr[sectionId]:
             curr[sectionId][row["parentVariantId"]] = {
                 "selected": bool(row["selected"]),
-                "versions": {},
-                "paramSweeps": {},
+                "version": row["versionId"],
+                "paramSweep": row["sweepId"],
             }
-
-        # Add version data if present
-        if row["versionId"] is not None:
-            curr[sectionId][row["parentVariantId"]]["versions"][
-                row["versionId"]
-            ] = bool(row["version_selected"])
-
-        # Add param sweep data if present
-        if row["sweepId"] is not None:
-            curr[sectionId][row["parentVariantId"]]["paramSweeps"][
-                row["sweepId"]
-            ] = bool(row["sweep_selected"])
 
     return output

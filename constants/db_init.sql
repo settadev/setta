@@ -100,33 +100,13 @@ CREATE TABLE IF NOT EXISTS SectionVariantRunGroup (
     sectionId TEXT,
     parentVariantId TEXT,
     selected BOOLEAN,
+    versionId TEXT,
+    sweepId TEXT,
     PRIMARY KEY (idid, sectionId, parentVariantId),
     FOREIGN KEY (idid) REFERENCES SectionVariantId(id) ON DELETE CASCADE,
-    FOREIGN KEY (sectionId) REFERENCES Section(id) ON DELETE CASCADE
-    FOREIGN KEY (parentVariantId) REFERENCES SectionVariantId(id) ON DELETE CASCADE
-);
-CREATE TABLE IF NOT EXISTS SectionVariantRunGroupVersions (
-    idid TEXT,
-    sectionId TEXT,
-    parentVariantId TEXT,
-    versionId TEXT,
-    selected BOOLEAN,
-    PRIMARY KEY (idid, sectionId, parentVariantId, versionId),
-    FOREIGN KEY (idid, sectionId, parentVariantId) 
-        REFERENCES SectionVariantRunGroup(idid, sectionId, parentVariantId) 
-        ON DELETE CASCADE,
-    FOREIGN KEY (versionId) REFERENCES SectionVariantId(id) ON DELETE CASCADE
-);
-CREATE TABLE IF NOT EXISTS SectionVariantRunGroupParamSweeps (
-    idid TEXT,
-    sectionId TEXT,
-    parentVariantId TEXT,
-    sweepId TEXT,
-    selected BOOLEAN,
-    PRIMARY KEY (idid, sectionId, parentVariantId, sweepId),
-    FOREIGN KEY (idid, sectionId, parentVariantId) 
-        REFERENCES SectionVariantRunGroup(idid, sectionId, parentVariantId) 
-        ON DELETE CASCADE,
+    FOREIGN KEY (sectionId) REFERENCES Section(id) ON DELETE CASCADE,
+    FOREIGN KEY (parentVariantId) REFERENCES SectionVariantId(id) ON DELETE CASCADE,
+    FOREIGN KEY (versionId) REFERENCES SectionVariantId(id) ON DELETE CASCADE,
     FOREIGN KEY (sweepId) REFERENCES SectionVariantId(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS EVRefs (
