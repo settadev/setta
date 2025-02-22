@@ -12,15 +12,14 @@
 
 ## News
 
+**February 22**: [v0.0.6](https://github.com/settadev/setta/releases/tag/v0.0.6)
+- Fixed bug where the language server URIs weren't created properly on Windows.
+
 **February 21**: [v0.0.5](https://github.com/settadev/setta/releases/tag/v0.0.5)
 - Mostly styling updates.
 
 **February 20**: [v0.0.4](https://github.com/settadev/setta/releases/tag/v0.0.4)
 - Improvements to subprocesses and param sweeps.
-
-**February 18**: [v0.0.3](https://github.com/settadev/setta/releases/tag/v0.0.3)
-- Big improvements to charts and in-memory functions.
-
 
 ## What does Setta do?
 
