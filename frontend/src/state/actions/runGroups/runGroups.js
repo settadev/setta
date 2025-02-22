@@ -87,25 +87,6 @@ function forceAllAncestorsToBeSelected(runGroupId, ancestors, state) {
   }
 }
 
-function allAncestorsAreSelected(runGroupId, ancestors, state) {
-  for (const [idx, a] of ancestors.entries()) {
-    const parentVariantId = idx === 0 ? null : ancestors[idx - 1].variantId;
-    if (
-      !state.variants[runGroupId].runGroup[a.id]?.[parentVariantId].version ===
-        a.variantId ||
-      !sectionIsSelected(runGroupId, a.id, parentVariantId, state)
-    ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function sectionIsSelected(runGroupId, sectionId, parentVariantId, state) {
-  return state.variants[runGroupId].runGroup[sectionId]?.[parentVariantId]
-    .selected;
-}
-
 function toggleRunGroupSectionAttr({
   runGroupId,
   ancestors,
@@ -115,30 +96,17 @@ function toggleRunGroupSectionAttr({
   parentVariantId,
 }) {
   useSectionInfos.setState((state) => {
-    const isNewInit = maybeInitRunGroupSection(
+    maybeInitRunGroupSection(
       runGroupId,
       sectionId,
       parentVariantId,
       state,
       attrName === "version" ? attrId : null,
     );
-    let newState;
     const thisSectionState =
       state.variants[runGroupId].runGroup[sectionId][parentVariantId];
-    // if not new init, and if all ancestors are selected, and (when toggling version or paramsweep) the section itself is selected
-    if (
-      !isNewInit &&
-      allAncestorsAreSelected(runGroupId, ancestors, state) &&
-      (attrName === "selected" ||
-        sectionIsSelected(runGroupId, sectionId, parentVariantId, state))
-    ) {
-      newState = attrId ? attrId : !thisSectionState[attrName];
-    } else {
-      newState = true;
-    }
 
-    console.log("newState", newState)
-
+    const newState = attrId ? attrId : !thisSectionState[attrName];
     thisSectionState[attrName] = newState;
 
     if (newState) {

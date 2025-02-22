@@ -402,7 +402,7 @@ function VersionItemComponent({
   parentVariantId,
 }) {
   function onChange() {
-    console.log("onChange", id)
+    console.log("onChange", id);
     toggleRunGroupSectionVersion({
       id: runGroupId,
       sectionId,
