@@ -89,8 +89,6 @@ export function getProjectData({
     codeInfoCols,
   };
 
-  console.log("output", output);
-
   return output;
 }
 

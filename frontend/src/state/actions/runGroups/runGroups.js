@@ -106,7 +106,15 @@ function toggleRunGroupSectionAttr({
     const thisSectionState =
       state.variants[runGroupId].runGroup[sectionId][parentVariantId];
 
-    const newState = attrId ? attrId : !thisSectionState[attrName];
+    let newState;
+    if (attrName === "version") {
+      newState = attrId;
+    } else if (attrName === "paramSweep") {
+      // allow deselecting param sweep
+      newState = thisSectionState[attrName] === attrId ? null : attrId;
+    } else {
+      newState = true;
+    }
     thisSectionState[attrName] = newState;
 
     if (newState) {

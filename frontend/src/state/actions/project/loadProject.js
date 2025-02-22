@@ -46,7 +46,6 @@ export async function loadProjectState({
   uiTypes,
   uiTypeCols,
 }) {
-  console.log("variants", sectionVariants);
   useProjectConfig.setState({
     ..._.omit(projectConfig, ["children", "viewport"]),
   });

@@ -402,7 +402,6 @@ function VersionItemComponent({
   parentVariantId,
 }) {
   function onChange() {
-    console.log("onChange", id);
     toggleRunGroupSectionVersion({
       id: runGroupId,
       sectionId,
@@ -459,13 +458,13 @@ function ParamSweepItemComponent({
   const isSelected = useSectionInfos(
     (x) =>
       x.variants[runGroupId].runGroup[sectionId]?.[parentVariantId]
-        .paramSweeps === id,
+        .paramSweep === id,
   );
 
   return (
-    <RadioGroup checked={parentIsSelected && isSelected} onChange={onChange}>
+    <CheckboxGroup checked={parentIsSelected && isSelected} onChange={onChange}>
       {name}
-    </RadioGroup>
+    </CheckboxGroup>
   );
 }
 
