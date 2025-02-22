@@ -22,7 +22,6 @@
 - Big improvements to charts and in-memory functions.
 
 
-
 ## What does Setta do?
 
 Setta is a developer tool that streamlines Python coding, configuration, UI creation, and onboarding.
@@ -35,6 +34,26 @@ It enables you to:
 Here's a short intro video:
 
 https://github.com/user-attachments/assets/0599b754-1fbc-470b-ad6f-ac44b01da761
+
+
+## Examples
+
+Trying out Setta is the best way to see what it can do, and we have a bunch of easy-to-run examples here: https://github.com/settadev/examples
+
+Or click on one of the images below to go directly to that example:
+
+<table>
+  <tr>
+    <td><a href="https://github.com/settadev/examples/tree/main/stream_diffusion_img_to_img"><img src="https://github.com/user-attachments/assets/2a063779-ed61-4103-90a5-bf127f3ea012" /></a></td>
+    <td><a href="https://github.com/settadev/examples/tree/main/trl_language_model_finetuning"><img src="https://github.com/user-attachments/assets/96775341-4b6d-4d3c-8bc2-743eafce458a" /></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/settadev/examples/tree/main/transformers_trainer"><img src="https://github.com/user-attachments/assets/1f6554f8-8d49-4ba8-af48-f5dc6bc5d845" /></a></td>
+    <td><a href="https://github.com/settadev/examples/tree/main/pytorch_metric_learning_trainer"><img src="https://github.com/user-attachments/assets/45ae2047-9dbd-4057-9191-9a3460357ccc" /></a></td>
+  </tr>
+</table>
+
+We also have [tutorial videos](https://www.youtube.com/@settadev).
 
 ## Getting started
 
@@ -57,11 +76,6 @@ The Setta UI will now be available in your web browser at http://127.0.0.1:8000/
 
 Documentation is in progress: https://docs.setta.dev/
 
-## Examples
-
-Our examples are easy to run: https://github.com/settadev/examples
-
-The current examples are focused on AI, like LLM training and image generation. We'll soon be adding examples for other domains too.
 
 ## Features
 
