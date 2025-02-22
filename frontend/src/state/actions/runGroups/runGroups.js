@@ -137,6 +137,8 @@ function toggleRunGroupSectionAttr({
       newState = true;
     }
 
+    console.log("newState", newState)
+
     thisSectionState[attrName] = newState;
 
     if (newState) {

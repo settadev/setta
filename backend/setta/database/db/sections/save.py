@@ -174,7 +174,7 @@ def save_sections(db, sections, section_variants):
                 )
 
     query = """
-        INSERT INTO SectionVariantRunGroup (idid, sectionId, parentVariantId, selected)
-        VALUES (:idid, :sectionId, :parentVariantId, :selected)
+        INSERT INTO SectionVariantRunGroup (idid, sectionId, parentVariantId, selected, versionId, sweepId)
+        VALUES (:idid, :sectionId, :parentVariantId, :selected, :versionId, :sweepId)
     """
     db.executemany(query, run_group_query_params)

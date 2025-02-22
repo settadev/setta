@@ -106,7 +106,7 @@
     "config": {}
   },
   "evEntry": { "value": "", "evRefs": [] },
-  "runGroupEntry": { "selected": true, "paramSweeps": {}, "versions": {} },
+  "runGroupEntry": { "selected": true, "paramSweep": null, "version": null },
   "uiTypeColEntry": {
     "uiTypeId": "3fdaeb6a-e989-4888-b844-17a76f0b0192",
     "nonPresetUITypeIds": []
