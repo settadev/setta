@@ -75,19 +75,27 @@ The Setta UI will now be available in your web browser at http://127.0.0.1:8000/
 
 On the home page click `New Config`. This will load a brand new, empty project. 
 
-![first_setta_project_1](https://github.com/user-attachments/assets/674c0aa2-bfa0-4c40-91cd-957cbdda0aa6)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/674c0aa2-bfa0-4c40-91cd-957cbdda0aa6" width="75%" alt="first_setta_project_1">
+</p>
 
 Right click to open the context menu, and click `Section` to create your first section. 
 
-![first_setta_project_2](https://github.com/user-attachments/assets/74f7c74d-2833-45e3-ad11-2a203cfd360d)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/74f7c74d-2833-45e3-ad11-2a203cfd360d" width="75%" alt="first_setta_project_2">
+</p>
 
 Double click on the section name, and rename it to `special_val`. Type `math.sqrt` in the callable field, and press the tab key. An `x` parameter should appear in the parameters area. Enter `10` in the text field next to `x`. 
 
-![first_setta_project_3](https://github.com/user-attachments/assets/7f5b9781-9229-43aa-86a1-7675a699a6d5)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7f5b9781-9229-43aa-86a1-7675a699a6d5" width="75%" alt="first_setta_project_3">
+</p>
 
 Right click to open the context menu, and click `Python Code` to create a code block. 
 
-![first_setta_project_4](https://github.com/user-attachments/assets/87cdffa8-5844-4530-a549-0dfc1baedfe7)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/87cdffa8-5844-4530-a549-0dfc1baedfe7" width="75%" alt="first_setta_project_4">
+</p>
 
 Paste the following into this code block:
 
@@ -97,12 +105,14 @@ $SETTA_GENERATED_PYTHON
 print(special_val)
 ```
 
-Click Run in the nav bar. A terminal will print and it should print `3.1622776601683795`.
+Click Run in the nav bar. A terminal will appear and it should print 3.1622776601683795.
 
-![first_setta_project_5](https://github.com/user-attachments/assets/3a621fc4-fe07-45d4-a7ca-51b5271318d5)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3a621fc4-fe07-45d4-a7ca-51b5271318d5" width="75%" alt="first_setta_project_5">
+</p>
 
 Congratulations! You've successfully run your first Setta project!
+
 
 ## Documentation
 
