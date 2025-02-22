@@ -59,19 +59,33 @@ We also have [tutorial videos](https://www.youtube.com/@settadev).
 
 ## Getting started
 
-Run this command in your terminal:
+Activate your Python environment, and run:
 
 ```
 pip install setta
 ```
 
-Then go to your project folder and enter:
+Let's say you've created a new, empty git repo in a folder called `my_project`.
+
+Move into that folder and run:
 
 ```
 setta
 ```
 
 The Setta UI will now be available in your web browser at http://127.0.0.1:8000/.
+
+You'll also notice that Setta has created a few files. Here's what the structure of your `my_project` folder will look like: 
+
+```
+my_project/
+├── setta_files/
+│   ├── setta.db
+│   ├── setta-settings.json
+│   ├── setta-meta-settings.json
+│   └── code/
+│       └── temp_folder/
+```
 
 ## Create and run your first Setta project
 
