@@ -145,9 +145,7 @@ export function* getProjectRuns(project) {
       }
       // set every selected section's variantId
       for (const c of combo) {
-        if (c.versionId) {
-          variant.sections[c.sectionId].variantId = c.versionId;
-        }
+        variant.sections[c.sectionId].variantId = c.versionId;
       }
 
       const paramSweepSectionVariantIds = {};
