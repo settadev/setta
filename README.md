@@ -24,7 +24,7 @@
 
 ## What does Setta do?
 
-Setta is a developer tool that streamlines Python coding, configuration, UI creation, and onboarding.
+Setta is a general-purpose developer tool that streamlines Python coding, configuration, UI creation, and onboarding.
 
 It enables you to:
 - Skip the boilerplate parsers and frontend. 
@@ -71,6 +71,25 @@ setta
 
 The Setta UI will now be available in your web browser at http://127.0.0.1:8000/.
 
+## Create and run your first Setta project
+
+On the home page click `New Config`. This will load a brand new, empty project.
+
+Right click to open the context menu, and click `Section` to create your first section. Double click on the section name, and rename it to `special_val`.
+
+Type `math.sqrt` in the callable field, and press the tab key. An `x` parameter should appear in the parameters area. Enter `10` in the text field next to `x`.
+
+Right click to open the context menu, and click `Python Code` to create a code block. Paste the following into this code block:
+
+```python
+$SETTA_GENERATED_PYTHON
+
+print(special_val)
+```
+
+Click Run in the nav bar. A terminal will print and it should print `3.1622776601683795`.
+
+Congratulations! You've successfully run your first Setta project!
 
 ## Documentation
 
