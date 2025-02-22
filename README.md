@@ -31,6 +31,8 @@ It enables you to:
 - Effortlessly expose your Python functions as a flexible UI. 
 - Configure, interact, and share with ease.
 
+So whether you are fine tuning large AI models, or writing a small Python script, Setta can turn it into a useable interface. No special integrations required!
+
 Here's a short intro video:
 
 https://github.com/user-attachments/assets/0599b754-1fbc-470b-ad6f-ac44b01da761
