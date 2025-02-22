@@ -179,16 +179,15 @@ function recursiveHelper(
     }
     newRunGroupSections[match][parentVariantId] = {
       selected: true,
-      versions: {},
-      paramSweeps: {},
+      version: null,
+      paramSweep: null,
     };
     nextForSectionId = match;
   } else if (type === "sectionVariant") {
-    newRunGroupSections[forSectionId][parentVariantId].versions[match] = true;
+    newRunGroupSections[forSectionId][parentVariantId].version = match;
     nextParentVariantId = match;
   } else if (type === "paramSweep") {
-    newRunGroupSections[forSectionId][parentVariantId].paramSweeps[match] =
-      true;
+    newRunGroupSections[forSectionId][parentVariantId].paramSweep = match;
   }
 
   if (value) {
@@ -215,9 +214,7 @@ function recursiveHelper(
     // covered recursively
     if (!value || !Object.keys(value).some((k) => k.startsWith("@"))) {
       nextParentVariantId = sections[match].variantId;
-      newRunGroupSections[match][parentVariantId].versions[
-        nextParentVariantId
-      ] = true;
+      newRunGroupSections[match][parentVariantId].version = nextParentVariantId;
     }
   }
 
