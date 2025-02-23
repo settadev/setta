@@ -6,7 +6,7 @@ export function getEVRefRegexAndColorMap(state) {
   const names = [];
   const fullNameToInfo = {};
   for (const sid of Object.keys(state.details)) {
-    if (!state.details[sid].isTopLevelAndCanHaveEVRefs) {
+    if (!state.details[sid].isTopLevelAndCanBeReferredTo) {
       continue;
     }
     if (state.globalVariableId === sid) {

@@ -368,6 +368,12 @@ class Exporter:
                 # don't need to process the output since the global variables get added directly to the output
                 # i.e. they aren't children of anything
                 self.export_section_params(id)
+            elif type == C.TEXT_BLOCK:
+                variant = get_selected_section_variant(self.p, id)
+                info["value"] = variant["description"]
+                info["dependencies"] = []
+                info["ref_var_name_positions"] = []
+                self.output[var_name] = info
             else:
                 raise ValueError
         return var_name
