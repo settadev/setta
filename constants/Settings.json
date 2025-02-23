@@ -68,7 +68,7 @@
     "panOnScrollMode": "free",
     "zoomOnScroll": true,
     "zoomOnPinch": true,
-    "zoomOnDoubleClick": true,
+    "zoomOnDoubleClick": false,
     "selectionMode": "partial",
     "leftSidePaneShiftsMap": true,
     "transitionDuration": 50
