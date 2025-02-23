@@ -1,6 +1,6 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { useCodeMirrorStyle } from "components/Utils/CodeMirror/useCodeMirrorStyle";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   dbTextFieldCompletion,
   dbTextFieldInitializeCode,
@@ -8,7 +8,7 @@ import {
 import { setActiveSectionIdAndUpdateZIndex } from "state/actions/activeSections";
 import { DummyCodeMirror } from "./DummyCodeMirror";
 import { getExtensions } from "./getExtensions";
-import { getKeywordStylizer } from "./getKeywordStylizer";
+import { useKeywordStylizer } from "./getKeywordStylizer";
 import { getCompletionsFn, getOnCreateEditor } from "./getOnCreateEditor";
 
 export function TextInputCodeMirror({
@@ -144,10 +144,7 @@ function CoreCodeMirror({
 }) {
   const divId = `CodeMirror-${visualSectionId}-${paramInfoId}${isKeyName ? "-keyName" : ""}`;
 
-  const keywordStylizer = useMemo(
-    () => getKeywordStylizer(evRefs),
-    [JSON.stringify(evRefs)],
-  );
+  const keywordStylizer = useKeywordStylizer(evRefs);
 
   const completionsFn = useCallback(
     autocomplete
