@@ -41,7 +41,7 @@ function _SectionHeader({
         sectionTypeName={sectionTypeName}
         isInOtherProjectConfigs={isInOtherProjectConfigs}
       />
-      {sectionTypeName !== C.INFO && (
+      {sectionTypeName !== C.TEXT_BLOCK && (
         <>
           <CardTitle
             sectionId={sectionId}

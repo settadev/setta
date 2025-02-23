@@ -96,7 +96,7 @@
   },
   "2b06a83b-b96a-490d-a2d7-3631619e6495": {
     "id": "2b06a83b-b96a-490d-a2d7-3631619e6495",
-    "type": "INFO",
+    "type": "TEXT_BLOCK",
     "name": "",
     "presetType": "BASE",
     "config": {}

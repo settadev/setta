@@ -44,7 +44,7 @@ export function PaneContextMenu() {
       <Item onClick={getOnClickFn({ type: C.LIST_ROOT })}>List</Item>
       <Item onClick={getOnClickFn({ type: C.DICT_ROOT })}>Dict</Item>
       <Item onClick={getOnClickFn({ type: C.GROUP })}>Group</Item>
-      <Item onClick={getOnClickFn({ type: C.INFO })}>Info</Item>
+      <Item onClick={getOnClickFn({ type: C.TEXT_BLOCK })}>Text Block</Item>
       {!singletonSections[C.GLOBAL_VARIABLES] && (
         <Item onClick={getOnClickFn({ type: C.GLOBAL_VARIABLES })}>
           Global Variables

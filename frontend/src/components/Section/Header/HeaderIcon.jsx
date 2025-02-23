@@ -49,8 +49,8 @@ export function HeaderIcon({
       return (
         <TbArrowIteration className="text-setta-300 transition-colors group-hover/card-section:text-blue-500  dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff] " />
       );
-    case C.INFO:
-      return <InfoIcon sectionId={sectionId} />;
+    case C.TEXT_BLOCK:
+      return <TextBlockIcon sectionId={sectionId} />;
     case C.IMAGE:
       return (
         <div className="relative">
@@ -148,7 +148,7 @@ function ListElementIcon({ sectionId }) {
   );
 }
 
-function InfoIcon({ sectionId }) {
+function TextBlockIcon({ sectionId }) {
   const renderMarkdown = useSectionInfos((x) => x.x[sectionId].renderMarkdown);
 
   return renderMarkdown ? (

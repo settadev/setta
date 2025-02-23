@@ -12,11 +12,11 @@ import { GlobalParamSweepArea } from "../Layouts/GlobalParamSweepArea";
 import { GlobalVariablesArea } from "../Layouts/GlobalVariablesArea";
 import { IframeArea } from "../Layouts/IframeArea";
 import { ImageArea } from "../Layouts/ImageArea";
-import { InfoArea } from "../Layouts/InfoArea";
 import { InputArea } from "../Layouts/InputArea";
 import { ParamSweepArea } from "../Layouts/ParamSweepArea";
 import { SocialArea } from "../Layouts/SocialArea";
 import { TerminalArea } from "../Layouts/TerminalArea";
+import { TextBlock } from "../Layouts/TextBlock";
 import { Incrementer } from "../SectionParts/Incrementer";
 import "./dndline.css";
 import { getBgColor } from "./utils";
@@ -77,8 +77,8 @@ function AreaSwitch({ sectionId, sectionTypeName, bgColor }) {
       return <DrawArea sectionId={sectionId} />;
     case C.SOCIAL:
       return <SocialArea sectionId={sectionId} />;
-    case C.INFO:
-      return <InfoArea sectionId={sectionId} />;
+    case C.TEXT_BLOCK:
+      return <TextBlock sectionId={sectionId} />;
     case C.GLOBAL_VARIABLES:
       return <GlobalVariablesArea sectionId={sectionId} bgColor={bgColor} />;
     case C.CODE:

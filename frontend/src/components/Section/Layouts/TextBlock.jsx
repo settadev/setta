@@ -9,13 +9,13 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { useSectionInfos } from "state/definitions";
 import { useIsScrollable } from "state/hooks/sectionSizes";
-import { getInfoAreaDescription } from "state/hooks/sectionVariants";
+import { getTextBlockDescription } from "state/hooks/sectionVariants";
 import {
   SECTION_DISPLAY_MODES,
   SETTA_PREVENT_SECTION_ACTIVE_CSS,
 } from "utils/constants";
 
-function _InfoArea({ sectionId }) {
+function _TextBlock({ sectionId }) {
   const displayMode = useSectionInfos((x) => x.x[sectionId].displayMode);
 
   return displayMode === SECTION_DISPLAY_MODES.RENDER ? (
@@ -27,7 +27,7 @@ function _InfoArea({ sectionId }) {
 
 function _Markdown({ sectionId }) {
   const { renderMarkdown, description } = useSectionInfos(
-    (x) => getInfoAreaDescription(sectionId, x),
+    (x) => getTextBlockDescription(sectionId, x),
     _.isEqual,
   );
 
@@ -60,7 +60,7 @@ function _Markdown({ sectionId }) {
   );
 }
 
-export const InfoArea = React.memo(_InfoArea);
+export const TextBlock = React.memo(_TextBlock);
 const Markdown = React.memo(_Markdown);
 
 const CodeBlock = ({ node, inline, className, children, ...props }) => {

@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getSectionVariant } from "state/actions/sectionInfos";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
 import { useSectionInfos, useSettings } from "state/definitions";
-import { useInfoAreaDescriptionAndEditability } from "state/hooks/sectionVariants";
+import { useTextBlockDescriptionAndEditability } from "state/hooks/sectionVariants";
 import { SETTA_PREVENT_SECTION_ACTIVE_CSS } from "utils/constants";
 
 export function MarkdownEditorInPane({ sectionId }) {
@@ -44,7 +44,7 @@ export function MarkdownEditorInSection({ sectionId }) {
 const _MarkdownEditorCore = React.forwardRef(
   ({ sectionId, maxHeight, onCreateEditor, wrapperClassName }, ref) => {
     const { renderMarkdown, description, variantIsFrozen } =
-      useInfoAreaDescriptionAndEditability(sectionId);
+      useTextBlockDescriptionAndEditability(sectionId);
 
     const [localDescription, setLocalDescription] = useState(description);
 
@@ -61,7 +61,7 @@ const _MarkdownEditorCore = React.forwardRef(
             getSectionVariant(sectionId, state).description = v;
             state.x[sectionId].name =
               getFirstHeadingOrText(v) ??
-              useSettings.getState().sections[C.INFO].name;
+              useSettings.getState().sections[C.TEXT_BLOCK].name;
           });
           maybeIncrementProjectStateVersion(true);
         }

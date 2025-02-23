@@ -105,8 +105,8 @@
     "GLOBAL_PARAM_SWEEP": {
       "name": "Global Param Sweep"
     },
-    "INFO": {
-      "name": "Empty Info Section",
+    "TEXT_BLOCK": {
+      "name": "Empty Text Block",
       "displayMode": "RENDER"
     }
   }

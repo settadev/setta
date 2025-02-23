@@ -2,11 +2,11 @@ import { SwitchInput } from "components/Params/ParamUIs/SwitchInput";
 import { dbDocstringToMarkdown } from "requests/codeInfo";
 import { getSectionVariant } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
-import { useInfoAreaDescriptionAndEditability } from "state/hooks/sectionVariants";
+import { useTextBlockDescriptionAndEditability } from "state/hooks/sectionVariants";
 
-export function InfoAreaSettings({ sectionId }) {
+export function TextBlockSettings({ sectionId }) {
   const { renderMarkdown, description, variantIsFrozen } =
-    useInfoAreaDescriptionAndEditability(sectionId);
+    useTextBlockDescriptionAndEditability(sectionId);
 
   async function onChange(v) {
     let newDescription;

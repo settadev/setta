@@ -226,7 +226,7 @@ def get_exporter_fn(config, section_id):
         return export_regular_section
     elif stype in [C.LIST_ROOT, C.DICT_ROOT, C.GROUP]:
         return export_list_section
-    elif stype == C.INFO:
+    elif stype == C.TEXT_BLOCK:
         return export_info_section
     elif stype == C.PARAM_SWEEP:
         return export_param_sweep_section
