@@ -24,6 +24,7 @@
   "DRAW": "DRAW",
   "SOCIAL": "SOCIAL",
   "IFRAME": "IFRAME",
+  "CHAT": "CHAT",
   "NON_SECTION_TYPES": [
     "TEXT",
     "SLIDER",

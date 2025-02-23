@@ -77,6 +77,7 @@ export function PaneContextMenu() {
       <Item onClick={getOnClickFn({ type: C.CHART })}>Chart</Item>
       <Item onClick={getOnClickFn({ type: C.SOCIAL })}>Social</Item>
       <Item onClick={getOnClickFn({ type: C.IFRAME })}>IFrame</Item>
+      <Item onClick={getOnClickFn({ type: C.CHAT })}>Chat Window</Item>
     </ContextMenuCore>
   );
 }

@@ -55,6 +55,8 @@ function getMinSectionHeight({
     return 300;
   } else if (sectionType === C.SOCIAL) {
     return 50;
+  } else if (sectionType === C.CHAT) {
+    return 200;
   }
 }
 
@@ -76,6 +78,8 @@ function getMinSectionWidth({ sectionType, isTwitter }) {
     return 402;
   } else if (sectionType === C.CHART) {
     return 300;
+  } else if (sectionType === C.CHAT) {
+    return 400;
   }
 
   return 200;

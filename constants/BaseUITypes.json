@@ -149,5 +149,12 @@
     "name": "",
     "presetType": "BASE",
     "config": {}
+  },
+  "5d7859dd-fd3f-4f5f-9b8c-fe9bede13c33": {
+    "id": "5d7859dd-fd3f-4f5f-9b8c-fe9bede13c33",
+    "type": "CHAT",
+    "name": "",
+    "presetType": "BASE",
+    "config": {}
   }
 }

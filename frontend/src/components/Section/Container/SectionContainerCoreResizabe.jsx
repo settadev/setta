@@ -6,6 +6,7 @@ import { useSectionInfos } from "state/definitions";
 import { getIsYouTubeSection } from "state/hooks/social";
 import { SectionHeader } from "../Header/SectionHeader";
 import { ChartArea } from "../Layouts/ChartArea/ChartArea";
+import { ChatArea } from "../Layouts/ChatArea";
 import { CodeArea } from "../Layouts/CodeArea";
 import { DrawArea } from "../Layouts/DrawArea/DrawArea";
 import { GlobalParamSweepArea } from "../Layouts/GlobalParamSweepArea";
@@ -91,6 +92,8 @@ function AreaSwitch({ sectionId, sectionTypeName, bgColor }) {
       return <GlobalParamSweepArea sectionId={sectionId} />;
     case C.IFRAME:
       return <IframeArea sectionId={sectionId} />;
+    case C.CHAT:
+      return <ChatArea sectionId={sectionId} />;
     default:
       return null;
   }
