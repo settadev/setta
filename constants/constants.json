@@ -117,6 +117,7 @@
   "ALLOWED_ARTIFACT_TYPES": {
     "DRAW": ["img", "brushStrokes"],
     "IMAGE": ["img"],
-    "CHART": ["list"]
+    "CHART": ["list"],
+    "CHAT": ["chatHistory"]
   }
 }

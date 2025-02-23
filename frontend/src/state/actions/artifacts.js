@@ -43,6 +43,7 @@ export async function prepareArtifactForRendering(type, value) {
       return await base64ToImageObj(value);
     case "list":
     case "brushStrokes":
+    case "chatHistory":
       return value;
   }
 }

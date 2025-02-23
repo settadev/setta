@@ -1,16 +1,23 @@
+import _ from "lodash";
 import { useState } from "react";
+import { useAllSectionArtifacts } from "state/hooks/artifacts";
 import { useIsScrollable } from "state/hooks/sectionSizes";
 import { NO_PAN_CLASS_NAME, NO_WHEEL_CLASS_NAME } from "utils/constants";
 
-export function ChatArea() {
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hello!", sender: "bot" },
-    { id: 2, text: "Hi there!", sender: "user" },
-    { id: 1, text: "Hello!", sender: "bot" },
-    { id: 2, text: "Hi there!", sender: "user" },
-    { id: 1, text: "Hello!", sender: "bot" },
-    { id: 2, text: "Hi there!", sender: "user" },
-  ]);
+export function ChatArea({ sectionId }) {
+  const loadedArtifacts = useAllSectionArtifacts(sectionId, (x) =>
+    _.pick(x, ["value"]),
+  );
+  const artifact = Object.values(loadedArtifacts)[0];
+
+  return (
+    Boolean(artifact) && (
+      <ChatAreaCore sectionId={sectionId} messages={artifact.value} />
+    )
+  );
+}
+
+function ChatAreaCore({ sectionId, messages }) {
   const [newMessage, setNewMessage] = useState("");
   const { ref, isScrollable } = useIsScrollable();
 
@@ -37,9 +44,9 @@ export function ChatArea() {
         className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} flex-1 overflow-y-auto p-4`}
         ref={ref}
       >
-        {messages.map((message) => (
+        {messages.map((message, idx) => (
           <div
-            key={message.id}
+            key={idx}
             className={`mb-4 flex ${
               message.sender === "user" ? "justify-end" : "justify-start"
             }`}

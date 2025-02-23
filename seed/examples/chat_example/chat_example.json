@@ -1,0 +1,52 @@
+{
+  "projectConfig": {
+    "id": "2c42d844-7618-434e-b37c-175b3793777c",
+    "name": "crisp_flake",
+    "previewImgColor": "bg-green-500/60 dark:bg-green-600/30",
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "zoom": 1
+    },
+    "children": {
+      "05a93eda-1bc8-4244-9218-d0eaae2321a9": {
+        "x": 270,
+        "y": 75,
+        "zIndex": 1,
+        "w": 402,
+        "h": 202
+      }
+    }
+  },
+  "sectionVariants": {
+    "00c8b38c-b712-4467-922e-94aea915d50c": {
+      "name": "yappy_blue"
+    }
+  },
+  "artifacts": {
+    "78d895d8-b36c-4cec-8306-1bde5479ba90": {
+      "name": "my secret chat",
+      "path": "",
+      "value": [
+        { "sender": "Bot", "text": "Hello my name is Dingus!" },
+        { "sender": "user", "text": "hello Dingus! What a splendid name" }
+      ],
+      "type": "chatHistory"
+    }
+  },
+  "artifactGroups": {},
+  "uiTypes": {},
+  "uiTypeCols": {},
+  "sections": {
+    "05a93eda-1bc8-4244-9218-d0eaae2321a9": {
+      "id": "05a93eda-1bc8-4244-9218-d0eaae2321a9",
+      "name": "ordinary_gold",
+      "variantId": "00c8b38c-b712-4467-922e-94aea915d50c",
+      "uiTypeId": "5d7859dd-fd3f-4f5f-9b8c-fe9bede13c33",
+      "defaultVariantId": "00c8b38c-b712-4467-922e-94aea915d50c",
+      "variantIds": ["00c8b38c-b712-4467-922e-94aea915d50c"]
+    }
+  },
+  "codeInfo": {},
+  "codeInfoCols": {}
+}

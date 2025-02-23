@@ -3,6 +3,7 @@ import React from "react";
 import { getSectionType } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { ChartAreaSettings } from "./ChartAreaSettings";
+import { ChatAreaSettings } from "./ChatAreaSettings";
 import { CodeAreaSettings } from "./CodeAreaSettings";
 import { DrawAreaSettings } from "./DrawAreaSettings";
 import { IframeSettings } from "./IframeSettings";
@@ -47,5 +48,7 @@ function SpecializedConfiguration({ sectionId }) {
       return <SocialAreaSettings sectionId={sectionId} />;
     case C.IFRAME:
       return <IframeSettings sectionId={sectionId} />;
+    case C.CHAT:
+      return <ChatAreaSettings sectionId={sectionId} />;
   }
 }
