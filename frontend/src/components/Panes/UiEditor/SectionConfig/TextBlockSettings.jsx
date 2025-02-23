@@ -5,10 +5,10 @@ import { useSectionInfos } from "state/definitions";
 import { useTextBlockDescriptionAndEditability } from "state/hooks/sectionVariants";
 
 export function TextBlockSettings({ sectionId }) {
-  const { renderMarkdown, description, variantIsFrozen } =
+  const { renderMarkdown, description, variantIsFrozen, headingAsSectionName } =
     useTextBlockDescriptionAndEditability(sectionId);
 
-  async function onChange(v) {
+  async function onChangeRenderMarkdown(v) {
     let newDescription;
     if (v) {
       const res = await dbDocstringToMarkdown(description);
@@ -22,17 +22,36 @@ export function TextBlockSettings({ sectionId }) {
     });
   }
 
+  async function onChangeHeadingAsSectionName(v) {
+    useSectionInfos.setState((state) => {
+      state.x[sectionId].headingAsSectionName = v;
+    });
+  }
+
   return (
-    <div className="flex w-full items-center justify-between gap-4 ">
-      <p className="text-xs font-bold text-setta-700 dark:text-setta-300">
-        Render Markdown
-      </p>
-      <SwitchInput
-        isDisabled={variantIsFrozen}
-        value={renderMarkdown}
-        onChange={onChange}
-        outerDivClassName="flex items-center"
-      />
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex w-full items-center justify-between gap-4">
+        <p className="text-xs font-bold text-setta-700 dark:text-setta-300">
+          Render Markdown
+        </p>
+        <SwitchInput
+          isDisabled={variantIsFrozen}
+          value={renderMarkdown}
+          onChange={onChangeRenderMarkdown}
+          outerDivClassName="flex items-center"
+        />
+      </div>
+      <div className="flex w-full items-center justify-between gap-4">
+        <p className="text-xs font-bold text-setta-700 dark:text-setta-300">
+          Heading As Section Name
+        </p>
+        <SwitchInput
+          isDisabled={variantIsFrozen}
+          value={headingAsSectionName} // Add your state value
+          onChange={onChangeHeadingAsSectionName} // Add your onChange handler
+          outerDivClassName="flex items-center"
+        />
+      </div>
     </div>
   );
 }

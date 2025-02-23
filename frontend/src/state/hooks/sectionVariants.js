@@ -55,6 +55,7 @@ export function useTextBlockDescriptionAndEditability(sectionId) {
 export function getTextBlockDescription(sectionId, state) {
   return {
     renderMarkdown: state.x[sectionId].renderMarkdown,
+    headingAsSectionName: state.x[sectionId].headingAsSectionName,
     description: getDisplayedSectionVariant(sectionId, state).description,
   };
 }

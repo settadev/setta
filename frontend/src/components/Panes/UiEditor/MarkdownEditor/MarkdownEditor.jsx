@@ -5,12 +5,11 @@ import {
 } from "components/Section/Layouts/CodeArea";
 import { getExtensions } from "components/Utils/CodeMirror/getExtensions";
 import { useCodeMirrorStyle } from "components/Utils/CodeMirror/useCodeMirrorStyle";
-import C from "constants/constants.json";
 import _ from "lodash";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getSectionVariant } from "state/actions/sectionInfos";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
-import { useSectionInfos, useSettings } from "state/definitions";
+import { useSectionInfos } from "state/definitions";
 import { useTextBlockDescriptionAndEditability } from "state/hooks/sectionVariants";
 import { SETTA_PREVENT_SECTION_ACTIVE_CSS } from "utils/constants";
 
@@ -59,9 +58,10 @@ const _MarkdownEditorCore = React.forwardRef(
         if (v !== description) {
           useSectionInfos.setState((state) => {
             getSectionVariant(sectionId, state).description = v;
-            state.x[sectionId].name =
-              getFirstHeadingOrText(v) ??
-              useSettings.getState().sections[C.TEXT_BLOCK].name;
+            if (state.x[sectionId].headingAsSectionName) {
+              state.x[sectionId].name =
+                getFirstHeadingOrText(v) ?? state.x[sectionId].name;
+            }
           });
           maybeIncrementProjectStateVersion(true);
         }
