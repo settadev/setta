@@ -18,7 +18,10 @@ import {
 } from "state/actions/sectionInfos";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
 import { useMisc, useSectionInfos } from "state/definitions";
-import { SETTA_PREVENT_SECTION_ACTIVE_CSS } from "utils/constants";
+import {
+  NO_PAN_CLASS_NAME,
+  SETTA_PREVENT_SECTION_ACTIVE_CSS,
+} from "utils/constants";
 import { asyncDebounce } from "utils/utils";
 
 function _CodeArea({ sectionId }) {
@@ -117,7 +120,7 @@ function CoreCodeArea({ sectionId, language, completionsFn, keywordStylizer }) {
   return (
     <article
       ref={wrapperRef}
-      className={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title cursor-auto rounded-lg focus:bg-blue-200/70 focus:outline-none dark:focus:bg-blue-950/70 [&_*]:!outline-0 [&_.cm-activeLineGutter]:focus:!bg-transparent [&_.cm-activeLine]:focus:!bg-transparent [&_.cm-gutters]:focus:!bg-transparent ${overflow} ${nowheel}`}
+      className={`${NO_PAN_CLASS_NAME} ${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title cursor-auto rounded-lg focus:bg-blue-200/70 focus:outline-none dark:focus:bg-blue-950/70 [&_*]:!outline-0 [&_.cm-activeLineGutter]:focus:!bg-transparent [&_.cm-activeLine]:focus:!bg-transparent [&_.cm-gutters]:focus:!bg-transparent ${overflow} ${nowheel}`}
       tabIndex="0"
       onKeyDown={onArticleDivEnterKeyFocusOnCodeMirror}
     >
