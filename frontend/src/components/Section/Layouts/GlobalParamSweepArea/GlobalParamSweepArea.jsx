@@ -26,7 +26,7 @@ import { useGetParamSweepNames } from "state/hooks/paramSweep";
 import { useIsScrollable } from "state/hooks/sectionSizes";
 import { useGetSectionVariantNames } from "state/hooks/sectionVariants";
 import { createRandomName } from "utils/idNameCreation";
-import { useShowYaml } from "../../../state/hooks/toYaml";
+import { useShowYaml } from "../../../../state/hooks/toYaml";
 
 export function GlobalParamSweepArea({ sectionId }) {
   const width = useSectionInfos((x) => {
@@ -91,9 +91,9 @@ function LeftSide({ sectionId }) {
 
 function RightSide({ sectionId }) {
   const showYaml = useShowYaml(sectionId);
-  const shownRunGroupId = useSectionInfos((x) => {
-    return x.x[sectionId].previewVariantId ?? x.x[sectionId].variantId;
-  });
+  const shownRunGroupId = useSectionInfos(
+    (x) => x.x[sectionId].previewVariantId ?? x.x[sectionId].variantId,
+  );
 
   if (!shownRunGroupId) {
     return null;
@@ -104,20 +104,33 @@ function RightSide({ sectionId }) {
       className={`${showYaml ? "-mr-2 overflow-visible @sm/multipane:-mr-[14px] @sm/multipane:overflow-y-scroll" : "h-full min-h-0 min-w-0 max-w-full overflow-x-clip"} mt-2 flex flex-1 flex-col pb-2 `}
     >
       {!showYaml ? (
-        <>
-          <div className="flex gap-4">
-            <h3 className="text-xs font-bold uppercase text-setta-300 dark:text-setta-500">
-              Sections
-            </h3>
-            <FilterSection />
-          </div>
-
-          <TopLevelSectionList runGroupId={shownRunGroupId} />
-        </>
+        <RightSideGUIView
+          sectionId={sectionId}
+          shownRunGroupId={shownRunGroupId}
+        />
       ) : (
         <YamlView sectionId={sectionId} />
       )}
     </article>
+  );
+}
+
+function RightSideGUIView({ sectionId, shownRunGroupId }) {
+  const renderMatrix = useSectionInfos((x) => x.x[sectionId].renderMatrix);
+
+  return renderMatrix ? (
+    "WHOA!"
+  ) : (
+    <>
+      <div className="flex gap-4">
+        <h3 className="text-xs font-bold uppercase text-setta-300 dark:text-setta-500">
+          Sections
+        </h3>
+        <FilterSection />
+      </div>
+
+      <TopLevelSectionList runGroupId={shownRunGroupId} />
+    </>
   );
 }
 

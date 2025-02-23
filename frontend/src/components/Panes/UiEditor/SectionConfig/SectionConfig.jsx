@@ -5,6 +5,7 @@ import { useSectionInfos } from "state/definitions";
 import { ChartAreaSettings } from "./ChartAreaSettings";
 import { CodeAreaSettings } from "./CodeAreaSettings";
 import { DrawAreaSettings } from "./DrawAreaSettings";
+import { GlobalParamSweepSettings } from "./GlobalParamSweepSettings";
 import { IframeSettings } from "./IframeSettings";
 import { ImageAreaSettings } from "./ImageAreaSettings";
 import { InfoAreaSettings } from "./InfoAreaSettings";
@@ -33,6 +34,8 @@ function SpecializedConfiguration({ sectionId }) {
     case C.SECTION:
     case C.GLOBAL_VARIABLES:
       return <InputAreaSettings sectionId={sectionId} />;
+    case C.GLOBAL_PARAM_SWEEP:
+      return <GlobalParamSweepSettings sectionId={sectionId} />;
     case C.CODE:
       return <CodeAreaSettings sectionId={sectionId} />;
     case C.INFO:

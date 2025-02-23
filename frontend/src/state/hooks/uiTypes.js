@@ -84,6 +84,8 @@ function getRequiredUIEditorTabs(uiTypeName) {
         QUICKINFO_CONFIG_TAB,
         SECTION_VARIANTS_TAB,
       ];
+    case C.GLOBAL_PARAM_SWEEP:
+      return [SECTION_CONFIG_TAB];
     case C.LIST_ROOT:
     case C.DICT_ROOT:
     case C.CODE:
@@ -96,7 +98,6 @@ function getRequiredUIEditorTabs(uiTypeName) {
       return [SECTION_VARIANTS_TAB];
     case C.GROUP:
     case C.TERMINAL:
-    case C.GLOBAL_PARAM_SWEEP:
       return [];
     case C.DRAW:
     case C.IMAGE:

@@ -8,7 +8,7 @@ import { SectionHeader } from "../Header/SectionHeader";
 import { ChartArea } from "../Layouts/ChartArea/ChartArea";
 import { CodeArea } from "../Layouts/CodeArea";
 import { DrawArea } from "../Layouts/DrawArea/DrawArea";
-import { GlobalParamSweepArea } from "../Layouts/GlobalParamSweepArea";
+import { GlobalParamSweepArea } from "../Layouts/GlobalParamSweepArea/GlobalParamSweepArea";
 import { GlobalVariablesArea } from "../Layouts/GlobalVariablesArea";
 import { IframeArea } from "../Layouts/IframeArea";
 import { ImageArea } from "../Layouts/ImageArea";
