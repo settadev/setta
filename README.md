@@ -86,7 +86,7 @@ my_project/
 │       └── temp_folder/
 ```
 
-## Create and run your first Setta project
+### Create and run your first Setta project
 
 On the home page click `New Config`. This will load a brand new, empty project. 
 
@@ -128,7 +128,7 @@ Click Run in the nav bar. A terminal will appear and it should print 3.162277660
 
 Congratulations! You've successfully run your first Setta project!
 
-## What happens under the hood
+### What happens under the hood
 
 When you click the Run button,  Setta replaces `$SETTA_GENERATED_PYTHON` with:
 
