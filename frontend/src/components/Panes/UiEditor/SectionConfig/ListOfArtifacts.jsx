@@ -297,7 +297,7 @@ function EditableArtifactName({ id, name }) {
     useArtifacts.setState((state) => {
       const updated = _.cloneDeep(state.x[id]);
       updated.name = newName;
-      return { ...state.x, [id]: updated };
+      return { x: { ...state.x, [id]: updated } };
     });
   }
 
