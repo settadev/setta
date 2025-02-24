@@ -4,8 +4,8 @@
     "name": "crisp_flake",
     "previewImgColor": "bg-green-500/60 dark:bg-green-600/30",
     "viewport": {
-      "x": 46.04963852383729,
-      "y": -79.20677699263105,
+      "x": 279.04963852383725,
+      "y": 171.79322300736897,
       "zoom": 0.6386631009606775
     },
     "children": {
@@ -16,12 +16,19 @@
         "w": 702,
         "h": 302
       },
+      "0820bd41-dcf1-49c2-a4fb-f0f312c882f7": {
+        "x": 165,
+        "y": 120,
+        "zIndex": 3,
+        "w": 377,
+        "h": 97
+      },
       "7c17d498-cc88-4e33-b8b9-0e4cd7706096": {
         "x": 195,
         "y": 285,
-        "zIndex": 2,
+        "zIndex": 1,
         "w": 722,
-        "h": 859
+        "h": 858
       }
     }
   },
@@ -29,15 +36,28 @@
     "082b37ae-c834-4577-972a-ad76a1279c53": {
       "name": "spotless_indigo"
     },
+    "0d3920e9-e3f8-476c-8c36-5bc01bf35cab": {
+      "name": "only_blue"
+    },
     "eea6eb38-cbfc-4a50-8146-917239902dfb": {
       "name": "unsightly_purple",
       "code": "from setta.tasks.fns import SettaInMemoryFn\nfrom groq import Groq\n\nclient = Groq(api_key=\"\")\nc = {\"history\": None}\n\n\ndef processChat(p):\n    section = p[\"ordinary_gold\"]\n    userMsg = section[\"latestChatMessage\"]\n    if c[\"history\"] is None:\n        c[\"history\"] = section[\"chatHistory\"]\n\n    if not userMsg:\n        return None\n\n    c[\"history\"].append(\n        {\n            \"role\": \"user\",\n            \"content\": userMsg,\n        }\n    )\n\n    chat_completion = client.chat.completions.create(\n        messages=c[\"history\"],\n        model=\"llama-3.3-70b-versatile\",\n    )\n\n    c[\"history\"].append(\n        {\"role\": \"assistant\", \"content\": chat_completion.choices[0].message.content}\n    )\n\n    return [\n        {\n            \"name\": \"my secret chat\",\n            \"type\": \"chatHistory\",\n            \"value\": c[\"history\"],\n        }\n    ]\n\n\nfn = SettaInMemoryFn(fn=processChat)\n\nprint(\"done!\")\n"
+    },
+    "0c04a334-1030-49dc-8aaa-8e52968ef266": {
+      "name": "auth.json",
+      "codeInfoColId": "902ab2f5-484d-4275-9b87-d7b11a76e8b4"
     }
   },
   "artifacts": {},
   "artifactGroups": {},
   "uiTypes": {},
-  "uiTypeCols": {},
+  "uiTypeCols": {
+    "1c0d7043-66e0-484f-8c51-06366eadfe3d": {
+      "JSON-{\"filenameGlob\":\"auth.json\",\"key\":[\"api_key\"]}": {
+        "uiTypeId": "2180677d-333f-4ea4-ae37-dbbbb50671d7"
+      }
+    }
+  },
   "sections": {
     "04c6f2f7-dbec-4d45-9ecf-9e5e089de18b": {
       "id": "04c6f2f7-dbec-4d45-9ecf-9e5e089de18b",
@@ -51,6 +71,21 @@
       "defaultVariantId": "082b37ae-c834-4577-972a-ad76a1279c53",
       "variantIds": ["082b37ae-c834-4577-972a-ad76a1279c53"],
       "isReadOnlyTerminal": true
+    },
+    "0820bd41-dcf1-49c2-a4fb-f0f312c882f7": {
+      "id": "0820bd41-dcf1-49c2-a4fb-f0f312c882f7",
+      "name": "Global Variables",
+      "size": {
+        "width": 375
+      },
+      "variantId": "0c04a334-1030-49dc-8aaa-8e52968ef266",
+      "uiTypeId": "b2cda88e-7b77-4dff-8503-3c7e07a3ff0a",
+      "uiTypeColId": "1c0d7043-66e0-484f-8c51-06366eadfe3d",
+      "defaultVariantId": "0d3920e9-e3f8-476c-8c36-5bc01bf35cab",
+      "variantIds": ["0c04a334-1030-49dc-8aaa-8e52968ef266"],
+      "configLanguage": "json",
+      "jsonSource": "auth.json",
+      "columnWidth": 169.5
     },
     "7c17d498-cc88-4e33-b8b9-0e4cd7706096": {
       "id": "7c17d498-cc88-4e33-b8b9-0e4cd7706096",
@@ -66,6 +101,22 @@
       "subprocessStartMethod": "spawn"
     }
   },
-  "codeInfo": {},
-  "codeInfoCols": {}
+  "codeInfo": {
+    "660b812d-793e-4a4b-98dc-7c66526861c3": {
+      "id": "660b812d-793e-4a4b-98dc-7c66526861c3",
+      "editable": true
+    },
+    "JSON-{\"filenameGlob\":\"auth.json\",\"key\":[\"api_key\"]}": {
+      "id": "JSON-{\"filenameGlob\":\"auth.json\",\"key\":[\"api_key\"]}",
+      "name": "api_key"
+    }
+  },
+  "codeInfoCols": {
+    "902ab2f5-484d-4275-9b87-d7b11a76e8b4": {
+      "children": {
+        "JSON-{\"filenameGlob\":\"auth.json\",\"key\":[\"api_key\"]}": [],
+        "null": ["JSON-{\"filenameGlob\":\"auth.json\",\"key\":[\"api_key\"]}"]
+      }
+    }
+  }
 }

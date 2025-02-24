@@ -21,8 +21,9 @@ from ..sectionVariants.save import save_section_variants
 from ..uiTypes.save import save_ui_type_cols, save_ui_types
 
 
-def save_project_details(db, p):
-    save_json_source_data(p)
+def save_project_details(db, p, do_save_json_source_data=True):
+    if do_save_json_source_data:
+        save_json_source_data(p)
     remove_json_source_data(p)
     save_artifacts(db, p["artifacts"])
     save_artifact_groups(db, p["artifactGroups"], p["sections"])
