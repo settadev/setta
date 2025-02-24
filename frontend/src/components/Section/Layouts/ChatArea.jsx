@@ -59,7 +59,7 @@ function ChatAreaCore({ sectionId, messages }) {
       <div
         className={`${
           isScrollable ? NO_WHEEL_CLASS_NAME : ""
-        } flex flex-1 flex-col-reverse overflow-y-auto p-4`}
+        } flex flex-1 flex-col-reverse overflow-y-auto px-4`}
         ref={ref}
       >
         {/* The flex-col-reverse trick is to keep the scrollbar at the bottom: https://stackoverflow.com/a/44051405. Wrapped messages in a div to maintain correct visual order */}
@@ -67,7 +67,7 @@ function ChatAreaCore({ sectionId, messages }) {
           {[...messages, ...pendingUserMessages].map((message, idx) => (
             <div
               key={idx}
-              className={`mb-4 flex ${
+              className={`my-2 flex ${
                 message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
@@ -77,7 +77,7 @@ function ChatAreaCore({ sectionId, messages }) {
                 className={`prose prose-sm max-w-[clamp(100px,_85%,_800px)] cursor-text px-4 py-2.5 ${
                   message.role === "user"
                     ? "rounded-t-lg rounded-bl-lg bg-blue-500 text-white prose-headings:text-blue-200 dark:bg-blue-700"
-                    : "rounded-b-lg rounded-tr-lg bg-setta-100 text-setta-800 prose-headings:text-setta-600 dark:bg-setta-700/50 dark:text-setta-50"
+                    : "rounded-b-lg rounded-tr-lg bg-setta-100 text-setta-800 prose-headings:text-setta-600 dark:bg-setta-700/50 dark:text-setta-50 dark:prose-headings:text-setta-300"
                 } [flex:1_1_auto] dark:prose-invert   prose-headings:tracking-tighter   prose-h1:text-2xl prose-h1:leading-none prose-p:text-sm prose-code:before:hidden prose-code:after:hidden [&_*]:break-words`}
                 components={{
                   code: CodeBlock,
@@ -91,7 +91,7 @@ function ChatAreaCore({ sectionId, messages }) {
       </div>
 
       {/* Message input */}
-      <form onSubmit={handleSubmit} className="p-4">
+      <form onSubmit={handleSubmit} className="px-4 pb-2 pt-2">
         <div className="flex space-x-2">
           <textarea
             type="text"
