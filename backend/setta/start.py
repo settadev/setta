@@ -43,8 +43,19 @@ def init_db(path, with_examples):
 
 @click.command()
 @click.argument("path", default=get_default_db_path(), required=False)
-def export_db(path):
-    export_database(path)
+@click.option("--raw", is_flag=True, help="Export raw database format")
+@click.option("--readable", is_flag=True, help="Export in human-readable format")
+@click.option(
+    "--readable-with-variants",
+    is_flag=True,
+    help="Export in readable format with variants",
+)
+def export_db(path, raw, readable, readable_with_variants):
+    # If no export options are specified, default to raw format
+    if not any([raw, readable, readable_with_variants]):
+        readable_with_variants = True
+
+    export_database(path, raw, readable, readable_with_variants)
 
 
 @click.command()

@@ -1,4 +1,5 @@
 import * as Accordion from "@radix-ui/react-accordion";
+import { Editable } from "components/Utils/Editable";
 import C from "constants/constants.json";
 import _ from "lodash";
 import { useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import {
   getAllSectionArtifactIds,
   getSectionArtifactGroupMetadata,
 } from "state/hooks/artifacts";
+import { useEditableOnSubmit } from "state/hooks/editableText";
 import { newArtifactTransform } from "utils/objs/artifact";
 
 const LayersList = ({
@@ -206,13 +208,13 @@ function ImageArtifactObjects({
             </div>
 
             <Accordion.Content className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
-              <div className="rounded-md bg-setta-50 px-3 py-2 dark:bg-setta-900/50">
+              <div className="rounded-md bg-setta-100/50 px-3 py-2 dark:bg-setta-900/50">
                 {loadedDetails[item.id] ? (
                   <pre className="text-xs text-setta-900 dark:text-setta-100">
                     {JSON.stringify(loadedDetails[item.id], null, 2)}
                   </pre>
                 ) : (
-                  <div className="text-xs text-setta-500 dark:text-setta-400">
+                  <div className="text-xs !text-setta-500 dark:!text-setta-400">
                     No additional details available
                   </div>
                 )}
@@ -251,13 +253,11 @@ function ChartArtifactObjects({
             onDragEnd={onDragEnd}
             onClick={() => onClick?.(id, item.type)}
           >
-            <div className="flex flex-1 flex-col">
+            <div className="flex w-full flex-1 flex-col">
               <div className="flex items-center justify-between">
-                <header className="flex min-w-0">
-                  <p className="truncate text-xs font-bold text-setta-600 dark:text-setta-200">
-                    {item.name}
-                  </p>
-                  <p className="ml-2 truncate text-xs text-setta-500 dark:text-setta-400">
+                <header className="flex w-full min-w-0">
+                  <EditableArtifactName id={id} name={item.name} />
+                  <p className="ml-2 mr-0 truncate text-xs text-setta-500 dark:text-setta-400">
                     {item.type}
                   </p>
                 </header>
@@ -273,7 +273,7 @@ function ChartArtifactObjects({
             </div>
 
             <Accordion.Content className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
-              <div className="rounded-md bg-setta-50 px-3 py-2 dark:bg-setta-900/50">
+              <div className="rounded-md bg-setta-100/50 px-3 py-2 dark:bg-setta-900/50">
                 {loadedDetails[item.id] ? (
                   <pre className="text-xs text-setta-900 dark:text-setta-100">
                     {JSON.stringify(loadedDetails[item.id], null, 2)}
@@ -289,6 +289,38 @@ function ChartArtifactObjects({
         ))}
       </Accordion.Root>
     </>
+  );
+}
+
+function EditableArtifactName({ id, name }) {
+  function onTitleInputChange(newName) {
+    useArtifacts.setState((state) => {
+      const updated = _.cloneDeep(state.x[id]);
+      updated.name = newName;
+      return { x: { ...state.x, [id]: updated } };
+    });
+  }
+
+  const [inputValue, onChange, onBlur, onKeyDown, blurTriggeredByEscapeKey] =
+    useEditableOnSubmit(name, onTitleInputChange, () => true);
+
+  // TODO: fix the border and margin on this. its hacky, and is probably overriding something else to achieve the underline during edit.
+
+  return (
+    <Editable
+      value={inputValue}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      titleProps={{
+        editing:
+          "flex-1 truncate text-xs font-bold text-setta-600 dark:text-setta-200 border-solid border-t-0 border-x-0 border-white h-full mt-[1px]",
+        notEditing:
+          "flex-1 truncate text-xs font-bold text-setta-600 dark:text-setta-200  border-solid border-t-0 border-x-0 border-transparent h-full ",
+      }}
+      doubleClickToEdit={true}
+      blurTriggeredByEscapeKey={blurTriggeredByEscapeKey}
+    />
   );
 }
 
@@ -351,7 +383,7 @@ export function JustListOfArtifacts({ sectionId, sectionTypeName }) {
 
   function getItemStyle(id) {
     return selectedArtifactIds.has(id)
-      ? "!bg-blue-500 [&_*]:!text-white dark:!bg-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900 border-transparent"
+      ? "!bg-blue-500 [&_*]:text-white dark:!bg-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900 border-transparent"
       : null;
   }
 
