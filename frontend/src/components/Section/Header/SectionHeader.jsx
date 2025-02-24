@@ -41,17 +41,12 @@ function _SectionHeader({
         sectionTypeName={sectionTypeName}
         isInOtherProjectConfigs={isInOtherProjectConfigs}
       />
-      {sectionTypeName !== C.INFO && (
-        <>
-          <CardTitle
-            sectionId={sectionId}
-            isActiveSection={isActiveSection}
-            isInOtherProjectConfigs={isInOtherProjectConfigs}
-            sectionTypeName={sectionTypeName}
-          />
-        </>
-      )}
-
+      <MaybeCardTitle
+        sectionId={sectionId}
+        isActiveSection={isActiveSection}
+        isInOtherProjectConfigs={isInOtherProjectConfigs}
+        sectionTypeName={sectionTypeName}
+      />
       <div className="z-10 ml-auto flex items-center">
         {isSeriesElement && (
           <StandardPopover
@@ -83,18 +78,22 @@ function _SectionHeader({
   );
 }
 
-function CardTitle({
+export const SectionHeader = React.memo(_SectionHeader);
+
+function MaybeCardTitle({
   sectionId,
   isActiveSection,
   isInOtherProjectConfigs,
   sectionTypeName,
 }) {
-  // const isSearchResult = useProjectSearch((x) =>
-  //   x.sections.includes(sectionId)
-  // );
-
-  return (
-    // <div className={`${isSearchResult ? "outline outline-green-400" : ""}`}>
+  return sectionTypeName === C.TEXT_BLOCK ? (
+    <TextBlockCardTitle
+      sectionId={sectionId}
+      isActiveSection={isActiveSection}
+      isInOtherProjectConfigs={isInOtherProjectConfigs}
+      sectionTypeName={sectionTypeName}
+    />
+  ) : (
     <SectionTitle
       sectionId={sectionId}
       titleProps={getTitleStyles({
@@ -103,11 +102,32 @@ function CardTitle({
         sectionTypeName,
       })}
     />
-    // </div>
   );
 }
 
-export const SectionHeader = React.memo(_SectionHeader);
+function TextBlockCardTitle({
+  sectionId,
+  isActiveSection,
+  isInOtherProjectConfigs,
+  sectionTypeName,
+}) {
+  const headingAsSectionName = useSectionInfos(
+    (x) => x.x[sectionId].headingAsSectionName,
+  );
+
+  return (
+    !headingAsSectionName && (
+      <SectionTitle
+        sectionId={sectionId}
+        titleProps={getTitleStyles({
+          isActiveSection,
+          isInOtherProjectConfigs,
+          sectionTypeName,
+        })}
+      />
+    )
+  );
+}
 
 function getTitleStyles({
   isActiveSection,

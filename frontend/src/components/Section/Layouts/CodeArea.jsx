@@ -1,18 +1,12 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { getExtensions } from "components/Utils/CodeMirror/getExtensions";
-import { getKeywordStylizer } from "components/Utils/CodeMirror/getKeywordStylizer";
+import { useKeywordStylizer } from "components/Utils/CodeMirror/getKeywordStylizer";
 import { getCompletionsFn } from "components/Utils/CodeMirror/getOnCreateEditor";
 import { useCodeMirrorStyle } from "components/Utils/CodeMirror/useCodeMirrorStyle";
 import { useReactFlow } from "forks/xyflow/core/store";
 import { computeReadyToBeVisible } from "forks/xyflow/core/store/utils";
 import _ from "lodash";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   dbCodeAreaCompletion,
   dbCodeAreaInitializeCode,
@@ -24,7 +18,10 @@ import {
 } from "state/actions/sectionInfos";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
 import { useMisc, useSectionInfos } from "state/definitions";
-import { SETTA_PREVENT_SECTION_ACTIVE_CSS } from "utils/constants";
+import {
+  NO_PAN_CLASS_NAME,
+  SETTA_PREVENT_SECTION_ACTIVE_CSS,
+} from "utils/constants";
 import { asyncDebounce } from "utils/utils";
 
 function _CodeArea({ sectionId }) {
@@ -47,10 +44,9 @@ function PythonCodeArea({ sectionId, language }) {
     (x) => getDisplayedSectionVariant(sectionId, x).evRefs,
     _.isEqual,
   );
-  const keywordStylizer = useMemo(
-    () => getKeywordStylizer(evRefs),
-    [JSON.stringify(evRefs)],
-  );
+
+  const keywordStylizer = useKeywordStylizer(evRefs);
+
   const completionsFn = useCallback(
     getCompletionsFn(sectionId, null, dbCodeAreaCompletion, language),
     [sectionId],
@@ -124,7 +120,7 @@ function CoreCodeArea({ sectionId, language, completionsFn, keywordStylizer }) {
   return (
     <article
       ref={wrapperRef}
-      className={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title cursor-auto rounded-lg focus:bg-blue-200/70 focus:outline-none dark:focus:bg-blue-950/70 [&_*]:!outline-0 [&_.cm-activeLineGutter]:focus:!bg-transparent [&_.cm-activeLine]:focus:!bg-transparent [&_.cm-gutters]:focus:!bg-transparent ${overflow} ${nowheel}`}
+      className={`${NO_PAN_CLASS_NAME} ${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title cursor-auto rounded-lg focus:bg-blue-200/70 focus:outline-none dark:focus:bg-blue-950/70 [&_*]:!outline-0 [&_.cm-activeLineGutter]:focus:!bg-transparent [&_.cm-activeLine]:focus:!bg-transparent [&_.cm-gutters]:focus:!bg-transparent ${overflow} ${nowheel}`}
       tabIndex="0"
       onKeyDown={onArticleDivEnterKeyFocusOnCodeMirror}
     >

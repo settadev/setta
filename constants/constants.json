@@ -15,7 +15,7 @@
   "GROUP": "GROUP",
   "GLOBAL_VARIABLES": "GLOBAL_VARIABLES",
   "CODE": "CODE",
-  "INFO": "INFO",
+  "TEXT_BLOCK": "TEXT_BLOCK",
   "PARAM_SWEEP": "PARAM_SWEEP",
   "TERMINAL": "TERMINAL",
   "GLOBAL_PARAM_SWEEP": "GLOBAL_PARAM_SWEEP",
@@ -24,6 +24,7 @@
   "DRAW": "DRAW",
   "SOCIAL": "SOCIAL",
   "IFRAME": "IFRAME",
+  "CHAT": "CHAT",
   "NON_SECTION_TYPES": [
     "TEXT",
     "SLIDER",
@@ -116,6 +117,7 @@
   "ALLOWED_ARTIFACT_TYPES": {
     "DRAW": ["img", "brushStrokes"],
     "IMAGE": ["img"],
-    "CHART": ["list"]
+    "CHART": ["list"],
+    "CHAT": ["chatHistory"]
   }
 }

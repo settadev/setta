@@ -96,7 +96,7 @@
   },
   "2b06a83b-b96a-490d-a2d7-3631619e6495": {
     "id": "2b06a83b-b96a-490d-a2d7-3631619e6495",
-    "type": "INFO",
+    "type": "TEXT_BLOCK",
     "name": "",
     "presetType": "BASE",
     "config": {}
@@ -146,6 +146,13 @@
   "fae9523f-b9ee-4f0f-8785-3ce36c546aba": {
     "id": "fae9523f-b9ee-4f0f-8785-3ce36c546aba",
     "type": "IFRAME",
+    "name": "",
+    "presetType": "BASE",
+    "config": {}
+  },
+  "5d7859dd-fd3f-4f5f-9b8c-fe9bede13c33": {
+    "id": "5d7859dd-fd3f-4f5f-9b8c-fe9bede13c33",
+    "type": "CHAT",
     "name": "",
     "presetType": "BASE",
     "config": {}

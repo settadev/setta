@@ -125,6 +125,7 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "renderedValue",
         "isReadOnlyTerminal",
         "subprocessStartMethod",
+        "headingAsSectionName",
     )
 )
 

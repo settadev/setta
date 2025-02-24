@@ -18,11 +18,20 @@ def get_section_type(p, id):
 
 
 def get_artifacts(p, id):
-    return p["sections"][id]["artifacts"]
+    artifactGroupIds = p["sections"][id]["artifactGroupIds"]
+    artifacts = []
+    for groupId in artifactGroupIds:
+        for transform in p["artifactGroups"][groupId]["artifactTransforms"]:
+            artifacts.append(p["artifacts"][transform["artifactId"]])
+    return artifacts
 
 
 def get_drawing(p, id):
     return p["sections"][id]["drawing"]
+
+
+def get_chat_message(p, id):
+    return p["sections"][id]["latestChatMessage"]
 
 
 def get_section_name(p, id):
@@ -266,19 +275,20 @@ class Exporter:
                 "section": section_details,
                 "sectionVariant": section_variant,
             }
-        self.types_to_process = [
+        self.section_types_to_process = [
             C.SECTION,
             C.LIST_ROOT,
             C.DICT_ROOT,
             C.GROUP,
             C.CODE,
             C.GLOBAL_VARIABLES,
+            C.TEXT_BLOCK,
         ]
 
     def export(self):
         remove_unneeded_sections(
             self.p,
-            self.types_to_process,
+            self.section_types_to_process,
         )
         self.export_sections(list(self.p["projectConfig"]["children"].keys()))
 
@@ -334,7 +344,7 @@ class Exporter:
                 children = [
                     c
                     for c in children
-                    if get_section_type(self.p, c) in self.types_to_process
+                    if get_section_type(self.p, c) in self.section_types_to_process
                 ]
                 # some sections (like CODE) don't get added to self.output
                 info["value"] = [
@@ -367,6 +377,12 @@ class Exporter:
                 # don't need to process the output since the global variables get added directly to the output
                 # i.e. they aren't children of anything
                 self.export_section_params(id)
+            elif type == C.TEXT_BLOCK:
+                variant = get_selected_section_variant(self.p, id)
+                info["value"] = variant["description"]
+                info["dependencies"] = []
+                info["ref_var_name_positions"] = []
+                self.output[var_name] = info
             else:
                 raise ValueError
         return var_name
@@ -536,6 +552,7 @@ class ExporterForInMemoryFn:
                 # C.IMAGE,
                 # C.CHART,
                 C.DRAW,
+                C.CHAT,
                 C.GLOBAL_VARIABLES,
             ],
         )
@@ -577,6 +594,15 @@ class ExporterForInMemoryFn:
         elif type == C.DRAW:
             value = {"drawing": get_drawing(self.p, id)}
             self.create_var_mapping((id, "drawing"), f'{name}["drawing"]')
+        elif type == C.CHAT:
+            latestChatMessage = get_chat_message(self.p, id)
+            artifacts = get_artifacts(self.p, id)
+            chatHistory = artifacts[0]["value"] if len(artifacts) > 0 else None
+            value = {"latestChatMessage": latestChatMessage, "chatHistory": chatHistory}
+            self.create_var_mapping(
+                (id, "latestChatMessage"), f'{name}["latestChatMessage"]'
+            )
+            self.create_var_mapping((id, "chatHistory"), f'{name}["chatHistory"]')
         elif type == C.GLOBAL_VARIABLES:
             self.output.update(self.export_section_params(id, "", is_global=True))
             value_is_returned = False

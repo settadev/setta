@@ -31,7 +31,7 @@ def seed_examples(db):
         with open(filepath, "r") as f:
             data = json.load(f)
         add_defaults_to_project(data)  # json files don't have all the defaults
-        save_project_details(db, data)
+        save_project_details(db, data, do_save_json_source_data=False)
 
 
 def seed(db, with_examples=False, with_base_ui_types=False):

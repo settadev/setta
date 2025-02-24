@@ -31,13 +31,15 @@ import { generateSectionParamSweepVersionCombinations } from "./generateSectionP
 import { getProjectData } from "./saveProject";
 
 export async function getProjectDataToGenerateCode({
+  withArtifacts = false,
   includeFullNameToInfo = true,
   includeInfoToFullName = true,
   includeFullNameToSectionId = true,
   includeSectionPathFullNames = true,
   includeDrawings = false,
+  includeLatestChatMessages = false,
 }) {
-  const project = getProjectData({});
+  const project = getProjectData({ withArtifacts });
   if (includeFullNameToInfo) {
     project.fullNameToInfo = useEVRefRegex.getState().fullNameToInfo;
   }
@@ -57,18 +59,23 @@ export async function getProjectDataToGenerateCode({
       );
     }
   }
-  if (includeDrawings) {
+  if (includeDrawings || includeLatestChatMessages) {
     const sectionInfosState = useSectionInfos.getState().x;
     const sections = {};
     for (const x of Object.values(sectionInfosState)) {
       const currSection = _.cloneDeep(x);
-      if (getSectionType(x.id) === C.DRAW) {
+      if (includeDrawings && getSectionType(x.id) === C.DRAW) {
         currSection.drawing = await requestBase64FromCanvas(x.id);
+      }
+      if (includeLatestChatMessages && getSectionType(x.id) === C.CHAT) {
+        // this property just needs to exist when the code is first imported
+        currSection.latestChatMessage = null;
       }
       sections[x.id] = currSection;
     }
     project.sections = sections;
   }
+
   return project;
 }
 

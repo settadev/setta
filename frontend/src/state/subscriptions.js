@@ -190,7 +190,7 @@ function regexSubscriptionFn(x) {
       codeInfoChildren: getCodeInfoCol(id, x).children,
       sectionTypeName,
       selectedItem: sectionVariant.selectedItem,
-      isTopLevelAndCanHaveEVRefs:
+      isTopLevelAndCanBeReferredTo:
         !s.parentId &&
         [
           C.GLOBAL_VARIABLES,
@@ -198,6 +198,7 @@ function regexSubscriptionFn(x) {
           C.LIST_ROOT,
           C.DICT_ROOT,
           C.GROUP,
+          C.TEXT_BLOCK,
         ].includes(sectionTypeName),
     };
 

@@ -138,7 +138,7 @@ def export_list_section(folder, config, section_id, variant_id, with_variants):
         export_section(children_folder, config, c, with_variants)
 
 
-def export_info_section(folder, config, section_id, variant_id, with_variants):
+def export_text_block_section(folder, config, section_id, variant_id, with_variants):
     base = maybe_with_variant_in_filename(config, section_id, variant_id, with_variants)
     section = config["sections"][section_id]
     description = get_section_variant_attr(config, variant_id, "description")
@@ -226,8 +226,8 @@ def get_exporter_fn(config, section_id):
         return export_regular_section
     elif stype in [C.LIST_ROOT, C.DICT_ROOT, C.GROUP]:
         return export_list_section
-    elif stype == C.INFO:
-        return export_info_section
+    elif stype == C.TEXT_BLOCK:
+        return export_text_block_section
     elif stype == C.PARAM_SWEEP:
         return export_param_sweep_section
     elif stype == C.GLOBAL_PARAM_SWEEP:

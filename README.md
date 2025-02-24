@@ -12,14 +12,14 @@
 
 ## News
 
+**February 23**: [v0.0.7](https://github.com/settadev/setta/releases/tag/v0.0.7)
+- New `CHAT` section type, and some bug fixes.
+
 **February 22**: [v0.0.6](https://github.com/settadev/setta/releases/tag/v0.0.6)
 - Fixed bug where the language server URIs weren't created properly on Windows.
 
 **February 21**: [v0.0.5](https://github.com/settadev/setta/releases/tag/v0.0.5)
 - Mostly styling updates.
-
-**February 20**: [v0.0.4](https://github.com/settadev/setta/releases/tag/v0.0.4)
-- Improvements to subprocesses and param sweeps.
 
 ## What does Setta do?
 

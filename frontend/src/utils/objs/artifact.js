@@ -42,6 +42,7 @@ function specificArtifactTransformProps(sectionTypeName, artifactType) {
       };
     case C.IMAGE:
     case C.CHART:
+    case C.CHAT:
       return {};
     default:
       return {};
