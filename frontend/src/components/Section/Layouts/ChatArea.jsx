@@ -27,8 +27,8 @@ function ChatAreaCore({ sectionId, messages }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim() === "") return;
-    sendToInteractiveTasks([sectionId, "chatMessage"], newMessage);
-    setPendingUserMessages((x) => [...x, { sender: "user", text: newMessage }]);
+    sendToInteractiveTasks([sectionId, "latestChatMessage"], newMessage);
+    setPendingUserMessages((x) => [...x, { role: "user", content: newMessage }]);
     setNewMessage("");
   };
 
@@ -52,17 +52,17 @@ function ChatAreaCore({ sectionId, messages }) {
             <div
               key={idx}
               className={`mb-4 flex ${
-                message.sender === "user" ? "justify-end" : "justify-start"
+                message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={`max-w-xs rounded-lg px-4 py-2 ${
-                  message.sender === "user"
+                  message.role === "user"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-100 text-gray-800"
                 }`}
               >
-                {message.text}
+                {message.content}
               </div>
             </div>
           ))}
