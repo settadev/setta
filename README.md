@@ -15,7 +15,8 @@
 **February 23**: [v0.0.7](https://github.com/settadev/setta/releases/tag/v0.0.7)
 - Added a new "Chat" section type for sending chats and displaying chat history. Here's what it looks like:
 <p align="center">
-<img width="350" src="https://github.com/user-attachments/assets/4a2726c8-028e-4cfe-bdb3-04fea7a8d72b" />
+<img width="350" src="https://github.com/user-attachments/assets/65fd504e-4dcb-42db-b32e-d21c540354ee" />
+
 </p>
 
 **February 22**: [v0.0.6](https://github.com/settadev/setta/releases/tag/v0.0.6)
