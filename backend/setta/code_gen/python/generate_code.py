@@ -70,13 +70,18 @@ def var_declaration(
 # TODO: remove str(x["value"]). I don't think it's necessary since x["value"] should always be a string already.
 def get_value(x, selected):
     type_value = x["type"]
-    if type_value == C.TEXT or type_value == C.SLIDER or type_value == C.DROPDOWN:
+    if (
+        type_value == C.TEXT
+        or type_value == C.SLIDER
+        or type_value == C.DROPDOWN
+        or type_value == C.PASSWORD
+    ):
         output = str(x["value"])
         relative_positions = []
     elif type_value == C.SWITCH:
         output = str(get_boolean(x["value"]))
         relative_positions = []
-    elif type_value == C.COLOR_PICKER or type_value == C.PASSWORD:
+    elif type_value == C.COLOR_PICKER:
         output = f'"{x["value"]}"'
         relative_positions = []
     elif type_value == C.TEXT_BLOCK:

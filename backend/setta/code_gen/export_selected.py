@@ -29,6 +29,7 @@ def get_artifacts(p, id):
 def get_drawing(p, id):
     return p["sections"][id]["drawing"]
 
+
 def get_chat_message(p, id):
     return p["sections"][id]["latestChatMessage"]
 
@@ -598,7 +599,9 @@ class ExporterForInMemoryFn:
             artifacts = get_artifacts(self.p, id)
             chatHistory = artifacts[0]["value"] if len(artifacts) > 0 else None
             value = {"latestChatMessage": latestChatMessage, "chatHistory": chatHistory}
-            self.create_var_mapping((id, "latestChatMessage"), f'{name}["latestChatMessage"]')
+            self.create_var_mapping(
+                (id, "latestChatMessage"), f'{name}["latestChatMessage"]'
+            )
             self.create_var_mapping((id, "chatHistory"), f'{name}["chatHistory"]')
         elif type == C.GLOBAL_VARIABLES:
             self.output.update(self.export_section_params(id, "", is_global=True))

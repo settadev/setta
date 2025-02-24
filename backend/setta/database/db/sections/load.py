@@ -262,6 +262,9 @@ def load_json_sources_into_data_structures(
         elif s["variantId"] not in s["variantIds"]:
             s["variantId"] = s["variantIds"][0]
 
+        if s["defaultVariantId"] not in s["variantIds"]:
+            s["defaultVariantId"] = s["variantId"]
+
 
 def load_json_source(filename_glob, jsonSourceKeys):
     new_data = {}

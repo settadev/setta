@@ -1,6 +1,6 @@
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, ViewPlugin } from "@codemirror/view";
-import { useMemo } from "React";
+import { useMemo } from "react";
 
 const italicStyle = Decoration.mark({ class: "italic" });
 
