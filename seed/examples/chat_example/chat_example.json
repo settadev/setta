@@ -4,8 +4,8 @@
     "name": "crisp_flake",
     "previewImgColor": "bg-green-500/60 dark:bg-green-600/30",
     "viewport": {
-      "x": 125.64963852383721,
-      "y": 30.993223007368442,
+      "x": 46.04963852383729,
+      "y": -79.20677699263105,
       "zoom": 0.6386631009606775
     },
     "children": {
@@ -16,55 +16,26 @@
         "w": 702,
         "h": 302
       },
-      "05a93eda-1bc8-4244-9218-d0eaae2321a9": {
-        "x": 390,
-        "y": 15,
-        "zIndex": 1,
-        "w": 402,
-        "h": 202
-      },
       "7c17d498-cc88-4e33-b8b9-0e4cd7706096": {
         "x": 195,
         "y": 285,
-        "zIndex": 3,
-        "w": 677,
-        "h": 895
+        "zIndex": 2,
+        "w": 722,
+        "h": 859
       }
     }
   },
   "sectionVariants": {
-    "00c8b38c-b712-4467-922e-94aea915d50c": {
-      "name": "yappy_blue"
-    },
     "082b37ae-c834-4577-972a-ad76a1279c53": {
       "name": "spotless_indigo"
     },
     "eea6eb38-cbfc-4a50-8146-917239902dfb": {
       "name": "unsightly_purple",
-      "code": "from setta.tasks.fns import SettaInMemoryFn\nfrom groq import Groq\n\nclient = Groq(api_key=\"\")\n\n\ndef processChat(p):\n    section = p[\"ordinary_gold\"]\n    userMsg = section[\"latestChatMessage\"]\n\n    if not userMsg:\n        print(\"returning early\")\n        return None\n\n    history = section[\"chatHistory\"]\n    messages = [\n        *history,\n        {\n            \"role\": \"user\",\n            \"content\": userMsg,\n        },\n    ]\n\n    print(messages)\n\n    chat_completion = client.chat.completions.create(\n        messages=messages,\n        model=\"llama-3.3-70b-versatile\",\n    )\n\n    return [\n        {\n            \"name\": \"my secret chat\",\n            \"type\": \"chatHistory\",\n            \"value\": [\n                *history,\n                {\"role\": \"assistant\", \"content\": chat_completion},\n            ],\n        }\n    ]\n\n\nfn = SettaInMemoryFn(fn=processChat)\n\nprint(\"done!\")\n"
+      "code": "from setta.tasks.fns import SettaInMemoryFn\nfrom groq import Groq\n\nclient = Groq(api_key=\"\")\nc = {\"history\": None}\n\n\ndef processChat(p):\n    section = p[\"ordinary_gold\"]\n    userMsg = section[\"latestChatMessage\"]\n    if c[\"history\"] is None:\n        c[\"history\"] = section[\"chatHistory\"]\n\n    if not userMsg:\n        return None\n\n    c[\"history\"].append(\n        {\n            \"role\": \"user\",\n            \"content\": userMsg,\n        }\n    )\n\n    chat_completion = client.chat.completions.create(\n        messages=c[\"history\"],\n        model=\"llama-3.3-70b-versatile\",\n    )\n\n    c[\"history\"].append(\n        {\"role\": \"assistant\", \"content\": chat_completion.choices[0].message.content}\n    )\n\n    return [\n        {\n            \"name\": \"my secret chat\",\n            \"type\": \"chatHistory\",\n            \"value\": c[\"history\"],\n        }\n    ]\n\n\nfn = SettaInMemoryFn(fn=processChat)\n\nprint(\"done!\")\n"
     }
   },
-  "artifacts": {
-    "78d895d8-b36c-4cec-8306-1bde5479ba90": {
-      "name": "my secret chat",
-      "path": "",
-      "value": [],
-      "type": "chatHistory"
-    }
-  },
-  "artifactGroups": {
-    "74831752-1e57-434d-9576-2be1eff121eb": {
-      "name": "squealing_harlequin",
-      "artifactTransforms": [
-        {
-          "artifactId": "78d895d8-b36c-4cec-8306-1bde5479ba90"
-        }
-      ],
-      "visible": true,
-      "layerOpacity": 0.5,
-      "brushOpacity": 1
-    }
-  },
+  "artifacts": {},
+  "artifactGroups": {},
   "uiTypes": {},
   "uiTypeCols": {},
   "sections": {
@@ -81,20 +52,11 @@
       "variantIds": ["082b37ae-c834-4577-972a-ad76a1279c53"],
       "isReadOnlyTerminal": true
     },
-    "05a93eda-1bc8-4244-9218-d0eaae2321a9": {
-      "id": "05a93eda-1bc8-4244-9218-d0eaae2321a9",
-      "name": "ordinary_gold",
-      "variantId": "00c8b38c-b712-4467-922e-94aea915d50c",
-      "uiTypeId": "5d7859dd-fd3f-4f5f-9b8c-fe9bede13c33",
-      "artifactGroupIds": ["74831752-1e57-434d-9576-2be1eff121eb"],
-      "defaultVariantId": "00c8b38c-b712-4467-922e-94aea915d50c",
-      "variantIds": ["00c8b38c-b712-4467-922e-94aea915d50c"]
-    },
     "7c17d498-cc88-4e33-b8b9-0e4cd7706096": {
       "id": "7c17d498-cc88-4e33-b8b9-0e4cd7706096",
       "name": "rough_green",
       "size": {
-        "width": 675
+        "width": 720
       },
       "variantId": "eea6eb38-cbfc-4a50-8146-917239902dfb",
       "uiTypeId": "af9f2cfd-8cb6-44fd-9736-eefffae4cd29",

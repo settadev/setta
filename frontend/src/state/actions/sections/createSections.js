@@ -11,7 +11,7 @@ import { newSectionVariant } from "utils/objs/sectionVariant";
 import { focusOnSectionSearch } from "utils/tabbingLogic";
 import { insertIntoArray } from "utils/utils";
 import { setActiveSectionIdAndUpdateZIndex } from "../activeSections";
-import { addDrawAreaLayer } from "../artifacts";
+import { addChatHistoryArtifact, addDrawAreaLayer } from "../artifacts";
 import { initRunGroup } from "../runGroups/runGroups";
 import { setSectionVariantChildren } from "../sectionInfos";
 
@@ -147,6 +147,9 @@ export function createSectionInfo({
         break;
       case C.DRAW:
         addDrawAreaLayer(s.id, state);
+        break;
+      case C.CHAT:
+        addChatHistoryArtifact(s.id, state);
         break;
     }
     if (!s.parentId) {

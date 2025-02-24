@@ -78,9 +78,13 @@ export function getArtifactStateForSaving() {
   return result;
 }
 
-export function addDrawAreaLayer(sectionId, state) {
+function addArtifactUponSectionCreation({
+  sectionId,
+  sectionTypeName,
+  artifactType,
+  state,
+}) {
   const artifactId = createNewId();
-  const artifactType = "brushStrokes";
   useArtifacts.setState((state) => ({
     x: {
       ...state.x,
@@ -91,12 +95,33 @@ export function addDrawAreaLayer(sectionId, state) {
   const artifactGroupId = createNewId();
   state.artifactGroups[artifactGroupId] = newLayer({
     artifactTransforms: [
-      newArtifactTransform(artifactId, C.DRAW, artifactType),
+      newArtifactTransform(artifactId, sectionTypeName, artifactType),
     ],
   });
 
   state.x[sectionId].artifactGroupIds.push(artifactGroupId);
+
+  return artifactGroupId;
+}
+
+export function addDrawAreaLayer(sectionId, state) {
+  const artifactGroupId = addArtifactUponSectionCreation({
+    sectionId,
+    artifactType: "brushStrokes",
+    sectionTypeName: C.DRAW,
+    state,
+  });
+
   state.x[sectionId].canvasSettings.activeLayerId = artifactGroupId;
+}
+
+export function addChatHistoryArtifact(sectionId, state) {
+  addArtifactUponSectionCreation({
+    sectionId,
+    artifactType: "chatHistory",
+    sectionTypeName: C.CHAT,
+    state,
+  });
 }
 
 export function updateArtifactGroupAndSetArtifactId({
