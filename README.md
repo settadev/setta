@@ -13,7 +13,7 @@
 ## News
 
 **February 23**: [v0.0.7](https://github.com/settadev/setta/releases/tag/v0.0.7)
-- New `CHAT` section type, and some bug fixes.
+- Added new "Chat" section type for sending chats and displaying chat history.
 
 **February 22**: [v0.0.6](https://github.com/settadev/setta/releases/tag/v0.0.6)
 - Fixed bug where the language server URIs weren't created properly on Windows.
