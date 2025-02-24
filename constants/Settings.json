@@ -107,6 +107,9 @@
     },
     "TEXT_BLOCK": {
       "displayMode": "RENDER"
+    },
+    "CHAT": {
+      "size": { "width": 405, "height": 405 }
     }
   }
 }
