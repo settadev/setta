@@ -41,27 +41,32 @@ function ChatAreaCore({ sectionId, messages }) {
       className={`${NO_PAN_CLASS_NAME} section-full flex flex-col rounded-lg bg-white shadow-lg`}
     >
       <div
-        className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} flex-1 overflow-y-auto p-4`}
+        className={`${
+          isScrollable ? NO_WHEEL_CLASS_NAME : ""
+        } flex flex-1 flex-col-reverse overflow-y-auto p-4`}
         ref={ref}
       >
-        {[...messages, ...pendingUserMessages].map((message, idx) => (
-          <div
-            key={idx}
-            className={`mb-4 flex ${
-              message.sender === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
+        {/* The flex-col-reverse trick is to keep the scrollbar at the bottom: https://stackoverflow.com/a/44051405. Wrapped messages in a div to maintain correct visual order */}
+        <div>
+          {[...messages, ...pendingUserMessages].map((message, idx) => (
             <div
-              className={`max-w-xs rounded-lg px-4 py-2 ${
-                message.sender === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-800"
+              key={idx}
+              className={`mb-4 flex ${
+                message.sender === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              {message.text}
+              <div
+                className={`max-w-xs rounded-lg px-4 py-2 ${
+                  message.sender === "user"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {message.text}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Message input */}
