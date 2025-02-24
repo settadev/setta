@@ -7,6 +7,7 @@ import { FaChartPie, FaLayerGroup, FaSquareXTwitter } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { GrFormView } from "react-icons/gr";
 import { IoLogoJavascript } from "react-icons/io";
+import { IoChatbox } from "react-icons/io5";
 import { PiTextTFill } from "react-icons/pi";
 import { RiGlobalFill } from "react-icons/ri";
 import { SiGnubash, SiPython } from "react-icons/si";
@@ -79,6 +80,13 @@ export function HeaderIcon({
     case C.CHART:
       return (
         <FaChartPie
+          className="text-setta-300 transition-colors group-hover/card-section:text-blue-500  dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]
+          "
+        />
+      );
+    case C.CHAT:
+      return (
+        <IoChatbox
           className="text-setta-300 transition-colors group-hover/card-section:text-blue-500  dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]
           "
         />
