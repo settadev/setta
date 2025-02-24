@@ -1,4 +1,5 @@
 import * as Accordion from "@radix-ui/react-accordion";
+import { Editable } from "components/Utils/Editable";
 import C from "constants/constants.json";
 import _ from "lodash";
 import { useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import {
   getAllSectionArtifactIds,
   getSectionArtifactGroupMetadata,
 } from "state/hooks/artifacts";
+import { useEditableOnSubmit } from "state/hooks/editableText";
 import { newArtifactTransform } from "utils/objs/artifact";
 
 const LayersList = ({
@@ -254,9 +256,7 @@ function ChartArtifactObjects({
             <div className="flex flex-1 flex-col">
               <div className="flex items-center justify-between">
                 <header className="flex min-w-0">
-                  <p className="truncate text-xs font-bold text-setta-600 dark:text-setta-200">
-                    {item.name}
-                  </p>
+                  <EditableArtifactName id={id} name={item.name} />
                   <p className="ml-2 truncate text-xs text-setta-500 dark:text-setta-400">
                     {item.type}
                   </p>
@@ -289,6 +289,36 @@ function ChartArtifactObjects({
         ))}
       </Accordion.Root>
     </>
+  );
+}
+
+function EditableArtifactName({ id, name }) {
+  function onTitleInputChange(newName) {
+    useArtifacts.setState((state) => {
+      const updated = _.cloneDeep(state.x[id]);
+      updated.name = newName;
+      return { ...state.x, [id]: updated };
+    });
+  }
+
+  const [inputValue, onChange, onBlur, onKeyDown, blurTriggeredByEscapeKey] =
+    useEditableOnSubmit(name, onTitleInputChange, () => true);
+
+  return (
+    <Editable
+      value={inputValue}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      titleProps={{
+        editing:
+          "truncate text-xs font-bold text-setta-600 dark:text-setta-200",
+        notEditing:
+          "truncate text-xs font-bold text-setta-600 dark:text-setta-200",
+      }}
+      doubleClickToEdit={true}
+      blurTriggeredByEscapeKey={blurTriggeredByEscapeKey}
+    />
   );
 }
 
