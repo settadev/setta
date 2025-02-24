@@ -1,7 +1,9 @@
 import _ from "lodash";
 import { useState } from "react";
+import { sendToInteractiveTasks } from "state/actions/interactive";
 import { useAllSectionArtifacts } from "state/hooks/artifacts";
 import { useIsScrollable } from "state/hooks/sectionSizes";
+import useDeepCompareEffect from "use-deep-compare-effect";
 import { NO_PAN_CLASS_NAME, NO_WHEEL_CLASS_NAME } from "utils/constants";
 
 export function ChatArea({ sectionId }) {
@@ -19,22 +21,20 @@ export function ChatArea({ sectionId }) {
 
 function ChatAreaCore({ sectionId, messages }) {
   const [newMessage, setNewMessage] = useState("");
+  const [pendingUserMessages, setPendingUserMessages] = useState([]);
   const { ref, isScrollable } = useIsScrollable();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim() === "") return;
-
-    setMessages([
-      ...messages,
-      {
-        id: messages.length + 1,
-        text: newMessage,
-        sender: "user",
-      },
-    ]);
+    sendToInteractiveTasks([sectionId, "chatMessage"], newMessage);
+    setPendingUserMessages((x) => [...x, { sender: "user", text: newMessage }]);
     setNewMessage("");
   };
+
+  useDeepCompareEffect(() => {
+    setPendingUserMessages([]);
+  }, [messages]);
 
   return (
     <div
@@ -44,7 +44,7 @@ function ChatAreaCore({ sectionId, messages }) {
         className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} flex-1 overflow-y-auto p-4`}
         ref={ref}
       >
-        {messages.map((message, idx) => (
+        {[...messages, ...pendingUserMessages].map((message, idx) => (
           <div
             key={idx}
             className={`mb-4 flex ${

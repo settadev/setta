@@ -28,7 +28,7 @@
       "name": "my secret chat",
       "path": "",
       "value": [
-        { "sender": "Bot", "text": "Hello my name is Dingus!" },
+        { "sender": "bot", "text": "Hello my name is Dingus!" },
         { "sender": "user", "text": "hello Dingus! What a splendid name" }
       ],
       "type": "chatHistory"
