@@ -63,7 +63,7 @@ function _Markdown({ sectionId }) {
 export const TextBlock = React.memo(_TextBlock);
 const Markdown = React.memo(_Markdown);
 
-const CodeBlock = ({ node, inline, className, children, ...props }) => {
+export const CodeBlock = ({ node, inline, className, children, ...props }) => {
   const [copied, setCopied] = React.useState(false);
   const codeRef = React.useRef(null);
 
