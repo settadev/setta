@@ -41,3 +41,4 @@ setta_code/
 .dmypy.json
 backend/setta/frontend
 setta_files/
+auth.json
