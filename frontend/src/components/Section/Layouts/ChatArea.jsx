@@ -103,7 +103,7 @@ function ChatAreaCore({ sectionId, messages }) {
           />
           <button
             type="submit"
-            className="cursor-pointer self-end rounded-lg bg-blue-500 px-4 py-2.5 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="cursor-pointer self-end rounded-lg bg-blue-500 px-4 py-2.5 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700"
           >
             Send
           </button>

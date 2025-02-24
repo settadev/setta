@@ -97,7 +97,7 @@ export const CodeBlock = ({ node, inline, className, children, ...props }) => {
     <span className="group relative block">
       <button
         onClick={handleCopy}
-        className="absolute bottom-0 right-0 top-0 cursor-pointer rounded bg-transparent text-setta-300 opacity-0 transition-opacity 
+        className="absolute right-0 top-0.5 cursor-pointer rounded bg-transparent text-setta-300 opacity-0 transition-opacity 
                    duration-200 hover:text-setta-600 focus:outline-none
                    focus:ring-2 focus-visible:ring-blue-500 group-hover:opacity-100 dark:hover:text-white"
         aria-label="Copy code"
