@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { useState } from "react";
+import { IoSend } from "react-icons/io5";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
@@ -99,13 +100,13 @@ function ChatAreaCore({ sectionId, messages }) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} max-h-48 flex-1 resize-none overflow-y-auto rounded-lg border border-setta-100 bg-transparent px-4 py-2 text-setta-800 outline-none [field-sizing:content] hover:bg-setta-100/50  focus:outline-none focus:outline focus:outline-blue-500 dark:border-setta-700  dark:text-white dark:hover:bg-setta-800 dark:focus:bg-setta-800/50 dark:focus:outline-blue-700`}
+            className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} nodrag max-h-48 flex-1 resize-none overflow-y-auto rounded-lg border border-setta-100 bg-transparent px-4 py-2 text-setta-800 outline-none [field-sizing:content]  hover:bg-setta-100/50 focus:outline-none focus:outline focus:outline-blue-500  dark:border-setta-700 dark:text-white dark:hover:bg-setta-800 dark:focus:bg-setta-800/50 dark:focus:outline-blue-700`}
           />
           <button
             type="submit"
-            className="cursor-pointer self-end rounded-lg bg-blue-500 px-4 py-2.5 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700"
+            className="mb-3 cursor-pointer self-end px-2 py-0.5 text-setta-500  hover:text-blue-500 focus:text-blue-500 focus:outline-none focus:ring-0 dark:hover:text-blue-700 "
           >
-            Send
+            <IoSend />
           </button>
         </div>
       </form>
