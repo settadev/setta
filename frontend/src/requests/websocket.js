@@ -66,6 +66,8 @@ function receiveMessage(message) {
     updateInteractiveArtifacts(m.content);
   } else if (m.messageType === C.WS_IN_MEMORY_FN_AVG_RUN_TIME) {
     updateInMemorySubprocessInfo(m.content);
+  } else if (m.messageType === C.WS_SPECIFIC_FILE_WATCHER_UPDATE) {
+    console.log("WS_SPECIFIC_FILE_WATCHER_UPDATE", m)
   } else if (m.id) {
     setTemporaryMiscState(m.id, m.content);
   }

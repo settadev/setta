@@ -16,6 +16,7 @@ from setta.lsp.utils import (
     create_lsp_readers,
     create_lsp_writers,
     create_lsps,
+    create_specific_file_watcher,
     kill_lsps,
     start_lsps,
 )
@@ -52,6 +53,9 @@ async def lifespan(app: FastAPI):
     app.state.file_watcher = create_file_watcher(app.state.lsps, app.state.lsp_writers)
     app.state.terminal_websockets = TerminalWebsockets()
     app.state.websocket_manager = WebsocketManager()
+    app.state.specific_file_watcher = create_specific_file_watcher(
+        app.state.websocket_manager
+    )
     app.state.tasks = Tasks(app.state.lsp_writers)
     app.state.lsp_readers = create_lsp_readers(
         app.state.lsps, app.state.websocket_manager

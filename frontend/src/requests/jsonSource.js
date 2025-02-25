@@ -51,3 +51,12 @@ export async function dbDeleteFile(filepath) {
     address: C.ROUTE_DELETE_FILE,
   });
 }
+
+export async function dbFilesWatchList(filepaths) {
+  return await post({
+    body: {
+      filepaths,
+    },
+    address: C.ROUTE_FILE_WATCH_LIST,
+  });
+}

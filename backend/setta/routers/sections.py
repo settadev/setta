@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from setta.code_gen.export_selected import (
@@ -21,6 +21,7 @@ from setta.database.db.sections.copy import (
 )
 from setta.database.db.sections.jsonSource import save_json_source_data
 from setta.database.db.sections.load import load_json_sources_into_data_structures
+from setta.routers.dependencies import get_specific_file_watcher
 from setta.utils.constants import C
 from setta.utils.generate_new_filename import generate_new_filename
 
@@ -73,6 +74,10 @@ class GetJSONSourcePathToBeDeleted(BaseModel):
 
 class DeleteFileRequest(BaseModel):
     filepath: str
+
+
+class FileWatchListRequest(BaseModel):
+    filepaths: List[str]
 
 
 @router.post(C.ROUTE_COPY_SECTIONS)
@@ -172,3 +177,11 @@ def route_delete_file(x: DeleteFileRequest):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Failed to delete file: {str(e)}",
         )
+
+
+@router.post(C.ROUTE_FILE_WATCH_LIST)
+def route_file_watch_list(
+    x: FileWatchListRequest, specific_file_watcher=Depends(get_specific_file_watcher)
+):
+    # x.filepaths is the current list of file paths that should be watched
+    specific_file_watcher.update_watch_list(x.filepaths)
