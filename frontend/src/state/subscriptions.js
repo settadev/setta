@@ -250,8 +250,8 @@ function artifactNamePathTypeToIdSubscriptionFn(state) {
 function jsonSourceSubscriptionFn(state) {
   const jsonSourceSet = new Set();
   for (const s of Object.values(state.x)) {
-    if (s["jsonSource"]) {
-      jsonSourceSet.add(s["jsonSource"]);
+    if (s.jsonSource) {
+      jsonSourceSet.add(s.jsonSource);
     }
   }
   return jsonSourceSet;

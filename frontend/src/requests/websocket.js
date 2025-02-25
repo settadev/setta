@@ -4,6 +4,7 @@ import {
   updateInMemorySubprocessInfo,
   updateInteractiveArtifacts,
 } from "state/actions/interactive";
+import { updateJSONSourceContents } from "state/actions/jsonSource";
 import { setNotificationMessage } from "state/actions/notification";
 import { setTemporaryMiscState } from "state/actions/temporaryMiscState";
 import { processTypeErrors } from "state/actions/typeErrors";
@@ -53,6 +54,7 @@ function wssReady() {
 
 function receiveMessage(message) {
   const m = JSON.parse(message);
+  console.log("receiveMessage", m);
   if (m.messageType === C.WS_ALL_CONNECTIONS) {
     updateConnectedTo(m);
   } else if (m.messageType === C.WS_LSP_DIAGNOSTICS) {
@@ -67,7 +69,7 @@ function receiveMessage(message) {
   } else if (m.messageType === C.WS_IN_MEMORY_FN_AVG_RUN_TIME) {
     updateInMemorySubprocessInfo(m.content);
   } else if (m.messageType === C.WS_SPECIFIC_FILE_WATCHER_UPDATE) {
-    console.log("WS_SPECIFIC_FILE_WATCHER_UPDATE", m)
+    updateJSONSourceContents(m.content);
   } else if (m.id) {
     setTemporaryMiscState(m.id, m.content);
   }

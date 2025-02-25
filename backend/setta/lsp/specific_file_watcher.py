@@ -26,7 +26,6 @@ class SpecificFileWatcher:
         self.handler = SpecificFileEventHandler(
             callback, asyncio.get_event_loop(), self.watched_files
         )
-        self.started = False
 
     def add_file(self, file_path: str) -> bool:
         """
@@ -66,10 +65,6 @@ class SpecificFileWatcher:
             if not is_dir_watched:
                 self.observer.schedule(self.handler, dir_path, recursive=False)
 
-        # Start the observer if it's not already running
-        if not self.started:
-            self.start()
-
         return True
 
     def remove_file(self, file_path: str) -> None:
@@ -83,10 +78,6 @@ class SpecificFileWatcher:
 
         if absolute_path in self.watched_files:
             self.watched_files.remove(absolute_path)
-
-        # If no files are being watched, stop the observer
-        if not self.watched_files and self.started:
-            self.stop()
 
     def update_watch_list(self, file_paths: List[str]) -> Dict[str, List[str]]:
         """
@@ -127,16 +118,14 @@ class SpecificFileWatcher:
 
     def start(self) -> None:
         """Start the file watcher."""
-        if not self.started:
-            self.observer.start()
-            self.started = True
+        self.observer.start()
+        self.started = True
 
     def stop(self) -> None:
         """Stop the file watcher."""
-        if self.started:
-            self.observer.stop()
-            self.observer.join()
-            self.started = False
+        self.observer.stop()
+        self.observer.join()
+        self.started = False
 
 
 class SpecificFileEventHandler(FileSystemEventHandler):
@@ -208,33 +197,53 @@ class SpecificFileEventHandler(FileSystemEventHandler):
             event: The file system event
             event_type: The type of event ('created', 'modified', 'deleted', 'moved')
         """
-        file_path = os.path.abspath(event.src_path)
+        logger.debug("_send_event")
+        # Get absolute path
+        abs_path = os.path.abspath(event.src_path)
+
+        # Get relative path to current working directory
+        rel_path = os.path.relpath(abs_path)
 
         # Get file contents for created and modified events
         file_content = None
         if event_type in ("created", "modified"):
             try:
-                with open(file_path, "r", encoding="utf-8") as f:
+                with open(abs_path, "r", encoding="utf-8") as f:
                     file_content = f.read()
             except Exception as e:
-                logger.debug(f"Error reading file {file_path}: {e}")
+                logger.debug(f"Error reading file {abs_path}: {e}")
                 file_content = None
 
         # For moved events, get the content of the destination file
+        dest_abs_path = None
+        dest_rel_path = None
         if event_type == "moved" and hasattr(event, "dest_path"):
-            dest_path = os.path.abspath(event.dest_path)
+            dest_abs_path = os.path.abspath(event.dest_path)
+            dest_rel_path = os.path.relpath(dest_abs_path)
             try:
-                with open(dest_path, "r", encoding="utf-8") as f:
+                with open(dest_abs_path, "r", encoding="utf-8") as f:
                     file_content = f.read()
             except Exception as e:
-                logger.debug(f"Error reading destination file {dest_path}: {e}")
+                logger.debug(f"Error reading destination file {dest_abs_path}: {e}")
                 file_content = None
 
+        # Prepare event info object
+        event_info = {
+            "absPath": abs_path,
+            "relPath": rel_path,
+            "eventType": event_type,
+            "fileContent": file_content,
+        }
+
+        # Add destination paths for moved events
+        if event_type == "moved" and dest_abs_path:
+            event_info["destAbsPath"] = dest_abs_path
+            event_info["destRelPath"] = dest_rel_path
+
+        logger.debug(f"will send {event_info}")
         if asyncio.iscoroutinefunction(self.callback):
             self.loop.call_soon_threadsafe(
-                lambda: self.loop.create_task(
-                    self.callback(file_path, event_type, file_content)
-                )
+                lambda: self.loop.create_task(self.callback(event_info))
             )
         else:
-            self.callback(file_path, event_type, file_content)
+            self.callback(event_info)

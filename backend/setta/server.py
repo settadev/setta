@@ -77,6 +77,7 @@ async def lifespan(app: FastAPI):
         app.state.lsp_writers,
     )
     app.state.file_watcher.start()
+    app.state.specific_file_watcher.start()
 
     if not is_dev_mode():
         # Mount the 'frontend/dist' directory at '/static'
@@ -102,6 +103,7 @@ async def lifespan(app: FastAPI):
     finally:
         app.state.tasks.close()
         app.state.file_watcher.stop()
+        app.state.specific_file_watcher.stop()
         await kill_lsps(app.state.lsps, app.state.lsp_readers)
 
 
