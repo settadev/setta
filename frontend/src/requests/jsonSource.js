@@ -2,12 +2,11 @@ import C from "constants/constants.json";
 import { useSectionInfos } from "state/definitions";
 import { post } from "./utils";
 
-export async function dbLoadSectionJSONSource(sectionId, jsonSource) {
+export async function dbLoadSectionJSONSource(sectionIdToJSONSource) {
   return await post({
     body: {
       project: dataForRequest(),
-      sectionId,
-      jsonSource,
+      sectionIdToJSONSource,
     },
     address: C.ROUTE_LOAD_SECTION_JSON_SOURCE,
   });

@@ -214,7 +214,6 @@ def load_json_sources_into_data_structures(
             f'Attempting to read {s["jsonSource"]} with keys {s["jsonSourceKeys"]}'
         )
         new_data = load_json_source(s["jsonSource"], s["jsonSourceKeys"])
-        logger.debug(f"Loaded json: {new_data}")
         for filename, data in new_data.items():
             codeInfo.update(data["codeInfo"])
             variantId = None

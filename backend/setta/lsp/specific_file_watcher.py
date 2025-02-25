@@ -1,4 +1,5 @@
 import asyncio
+import glob
 import logging
 import os
 from typing import Dict, List, Set
@@ -23,8 +24,12 @@ class SpecificFileWatcher:
         """
         self.observer = Observer()
         self.watched_files: Set[str] = set()
+        self.file_to_patterns = {}
         self.handler = SpecificFileEventHandler(
-            callback, asyncio.get_event_loop(), self.watched_files
+            callback,
+            asyncio.get_event_loop(),
+            self.watched_files,
+            self.file_to_patterns,
         )
 
     def add_file(self, file_path: str) -> bool:
@@ -79,17 +84,21 @@ class SpecificFileWatcher:
         if absolute_path in self.watched_files:
             self.watched_files.remove(absolute_path)
 
-    def update_watch_list(self, file_paths: List[str]) -> Dict[str, List[str]]:
+    def update_watch_list(
+        self, filepaths_and_glob_patterns: List[str]
+    ) -> Dict[str, List[str]]:
         """
         Update the entire list of files being watched with a single function call.
         This efficiently handles adding new files and removing files that are no longer needed.
 
         Args:
-            file_paths: List of file paths that should be watched
+            filepaths_and_glob_patterns: List of file paths that should be watched
 
         Returns:
             Dict containing 'added' and 'removed' lists of file paths
         """
+        file_paths = self.get_actual_file_paths_to_watch(filepaths_and_glob_patterns)
+
         # Convert all input paths to absolute paths (only if they exist)
         absolute_paths = [
             os.path.abspath(path) for path in file_paths if os.path.exists(path)
@@ -116,6 +125,24 @@ class SpecificFileWatcher:
         # Return information about what changed
         return {"added": added_files, "removed": list(files_to_remove)}
 
+    def get_actual_file_paths_to_watch(self, filepaths_and_glob_patterns):
+        actual_filepaths = set()
+        # Expand glob patterns and build the mapping
+        for pattern in filepaths_and_glob_patterns:
+            matching_files = glob.glob(pattern)
+            for file_path in matching_files:
+                # Only add actual files, not directories
+                if os.path.isfile(file_path):
+                    abs_path = os.path.abspath(file_path)
+                    actual_filepaths.add(abs_path)
+
+                    # Add to the mapping
+                    if abs_path not in self.file_to_patterns:
+                        self.file_to_patterns[abs_path] = set()
+                    self.file_to_patterns[abs_path].add(pattern)
+
+        return actual_filepaths
+
     def start(self) -> None:
         """Start the file watcher."""
         self.observer.start()
@@ -131,7 +158,7 @@ class SpecificFileWatcher:
 class SpecificFileEventHandler(FileSystemEventHandler):
     """Event handler for specific file events."""
 
-    def __init__(self, callback, loop, watched_files_ref):
+    def __init__(self, callback, loop, watched_files_ref, file_to_patterns):
         """
         Initialize the event handler.
 
@@ -143,6 +170,7 @@ class SpecificFileEventHandler(FileSystemEventHandler):
         self.callback = callback
         self.loop = loop
         self.watched_files_ref = watched_files_ref
+        self.file_to_patterns = file_to_patterns
 
     def on_created(self, event: FileSystemEvent):
         """Handle file creation event."""
@@ -233,6 +261,7 @@ class SpecificFileEventHandler(FileSystemEventHandler):
             "relPath": rel_path,
             "eventType": event_type,
             "fileContent": file_content,
+            "matchingGlobPatterns": list(self.file_to_patterns[abs_path]),
         }
 
         # Add destination paths for moved events

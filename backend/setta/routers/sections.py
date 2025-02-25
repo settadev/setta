@@ -54,8 +54,7 @@ class GlobalParamSweepSectionToYamlRequest(BaseModel):
 
 class LoadSectionJSONSourceRequest(BaseModel):
     project: dict
-    sectionId: str
-    jsonSource: str
+    sectionIdToJSONSource: Dict[str, str]
 
 
 class SaveSectionJSONSourceRequest(BaseModel):
@@ -131,13 +130,14 @@ def route_global_param_sweep_section_to_yaml(x: GlobalParamSweepSectionToYamlReq
 @router.post(C.ROUTE_LOAD_SECTION_JSON_SOURCE)
 def route_load_section_json_source(x: LoadSectionJSONSourceRequest):
     p = x.project
-    p["sections"][x.sectionId]["jsonSource"] = x.jsonSource
+    for k, v in x.sectionIdToJSONSource.items():
+        p["sections"][k]["jsonSource"] = v
     load_json_sources_into_data_structures(
         p["sections"],
         p["codeInfo"],
         p["codeInfoCols"],
         p["sectionVariants"],
-        section_ids=[x.sectionId],
+        section_ids=list(x.sectionIdToJSONSource.keys()),
     )
     return {"project": p}
 
@@ -183,5 +183,5 @@ def route_delete_file(x: DeleteFileRequest):
 def route_file_watch_list(
     x: FileWatchListRequest, specific_file_watcher=Depends(get_specific_file_watcher)
 ):
-    # x.filepaths is the current list of file paths that should be watched
+    # x.filepaths is the current list of file paths or glob patterns that should be watched
     specific_file_watcher.update_watch_list(x.filepaths)
