@@ -1,60 +1,59 @@
-import C from "constants/constants.json";
+import { dbLoadSectionJSONSource } from "requests/jsonSource";
 import { useSectionInfos } from "state/definitions";
-import { newEVEntry } from "utils/objs/ev";
-import { getSectionVariant } from "./sectionInfos";
+import { updateSectionInfos } from "./sectionInfos";
 
-export function updateJSONSourceContents(updatedFileInfo) {
-  const { absPath, relPath, destAbsPath, destRelPath, fileContent } =
-    updatedFileInfo;
-  const newJson = JSON.parse(fileContent);
-  console.log("newJson", newJson);
+export async function updateJSONSourceContents(updatedFileInfo) {
+  const { absPath, relPath, destAbsPath, destRelPath } = updatedFileInfo;
+
+  const info = {
+    sections: {},
+    codeInfo: {},
+    codeInfoCols: {},
+    sectionVariants: {},
+  };
+
+  for (const s of Object.values(useSectionInfos.getState().x)) {
+    if (
+      !(absPath && s.jsonSource === absPath) &&
+      !(relPath && s.jsonSource === relPath) &&
+      !(destAbsPath && s.jsonSource === destAbsPath) &&
+      !(destRelPath && s.jsonSource === destRelPath)
+    ) {
+      continue;
+    }
+    const { sections, sectionVariants, codeInfo, codeInfoCols } =
+      await loadJsonContents(s.id, s.jsonSource);
+
+    Object.assign(info.sections, sections);
+    Object.assign(info.sectionVariants, sectionVariants);
+    Object.assign(info.codeInfo, codeInfo);
+    Object.assign(info.codeInfoCols, codeInfoCols);
+  }
 
   useSectionInfos.setState((state) => {
-    for (const s of Object.values(state.x)) {
-      if (
-        !(absPath && s.jsonSource === absPath) &&
-        !(relPath && s.jsonSource === relPath) &&
-        !(destAbsPath && s.jsonSource === destAbsPath) &&
-        !(destRelPath && s.jsonSource === destRelPath)
-      ) {
-        continue;
-      }
-      const variant = getSectionVariant(s.id, state);
-      const idsToRemove = [];
-
-      for (const [codeInfoId, value] of Object.entries(variant.values)) {
-        if (isFromJsonSource(codeInfoId)) {
-          const metadata = JSON.parse(
-            codeInfoId.replace(C.JSON_SOURCE_PREFIX, ""),
-          );
-          let currVal = newJson;
-          let keyNotPresent = false;
-          for (const k of metadata.key) {
-            if (currVal && k in currVal) {
-              currVal = currVal[k];
-            } else {
-              keyNotPresent = true;
-              break;
-            }
-          }
-          if (keyNotPresent) {
-            idsToRemove.push(codeInfoId);
-            continue;
-          }
-          if (value !== currVal) {
-            variant.values[codeInfoId] = newEVEntry();
-            variant.values[codeInfoId].value = JSON.stringify(currVal);
-          }
-        }
-      }
-
-      console.log("new values", variant.values);
-
-      console.log("idsToRemove", idsToRemove);
-    }
+    updateSectionInfos({
+      sections: info.sections,
+      sectionVariants: info.sectionVariants,
+      codeInfo: info.codeInfo,
+      codeInfoCols: info.codeInfoCols,
+      state,
+    });
   });
 }
 
-function isFromJsonSource(id) {
-  return id && id.startsWith(C.JSON_SOURCE_PREFIX);
+export async function loadJsonContents(sectionId, jsonSource) {
+  let codeInfo = null,
+    codeInfoCols = null,
+    sectionVariants = null,
+    sections = null;
+
+  if (jsonSource) {
+    const res = await dbLoadSectionJSONSource(sectionId, jsonSource);
+    if (res.status === 200) {
+      ({ codeInfo, codeInfoCols, sectionVariants, sections } =
+        res.data.project);
+    }
+  }
+
+  return { sections, sectionVariants, codeInfo, codeInfoCols };
 }

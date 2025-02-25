@@ -293,72 +293,74 @@ def load_json_source(filename_glob, jsonSourceKeys):
             logger.debug(f"couldn't find: {filename}")
             continue
 
-        new_data[filename] = {
-            "codeInfo": {},
-            "codeInfoColChildren": {},
-            "sectionVariantValues": {},
-        }
-
-        try:
-            for k in jsonSourceKeys:
-                jsonSourceData = jsonSourceData[k]
-        except:
-            # TODO print warning or something
-            pass
-
-        process_json_object(
-            new_data, jsonSourceData, filename, filename_glob, jsonSourceKeys
+        new_data[filename] = process_json_object(
+            jsonSourceData, filename, filename_glob, jsonSourceKeys
         )
-
-        if len(jsonSourceKeys) > 0:
-            # point directly from None (the root) to the children
-            highest_key = create_json_code_info_key(filename_glob, jsonSourceKeys)
-            codeInfoChildren = new_data[filename]["codeInfoColChildren"]
-            codeInfoChildren[None] = codeInfoChildren[highest_key]
-            del codeInfoChildren[highest_key]
 
     return new_data
 
 
-def process_json_object(output, obj, filename, filename_glob, current_path):
+def process_json_object(jsonSourceData, filename, filename_glob, jsonSourceKeys):
+    new_data = {
+        "codeInfo": {},
+        "codeInfoColChildren": {},
+        "sectionVariantValues": {},
+    }
+
+    try:
+        for k in jsonSourceKeys:
+            jsonSourceData = jsonSourceData[k]
+    except:
+        # TODO print warning or something
+        pass
+
+    process_json_object_helper(
+        new_data, jsonSourceData, filename, filename_glob, jsonSourceKeys
+    )
+
+    if len(jsonSourceKeys) > 0:
+        # point directly from None (the root) to the children
+        highest_key = create_json_code_info_key(filename_glob, jsonSourceKeys)
+        codeInfoChildren = new_data["codeInfoColChildren"]
+        codeInfoChildren[None] = codeInfoChildren[highest_key]
+        del codeInfoChildren[highest_key]
+
+    return new_data
+
+
+def process_json_object_helper(output, obj, filename, filename_glob, current_path):
     if not isinstance(obj, dict):
         return
 
     children_keys = []
     for k, v in obj.items():
         path = current_path + [k]
-        full_key, is_dict = create_json_code_info(
-            filename, filename_glob, path, k, v, output
-        )
+        full_key, is_dict = create_json_code_info(filename_glob, path, k, v, output)
         children_keys.append(full_key)
         if is_dict:
-            process_json_object(output, v, filename, filename_glob, path)
+            process_json_object_helper(output, v, filename, filename_glob, path)
 
     parent_id = None
     if len(current_path) > 0:
         parent_id = create_json_code_info_key(filename_glob, current_path)
 
-    output[filename]["codeInfoColChildren"][parent_id] = children_keys
+    output["codeInfoColChildren"][parent_id] = children_keys
 
 
-def create_json_code_info(filename, filename_glob, path, key, value, output):
+def create_json_code_info(filename_glob, path, key, value, output):
     full_key = create_json_code_info_key(filename_glob, path)
     # Create code info entry
-    output[filename]["codeInfo"][full_key] = with_code_info_defaults(
-        id=full_key, name=key
-    )
-    output[filename]["codeInfoColChildren"][full_key] = []
+    output["codeInfo"][full_key] = with_code_info_defaults(id=full_key, name=key)
+    output["codeInfoColChildren"][full_key] = []
 
     is_dict = isinstance(value, dict)
     # Create variant value entry
     if is_dict:
         # For objects, store empty value and process children
-        output[filename]["sectionVariantValues"][full_key] = new_ev_entry()
+        output["sectionVariantValues"][full_key] = new_ev_entry()
     else:
         # For non-objects, store the value directly
-        output[filename]["sectionVariantValues"][full_key] = new_ev_entry(
-            value=json.dumps(value)
-        )
+        output["sectionVariantValues"][full_key] = new_ev_entry(value=json.dumps(value))
 
     return full_key, is_dict
 
