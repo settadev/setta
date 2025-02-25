@@ -46,10 +46,14 @@ def create_file_watcher(lsps, lsp_writers):
 
 
 def create_specific_file_watcher(websocket_manager):
-    async def callback(file_path, event_type):
+    async def callback(file_path, event_type, file_content):
         await websocket_manager.broadcast(
             {
-                "content": {"filePath": file_path, "eventType": event_type},
+                "content": {
+                    "filePath": file_path,
+                    "eventType": event_type,
+                    "fileContent": file_content,
+                },
                 "messageType": C.WS_SPECIFIC_FILE_WATCHER_UPDATE,
             }
         )

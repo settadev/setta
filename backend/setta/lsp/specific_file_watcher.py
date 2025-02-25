@@ -1,9 +1,12 @@
 import asyncio
+import logging
 import os
 from typing import Dict, List, Set
 
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
+
+logger = logging.getLogger(__name__)
 
 
 class SpecificFileWatcher:
@@ -207,9 +210,31 @@ class SpecificFileEventHandler(FileSystemEventHandler):
         """
         file_path = os.path.abspath(event.src_path)
 
+        # Get file contents for created and modified events
+        file_content = None
+        if event_type in ("created", "modified"):
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    file_content = f.read()
+            except Exception as e:
+                logger.debug(f"Error reading file {file_path}: {e}")
+                file_content = None
+
+        # For moved events, get the content of the destination file
+        if event_type == "moved" and hasattr(event, "dest_path"):
+            dest_path = os.path.abspath(event.dest_path)
+            try:
+                with open(dest_path, "r", encoding="utf-8") as f:
+                    file_content = f.read()
+            except Exception as e:
+                logger.debug(f"Error reading destination file {dest_path}: {e}")
+                file_content = None
+
         if asyncio.iscoroutinefunction(self.callback):
             self.loop.call_soon_threadsafe(
-                lambda: self.loop.create_task(self.callback(file_path, event_type))
+                lambda: self.loop.create_task(
+                    self.callback(file_path, event_type, file_content)
+                )
             )
         else:
-            self.callback(file_path, event_type)
+            self.callback(file_path, event_type, file_content)
