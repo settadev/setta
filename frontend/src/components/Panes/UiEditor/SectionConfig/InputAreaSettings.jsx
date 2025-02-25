@@ -15,7 +15,7 @@ export function InputAreaSettings({ sectionId }) {
   async function onBlur(e) {
     const jsonSource = e.target.value;
     const { sections, sectionVariants, codeInfo, codeInfoCols } =
-      await loadJsonContents([sectionId], [jsonSource]);
+      await loadJsonContents({ [sectionId]: jsonSource });
     useSectionInfos.setState((state) => {
       state.x[sectionId].jsonSource = jsonSource;
       updateSectionInfos({
