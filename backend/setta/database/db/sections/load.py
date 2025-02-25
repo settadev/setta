@@ -210,7 +210,11 @@ def load_json_sources_into_data_structures(
         if v["jsonSource"] and ((not section_ids) or k in section_ids)
     }
     for s in sections.values():
+        logger.debug(
+            f'Attempting to read {s["jsonSource"]} with keys {s["jsonSourceKeys"]}'
+        )
         new_data = load_json_source(s["jsonSource"], s["jsonSourceKeys"])
+        logger.debug(f"Loaded json: {new_data}")
         for filename, data in new_data.items():
             codeInfo.update(data["codeInfo"])
             variantId = None
@@ -244,6 +248,9 @@ def load_json_sources_into_data_structures(
     for s in sections.values():
         for vid in s["variantIds"]:
             if sectionVariants[vid]["name"] not in filenames_loaded:
+                logger.debug(
+                    f'Removing variant {sectionVariants[vid]["name"]} because the associated json was not found'
+                )
                 to_delete.append(vid)
 
     for vid in to_delete:
@@ -255,14 +262,22 @@ def load_json_sources_into_data_structures(
         s["jsonSourceMissing"] = False
         s["variantIds"] = [v for v in s["variantIds"] if v in sectionVariants]
         if len(s["variantIds"]) == 0:
+            logger.debug("Section has no variantIds. Creating new section variant.")
             variantId, variant = new_section_variant()
-            s["variantIds"].append(variantId)
             sectionVariants[variantId] = variant
+            s["variantId"] = variantId
+            s["variantIds"].append(variantId)
             s["jsonSourceMissing"] = True
         elif s["variantId"] not in s["variantIds"]:
+            logger.debug(
+                "Selected variantId is not in list of variantIds. Changing selected variantId"
+            )
             s["variantId"] = s["variantIds"][0]
 
         if s["defaultVariantId"] not in s["variantIds"]:
+            logger.debug(
+                "Default variantId is not in list of variantIds. Changing default variantId"
+            )
             s["defaultVariantId"] = s["variantId"]
 
 
