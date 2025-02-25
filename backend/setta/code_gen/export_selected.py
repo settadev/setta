@@ -549,7 +549,7 @@ class ExporterForInMemoryFn:
                 C.LIST_ROOT,
                 C.DICT_ROOT,
                 C.GROUP,
-                # C.IMAGE,
+                C.IMAGE,
                 # C.CHART,
                 C.DRAW,
                 C.CHAT,
@@ -588,9 +588,11 @@ class ExporterForInMemoryFn:
                     value[child_name] = self.export_section(
                         c, f'{name}["{child_name}"]'
                     )
-        # elif type in [C.IMAGE, C.CHART]:
-        #     value = get_artifacts(self.p, id)
-        #     self.create_var_mapping((id, "artifact"), name)
+        elif type in [C.IMAGE]:
+            artifacts = get_artifacts(self.p, id)
+            img = artifacts[0]["value"] if len(artifacts) > 0 else None
+            value = {"image": img}
+            self.create_var_mapping((id, "image"), f'{name}["image"]')
         elif type == C.DRAW:
             value = {"drawing": get_drawing(self.p, id)}
             self.create_var_mapping((id, "drawing"), f'{name}["drawing"]')
