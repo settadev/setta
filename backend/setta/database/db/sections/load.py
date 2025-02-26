@@ -351,7 +351,7 @@ def process_json_object_helper(output, obj, filename, filename_glob, current_pat
 def create_json_code_info(filename_glob, path, key, value, output):
     full_key = create_json_code_info_key(filename_glob, path)
     # Create code info entry
-    output["codeInfo"][full_key] = with_code_info_defaults(id=full_key, name=key)
+    output["codeInfo"][full_key] = with_code_info_defaults(id=full_key, name=key, editable=True)
     output["codeInfoColChildren"][full_key] = []
 
     is_dict = isinstance(value, dict)

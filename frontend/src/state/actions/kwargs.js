@@ -3,7 +3,7 @@ import { useSectionInfos } from "state/definitions";
 import { findAllParametersAndPathMaps } from "utils/getDescendants";
 import { createNewParamId, createRandomName } from "utils/idNameCreation";
 import { newCodeInfo } from "utils/objs/codeInfo";
-import { addCodeInfo, deleteCodeInfo } from "./codeInfo";
+import { addCodeInfo, deleteCodeInfo, getParamPath } from "./codeInfo";
 import { getCodeInfoCol, getSectionVariant } from "./sectionInfos";
 
 export function addKwarg({
@@ -19,7 +19,7 @@ export function addKwarg({
     if (!actualName) {
       actualName = createRandomName();
     }
-    paramPath = getParamPath(actualName, parentId, state);
+    paramPath = getParamPath(sectionId, actualName, parentId, state);
   }
   const kwargInfo = newCodeInfo({
     id: createNewParamId(paramPath, jsonSource, jsonSourceKeys),
@@ -114,23 +114,6 @@ function getKwargIds(sectionId, codeInfoId, _state) {
   const state = _state ?? useSectionInfos.getState();
   const codeInfoChildren = getCodeInfoCol(sectionId, state).children;
   return codeInfoChildren[codeInfoId].filter((x) => state.codeInfo[x].editable);
-}
-
-function getParamPath(name, parentId, state) {
-  const path = [name];
-  let id = parentId;
-  while (id) {
-    const info = state.codeInfo[id];
-    if (info.rcType === C.PARAMETER) {
-      path.push(info.name);
-      id = info.parentId;
-    } else {
-      break;
-    }
-  }
-
-  path.reverse();
-  return path;
 }
 
 export function getAllSelectedParamIds(sectionId, state) {

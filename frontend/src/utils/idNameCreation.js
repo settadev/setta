@@ -56,3 +56,7 @@ export function createRandomName() {
 
   return uniqueNamesGenerator(customConfig);
 }
+
+export function isFromJsonSource(id) {
+  return id && id.startsWith(C.JSON_SOURCE_PREFIX);
+}
