@@ -42,6 +42,15 @@ export async function dbGetJSONSourcePathToBeDeleted(variantName) {
   });
 }
 
+export async function dbCreateFile(filepath) {
+  return await post({
+    body: {
+      filepath,
+    },
+    address: C.ROUTE_CREATE_FILE,
+  });
+}
+
 export async function dbDeleteFile(filepath) {
   return await post({
     body: {

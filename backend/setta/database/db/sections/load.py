@@ -288,7 +288,9 @@ def load_json_source(filename_glob, jsonSourceKeys):
         try:
             with open(filename, "r") as f:
                 jsonSourceData = json.load(f)
-        except:
+        except json.JSONDecodeError:
+            jsonSourceData = {}
+        except FileNotFoundError:
             logger.debug(f"couldn't find: {filename}")
             continue
 

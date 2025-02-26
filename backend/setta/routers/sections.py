@@ -67,6 +67,10 @@ class NewJSONVersionNameRequest(BaseModel):
     filenameGlob: str
 
 
+class CreateFileRequest(BaseModel):
+    filepath: str
+
+
 class GetJSONSourcePathToBeDeleted(BaseModel):
     variantName: str
 
@@ -148,6 +152,12 @@ def route_new_json_version_name(x: NewJSONVersionNameRequest):
     Path(new_filename).parent.mkdir(parents=True, exist_ok=True)
     Path(new_filename).touch()
     return new_filename
+
+
+@router.post(C.ROUTE_CREATE_FILE)
+def route_create_file(x: CreateFileRequest):
+    Path(x.filepath).parent.mkdir(parents=True, exist_ok=True)
+    Path(x.filepath).touch()
 
 
 @router.post(C.ROUTE_SAVE_SECTION_JSON_SOURCE)
