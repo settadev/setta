@@ -1,4 +1,3 @@
-import C from "constants/constants.json";
 import {
   adjectives,
   colors,
@@ -12,24 +11,6 @@ export function createNewId() {
 
 export function maybeNewId(x) {
   return x ? x : createNewId();
-}
-
-function createJSONSourceParamId(paramPath, jsonSource) {
-  const metadata = JSON.stringify({
-    filenameGlob: jsonSource,
-    key: paramPath,
-  });
-  return `${C.JSON_SOURCE_PREFIX}${metadata}`;
-}
-
-export function createNewParamId(paramPath, jsonSource, jsonSourceKeys) {
-  if (jsonSource) {
-    return createJSONSourceParamId(
-      [...jsonSourceKeys, ...paramPath],
-      jsonSource,
-    );
-  }
-  return createNewId();
 }
 
 export function createVarName(existingVarNames) {
@@ -55,8 +36,4 @@ export function createRandomName() {
   };
 
   return uniqueNamesGenerator(customConfig);
-}
-
-export function isFromJsonSource(id) {
-  return id && id.startsWith(C.JSON_SOURCE_PREFIX);
 }

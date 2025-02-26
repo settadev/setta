@@ -17,7 +17,6 @@ import {
 import { getForSectionId } from "state/hooks/paramSweep";
 import { SECTION_DISPLAY_MODES } from "utils/constants";
 import { findAllParametersAndPathMaps } from "utils/getDescendants";
-import { createNewParamId } from "utils/idNameCreation";
 import { newCodeInfo } from "utils/objs/codeInfo";
 import { newEVEntry } from "utils/objs/ev";
 import { parseAllDocuments } from "yaml";
@@ -346,7 +345,6 @@ function sectionYamlToGUI(sectionId, yamlValue, originalObj) {
     }
   }
 
-  const { jsonSource, jsonSourceKeys } = state.x[sectionId];
   // add remaining new entries
   for (const v of fNewObj) {
     if (usedPaths.has(JSON.stringify(v.keyPath))) {
@@ -358,7 +356,7 @@ function sectionYamlToGUI(sectionId, yamlValue, originalObj) {
       value: v.value,
       isPinned: v.isPinned,
     };
-    curr.id = createNewParamId(curr.keyPath, jsonSource, jsonSourceKeys);
+    curr.id = createNewId();
     curr.isNewParam = true;
     output.push(curr);
   }

@@ -1,8 +1,13 @@
 import json
 from collections import defaultdict
 
-from setta.utils.constants import BASE_UI_TYPE_IDS, C, is_from_json_source
-from setta.utils.utils import recursive_dict_merge, save_json_to_file, try_json
+from setta.utils.constants import BASE_UI_TYPE_IDS, C
+from setta.utils.utils import (
+    recursive_dict_merge,
+    replace_null_keys_with_none,
+    save_json_to_file,
+    try_json,
+)
 
 
 def save_json_source_data(p, section_ids=None, forking_from=None):
@@ -19,6 +24,8 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
         with open(forking_from, "r") as f:
             forking_from_data = json.load(f)
 
+    p["codeInfoCols"] = replace_null_keys_with_none(p["codeInfoCols"])
+
     for s in sections.values():
         if not s["jsonSource"] or s["jsonSourceMissing"]:
             continue
@@ -28,8 +35,8 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
             codeInfoCol = p["codeInfoCols"][variant["codeInfoColId"]]
             filename = variant["name"]
             for k, children in codeInfoCol["children"].items():
-                if is_from_json_source(k):
-                    metadata = json.loads(k.removeprefix(C.JSON_SOURCE_PREFIX))
+                if k and p["codeInfo"][k]["jsonSourceMetadata"]:
+                    metadata = p["codeInfo"][k]["jsonSourceMetadata"]
                     key_path = metadata["key"]
                     value = try_getting_value(variant, k, children)
 
@@ -70,16 +77,25 @@ def add_key_path_to_dict(output, key_path):
     return output
 
 
-def condition_keep_code_info(k, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes):
+def condition_keep_code_info(
+    codeInfo, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
+):
+    if not codeInfo:
+        return False
     if keepCodeInfoThatHaveUITypes:
-        return k in jsonCodeInfoWithUIType or not is_from_json_source(k)
-    return not is_from_json_source(k)
+        return (
+            codeInfo["id"] in jsonCodeInfoWithUIType
+            or not codeInfo["jsonSourceMetadata"]
+        )
+    return not codeInfo["jsonSourceMetadata"]
 
 
 def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
     for variant in p["sectionVariants"].values():
         variant["values"] = {
-            k: v for k, v in variant["values"].items() if not is_from_json_source(k)
+            k: v
+            for k, v in variant["values"].items()
+            if not p["codeInfo"][k]["jsonSourceMetadata"]
         }
 
     jsonCodeInfoWithUIType = set()
@@ -89,7 +105,7 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
                 # we want to know which json source params have an associated uiTypeId
                 # only if it's not the base TEXT type, since that's the default
                 if (
-                    is_from_json_source(paramInfoId)
+                    p["codeInfo"][paramInfoId]["jsonSourceMetadata"]
                     and uiTypeInfo["uiTypeId"] != BASE_UI_TYPE_IDS[C.TEXT]
                 ):
                     jsonCodeInfoWithUIType.add(paramInfoId)
@@ -98,7 +114,7 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
         k: v
         for k, v in p["codeInfo"].items()
         if condition_keep_code_info(
-            k, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
+            v, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
         )
     }
 
@@ -109,7 +125,9 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
             for k, v in codeInfoCol["children"].items()
             if k is None
             or condition_keep_code_info(
-                k, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
+                p["codeInfo"].get(k),
+                jsonCodeInfoWithUIType,
+                keepCodeInfoThatHaveUITypes,
             )
         }
         for id, children in codeInfoCol["children"].items():
@@ -117,6 +135,8 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
                 c
                 for c in children
                 if condition_keep_code_info(
-                    c, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
+                    p["codeInfo"].get(c),
+                    jsonCodeInfoWithUIType,
+                    keepCodeInfoThatHaveUITypes,
                 )
             ]
