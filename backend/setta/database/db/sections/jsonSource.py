@@ -20,6 +20,9 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
             forking_from_data = json.load(f)
 
     for s in sections.values():
+        if not s["jsonSource"] or s["jsonSourceMissing"]:
+            continue
+
         for variantId in s["variantIds"]:
             variant = p["sectionVariants"][variantId]
             codeInfoCol = p["codeInfoCols"][variant["codeInfoColId"]]

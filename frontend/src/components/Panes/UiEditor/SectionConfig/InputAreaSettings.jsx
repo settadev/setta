@@ -8,12 +8,7 @@ import { useFileExists } from "state/hooks/utils";
 export function InputAreaSettings({ sectionId }) {
   const { fileExists, debouncedCheckIfFileExists } = useFileExists(200);
 
-  const { jsonSource, jsonSourceMissing } = useSectionInfos((x) => {
-    return {
-      jsonSource: x.x[sectionId].jsonSource,
-      jsonSourceMissing: x.x[sectionId].jsonSourceMissing,
-    };
-  });
+  const jsonSource = useSectionInfos((x) => x.x[sectionId].jsonSource);
 
   const [value, setValue] = useState(jsonSource ?? "");
 
