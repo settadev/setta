@@ -258,6 +258,8 @@ def convert_var_names_to_readable_form(
         # only create nice_var_name if we haven't already created it for this var_name
         if var_name not in var_name_to_nice_var_name_mapping:
             nice_name = exporter_obj.output[var_name]["name"]
+            # TODO: do the same thing on the frontend to find naming conflicts
+            nice_name = nice_name.replace(" ", "_")
             nice_var_name = create_nice_var_name(top_level_symbols, nice_name)
             top_level_symbols.add(nice_var_name)
             var_name_to_nice_var_name_mapping[var_name] = nice_var_name
