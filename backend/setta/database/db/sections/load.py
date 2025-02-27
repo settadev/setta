@@ -213,33 +213,8 @@ def load_json_sources_into_data_structures(
             f'Attempting to read {s["jsonSource"]} with keys {s["jsonSourceKeys"]}'
         )
         new_data = load_json_source(s["jsonSource"], s["jsonSourceKeys"])
-        for filename, data in new_data.items():
-            codeInfo.update(data["codeInfo"])
-            variantId = None
-            for vid in s["variantIds"]:
-                if sectionVariants[vid]["name"] == filename:
-                    variantId = vid
-                    break
-            if not variantId:
-                variantId, section_variant = new_section_variant(
-                    name=filename,
-                )
-                s["variantIds"].append(variantId)
-                sectionVariants[variantId] = section_variant
-
-            curr_section_variant = sectionVariants[variantId]
-            curr_section_variant["values"] = data["sectionVariantValues"]
-            codeInfoColId = curr_section_variant["codeInfoColId"]
-
-            if not codeInfoColId:
-                codeInfoColId = create_new_id()
-                curr_section_variant["codeInfoColId"] = codeInfoColId
-                codeInfoCols[codeInfoColId] = new_code_info_col()
-
-            codeInfoCols[codeInfoColId]["children"] = data["codeInfoColChildren"]
-
-            s["configLanguage"] = "json"
-            filenames_loaded.add(filename)
+        filenames_loaded.update(merge_into_existing(new_data, s, sectionVariants, codeInfo, codeInfoCols))
+        
 
     # delete variants that aren't associated with a loaded file
     to_delete = []
@@ -277,6 +252,59 @@ def load_json_sources_into_data_structures(
                 "Default variantId is not in list of variantIds. Changing default variantId"
             )
             s["defaultVariantId"] = s["variantId"]
+
+
+def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCols):
+    filenames_loaded = set()
+    jsonSourceMetadata_to_id = {}
+
+    for id, info in codeInfo.items():
+        jsonSourceMetadata_to_id[json.dumps(info["jsonSourceMetadata"])] = id
+
+    for filename, data in new_data.items():
+        replacements = {}
+        for newId, newInfo in data["codeInfo"].items():
+            existingId = jsonSourceMetadata_to_id.get(json.dumps(newInfo["jsonSourceMetadata"]))
+            if existingId:
+                replacements[newId] = existingId
+            else:
+                codeInfo[newId] = newInfo
+        
+        for newId, existingId in replacements.items():
+            del data["codeInfo"][newId]
+            data["codeInfoColChildren"][existingId] = [replacements.get(x, x) for x in data["codeInfoColChildren"][newId]]
+            del data["codeInfoColChildren"][newId]
+            data["sectionVariantValues"][existingId] = data["sectionVariantValues"][newId]
+            del data["sectionVariantValues"][newId]
+
+        variantId = None
+        for vid in section["variantIds"]:
+            if sectionVariants[vid]["name"] == filename:
+                variantId = vid
+                break
+        if not variantId:
+            variantId, section_variant = new_section_variant(
+                name=filename,
+            )
+            section["variantIds"].append(variantId)
+            sectionVariants[variantId] = section_variant
+
+        curr_section_variant = sectionVariants[variantId]
+        curr_section_variant["values"] = data["sectionVariantValues"]
+        codeInfoColId = curr_section_variant["codeInfoColId"]
+
+        if not codeInfoColId:
+            codeInfoColId = create_new_id()
+            curr_section_variant["codeInfoColId"] = codeInfoColId
+            codeInfoCols[codeInfoColId] = new_code_info_col()
+
+        codeInfoCols[codeInfoColId]["children"] = data["codeInfoColChildren"]
+
+        section["configLanguage"] = "json"
+        filenames_loaded.add(filename)
+
+    return filenames_loaded
+
 
 
 def load_json_source(filename_glob, jsonSourceKeys):

@@ -178,7 +178,7 @@ def router_set_as_default_project(x: SetAsDefaultProjectRequest, dbq=Depends(get
 
 @router.post(C.ROUTE_FILTER_DATA_FOR_JSON_EXPORT)
 def router_filter_data_for_json_export(x: FilterDataForJSONExportRequest):
-    filter_data_for_json_export(x.project, keepCodeInfoThatHaveUITypes=True)
+    filter_data_for_json_export(x.project)
     return x.project
 
 

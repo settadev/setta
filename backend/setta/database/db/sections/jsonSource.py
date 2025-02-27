@@ -77,20 +77,15 @@ def add_key_path_to_dict(output, key_path):
     return output
 
 
-def condition_keep_code_info(
-    codeInfo, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
-):
+def condition_keep_code_info(codeInfo, jsonCodeInfoWithUIType):
     if not codeInfo:
         return False
-    if keepCodeInfoThatHaveUITypes:
-        return (
-            codeInfo["id"] in jsonCodeInfoWithUIType
-            or not codeInfo["jsonSourceMetadata"]
-        )
-    return not codeInfo["jsonSourceMetadata"]
+    return (
+        codeInfo["id"] in jsonCodeInfoWithUIType or not codeInfo["jsonSourceMetadata"]
+    )
 
 
-def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
+def remove_json_source_data(p):
     for variant in p["sectionVariants"].values():
         variant["values"] = {
             k: v
@@ -99,23 +94,20 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
         }
 
     jsonCodeInfoWithUIType = set()
-    if keepCodeInfoThatHaveUITypes:
-        for uiTypeCol in p["uiTypeCols"].values():
-            for paramInfoId, uiTypeInfo in uiTypeCol.items():
-                # we want to know which json source params have an associated uiTypeId
-                # only if it's not the base TEXT type, since that's the default
-                if (
-                    p["codeInfo"][paramInfoId]["jsonSourceMetadata"]
-                    and uiTypeInfo["uiTypeId"] != BASE_UI_TYPE_IDS[C.TEXT]
-                ):
-                    jsonCodeInfoWithUIType.add(paramInfoId)
+    for uiTypeCol in p["uiTypeCols"].values():
+        for paramInfoId, uiTypeInfo in uiTypeCol.items():
+            # we want to know which json source params have an associated uiTypeId
+            # only if it's not the base TEXT type, since that's the default
+            if (
+                p["codeInfo"][paramInfoId]["jsonSourceMetadata"]
+                and uiTypeInfo["uiTypeId"] != BASE_UI_TYPE_IDS[C.TEXT]
+            ):
+                jsonCodeInfoWithUIType.add(paramInfoId)
 
     p["codeInfo"] = {
         k: v
         for k, v in p["codeInfo"].items()
-        if condition_keep_code_info(
-            v, jsonCodeInfoWithUIType, keepCodeInfoThatHaveUITypes
-        )
+        if condition_keep_code_info(v, jsonCodeInfoWithUIType)
     }
 
     for codeInfoColId in p["codeInfoCols"].keys():
@@ -127,7 +119,6 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
             or condition_keep_code_info(
                 p["codeInfo"].get(k),
                 jsonCodeInfoWithUIType,
-                keepCodeInfoThatHaveUITypes,
             )
         }
         for id, children in codeInfoCol["children"].items():
@@ -137,6 +128,5 @@ def remove_json_source_data(p, keepCodeInfoThatHaveUITypes=True):
                 if condition_keep_code_info(
                     p["codeInfo"].get(c),
                     jsonCodeInfoWithUIType,
-                    keepCodeInfoThatHaveUITypes,
                 )
             ]

@@ -43,8 +43,8 @@ def remove_empty(x):
     return {k: v for k, v in x.items() if len(v) > 0}
 
 
-def filter_data_for_json_export(p, keepCodeInfoThatHaveUITypes):
-    remove_json_source_data(p, keepCodeInfoThatHaveUITypes)
+def filter_data_for_json_export(p):
+    remove_json_source_data(p)
 
     p["projectConfig"] = filter_dict(
         p["projectConfig"],
