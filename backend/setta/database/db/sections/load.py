@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from setta.database.db.artifacts.load import load_artifact_groups
 from setta.database.db.codeInfo.utils import new_code_info_col, with_code_info_defaults
+from setta.database.db.sections.jsonSource import build_ancestor_paths
 from setta.database.db.sections.utils import with_section_defaults
 from setta.database.db.sectionVariants.utils import new_ev_entry, new_section_variant
 from setta.database.utils import create_new_id
@@ -254,19 +255,25 @@ def load_json_sources_into_data_structures(
             )
             s["defaultVariantId"] = s["variantId"]
 
-
 def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCols):
     filenames_loaded = set()
     jsonSourceMetadata_to_id = {}
 
+    ancestor_paths = build_ancestor_paths(codeInfo, codeInfoCols)
     for id, info in codeInfo.items():
-        jsonSourceMetadata_to_id[json.dumps(info["jsonSourceMetadata"])] = id
+        jsonSourceMetadata_to_id[
+            createMetadataJsonString(info["jsonSource"], ancestor_paths[id])
+        ] = id
+
 
     for filename, data in new_data.items():
         replacements = {}
+        new_ancestor_paths = build_ancestor_paths(
+            data["codeInfo"], {None: {"children": data["codeInfoColChildren"]}}
+        )
         for newId, newInfo in data["codeInfo"].items():
             existingId = jsonSourceMetadata_to_id.get(
-                json.dumps(newInfo["jsonSourceMetadata"])
+                createMetadataJsonString(newInfo["jsonSource"], new_ancestor_paths[newId])
             )
             if existingId:
                 replacements[newId] = existingId
@@ -331,13 +338,13 @@ def load_json_source(filename_glob, jsonSourceKeys):
             continue
 
         new_data[filename] = process_json_object(
-            jsonSourceData, filename, filename_glob, jsonSourceKeys
+            jsonSourceData, filename, jsonSourceKeys
         )
 
     return new_data
 
 
-def process_json_object(jsonSourceData, filename, filename_glob, jsonSourceKeys):
+def process_json_object(jsonSourceData, filename, jsonSourceKeys):
     new_data = {
         "codeInfo": {},
         "codeInfoColChildren": {},
@@ -354,7 +361,7 @@ def process_json_object(jsonSourceData, filename, filename_glob, jsonSourceKeys)
     metadataToId = {}
 
     highest_key = process_json_object_helper(
-        new_data, jsonSourceData, filename, filename_glob, jsonSourceKeys, metadataToId
+        new_data, jsonSourceData, filename, jsonSourceKeys, metadataToId
     )
 
     if len(jsonSourceKeys) > 0:
@@ -366,28 +373,22 @@ def process_json_object(jsonSourceData, filename, filename_glob, jsonSourceKeys)
     return new_data
 
 
-def process_json_object_helper(
-    output, obj, filename, filename_glob, current_path, metadataToId
-):
+def process_json_object_helper(output, obj, filename, current_path, metadataToId):
     if not isinstance(obj, dict):
         return
 
     children_keys = []
     for k, v in obj.items():
         path = current_path + [k]
-        paramInfoId, is_dict, code_info = create_json_code_info(
-            filename_glob, path, k, v, output
-        )
-        metadataToId[json.dumps(code_info["jsonSourceMetadata"])] = paramInfoId
+        paramInfoId, is_dict = create_json_code_info(filename, k, v, output)
+        metadataToId[createMetadataJsonString(filename, path)] = paramInfoId
         children_keys.append(paramInfoId)
         if is_dict:
-            process_json_object_helper(
-                output, v, filename, filename_glob, path, metadataToId
-            )
+            process_json_object_helper(output, v, filename, path, metadataToId)
 
     parent_id = None
     if len(current_path) > 0:
-        metadata = json.dumps(createMetadataObj(filename_glob, current_path))
+        metadata = json.dumps(createMetadataJsonString(filename, current_path))
         parent_id = metadataToId.get(metadata)
         if not parent_id:
             parent_id = create_new_id()
@@ -397,14 +398,14 @@ def process_json_object_helper(
     return parent_id
 
 
-def create_json_code_info(filename_glob, path, key, value, output):
+def create_json_code_info(filename, key, value, output):
     paramInfoId = create_new_id()
     # Create code info entry
     output["codeInfo"][paramInfoId] = with_code_info_defaults(
         id=paramInfoId,
         name=key,
         editable=True,
-        jsonSourceMetadata=createMetadataObj(filename_glob, path),
+        jsonSource=filename,
         separators=(",", ":"),
     )
     output["codeInfoColChildren"][paramInfoId] = []
@@ -420,8 +421,8 @@ def create_json_code_info(filename_glob, path, key, value, output):
             value=json.dumps(value)
         )
 
-    return paramInfoId, is_dict, output["codeInfo"][paramInfoId]
+    return paramInfoId, is_dict
 
 
-def createMetadataObj(filename_glob, path):
-    return {"filenameGlob": filename_glob, "key": path}
+def createMetadataJsonString(filename, path):
+    return json.dumps({"filename": filename, "key": path})

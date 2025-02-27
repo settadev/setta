@@ -1,6 +1,5 @@
 import { TextInputCodeMirror } from "components/Utils/CodeMirror/TextInputCodeMirror";
 import _ from "lodash";
-import { changeCodeInfoName } from "state/actions/codeInfo";
 import { getSectionVariant } from "state/actions/sectionInfos";
 import { useMisc, useSectionInfos } from "state/definitions";
 import { NO_PAN_CLASS_NAME } from "utils/constants";
@@ -28,7 +27,7 @@ export function ParamNameInput({
 
   function onChange(v) {
     useSectionInfos.setState((state) => {
-      changeCodeInfoName(sectionId, paramInfoId, v, state);
+      state.codeInfo[paramInfoId].name = v;
     });
   }
 

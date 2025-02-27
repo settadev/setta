@@ -95,7 +95,7 @@
     "isSelected": false,
     "evRefs": [],
     "ignoreTypeErrors": false,
-    "jsonSourceMetadata": {}
+    "jsonSource": null
   },
   "codeInfoCol": {
     "children": { "null": [] }

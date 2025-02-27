@@ -3,7 +3,7 @@ import { findAllParametersAndPathMaps } from "utils/getDescendants";
 import {
   addCodeInfo,
   deleteCodeInfo,
-  newCodeInfoMaybeWithMetadata,
+  newCodeInfoMaybeWithJsonSource,
 } from "./codeInfo";
 import { getCodeInfoCol, getSectionVariant } from "./sectionInfos";
 
@@ -13,12 +13,7 @@ export function addKwarg({
   insertIdx = null,
   state,
 }) {
-  const kwargInfo = newCodeInfoMaybeWithMetadata(
-    sectionId,
-    "",
-    parentId,
-    state,
-  );
+  const kwargInfo = newCodeInfoMaybeWithJsonSource(sectionId, state);
   addCodeInfo({
     sectionId,
     info: kwargInfo,

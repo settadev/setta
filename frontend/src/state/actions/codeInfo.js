@@ -55,37 +55,13 @@ export function getOrCreateCodeInfoCol(variant, state) {
   return state.codeInfoCols[codeInfoColId];
 }
 
-export function newCodeInfoMaybeWithMetadata(
-  sectionId,
-  codeInfoName,
-  parentId,
-  state,
-) {
-  const { jsonSource, jsonSourceKeys } = state.x[sectionId];
-  let jsonSourceMetadata = {};
-  if (jsonSource) {
-    jsonSourceMetadata.filename = jsonSource;
-    jsonSourceMetadata.key = [
-      ...jsonSourceKeys,
-      getParamPath(sectionId, codeInfoName, parentId, state),
-    ];
-  }
-
+export function newCodeInfoMaybeWithJsonSource(sectionId, state) {
   return newCodeInfo({
     id: createNewId(),
     rcType: C.PARAMETER,
     editable: true,
-    jsonSourceMetadata,
+    jsonSource: state.x[sectionId].jsonSource,
   });
-}
-
-export function changeCodeInfoName(sectionId, paramInfoId, newName, state) {
-  const { jsonSource } = state.x[sectionId];
-  if (jsonSource) {
-    const key = state.codeInfo[paramInfoId].jsonSourceMetadata.key;
-    key[key.length - 1] = newName;
-  }
-  state.codeInfo[paramInfoId].name = newName;
 }
 
 export function getParamPath(sectionId, paramName, parentId, state) {

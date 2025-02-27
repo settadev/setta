@@ -98,7 +98,7 @@ CODE_INFO_TABLE_DATA_JSON_FIELDS = set(
         "isPinned",
         "isFrozen",
         "ignoreTypeErrors",
-        "jsonSourceMetadata",
+        "jsonSource",
     )
 )
 
