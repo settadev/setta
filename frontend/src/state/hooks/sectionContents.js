@@ -32,7 +32,7 @@ export function useParamIdsToShowInArea(sectionId, isPinned) {
   return useSectionInfos((x) => {
     const { codeInfoChildren, parentCodeInfoId } =
       getCodeChildrenAndParentCodeInfoId(sectionId, x);
-  
+
     return getParamIdsToShowInArea(
       isPinned,
       x.codeInfo,
