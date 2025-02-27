@@ -88,10 +88,6 @@ def load_constants():
         DEFAULT_VALUES.update(json.load(f))
 
 
-def is_from_json_source(id):
-    return id and id.startswith(C.JSON_SOURCE_PREFIX)
-
-
 CODE_INFO_TABLE_DATA_JSON_FIELDS = set(
     (
         "editable",
