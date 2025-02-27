@@ -123,67 +123,67 @@
   },
   "uiTypeCols": {
     "04f95495-52ba-4277-a79e-228bb1c6a5bc": {
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"panOnScrollMode\"]}": {
+      "3c2bdfc3-cae6-4fef-891b-18ec42e01411": {
         "uiTypeId": "86b19dfb-742b-4d82-aa5f-5d4cca9f3d0a"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"selectionMode\"]}": {
+      "d55e49f2-16ef-4b96-bff1-09b8a2cb00d2": {
         "uiTypeId": "1ec5d8de-f984-451d-b43a-78917f698d52"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"showGridLines\"]}": {
+      "528fea7f-4c8c-47f2-935b-0c26ebbad6fd": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"gridColor\"]}": {
+      "a87e608c-a56c-4bd9-8a67-b246d521e2d4": {
         "uiTypeId": "74de30af-accf-44db-9b6b-da4260f0bd60"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"gridColorDarkMode\"]}": {
+      "7997876d-f3d3-4a4e-8aa9-5dc0df0cc623": {
         "uiTypeId": "74de30af-accf-44db-9b6b-da4260f0bd60"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"gridPattern\"]}": {
+      "bac391f0-de39-4d0d-9224-ca58492627e7": {
         "uiTypeId": "90f2233a-2864-498f-a4df-4c027fa0c4a4"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"showDefaultConfigOnLoad\"]}": {
+      "d213c684-68d0-4e78-89ac-7be538ee87ee": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"inferImports\"]}": {
+      "47d0e852-fe11-4e01-8443-06df0c27be93": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"autosave\"]}": {
+      "102beb02-7884-482a-ac94-b7d6f0f8e20d": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"autobackup\"]}": {
+      "8ffb6dde-0b06-4270-a268-f6810e1bf4f2": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"leftSidePaneShiftsMap\"]}": {
+      "2f2d2e0e-0580-4c00-aa4f-6811f005e8c9": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"panOnDrag\"]}": {
+      "53991988-af3f-4d5a-8bec-9f7b167da068": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"panOnScroll\"]}": {
+      "b45c335d-13f0-46be-a6c0-a02a6b8fb5ad": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"zoomOnScroll\"]}": {
+      "3f75a8b4-d4de-4afd-ab5b-e9ae0904c42c": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"zoomOnPinch\"]}": {
+      "ba2ce609-8824-428b-a6d7-5bdbbecf0a96": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"gui\",\"zoomOnDoubleClick\"]}": {
+      "783faca4-7d96-4452-82f1-40a0190c97b1": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"clearTerminalBeforeMarkingAsReady\"]}": {
+      "0ce94984-7636-43fd-bf0d-82ddb5b8d0d5": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"exportDbRawOnSave\"]}": {
+      "d195c720-daa6-4644-9b88-2f7c437d83df": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"exportDbReadableOnSave\"]}": {
+      "a15cdc07-07d5-460a-8ca2-f4068a5a6061": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"exportDbReadableWithVariantsOnSave\"]}": {
+      "ea3e991c-d9c3-4deb-99a2-3fdc76645a0c": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       },
-      "JSON-{\"filenameGlob\":\"setta_files/setta-settings*.json\",\"key\":[\"backend\",\"saveRenderedValues\"]}": {
+      "8622c18b-71c1-421f-afc5-9c4a5b937ef1": {
         "uiTypeId": "69cdf4c5-7555-4ef3-93d3-bda03f33c6d5"
       }
     }
