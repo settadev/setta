@@ -39,7 +39,13 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
             filename = variant["name"]
 
             recursively_add_keys(
-                p, variant, codeInfoCol, to_be_saved[filename], None, ancestor_paths
+                p,
+                variant,
+                codeInfoCol,
+                to_be_saved[filename],
+                None,
+                s["jsonSourceKeys"],
+                ancestor_paths,
             )
 
             # Make sure the jsonSourceKeys are present.
@@ -87,7 +93,7 @@ def build_ancestor_paths(codeInfo, codeInfoCols):
 
 
 def recursively_add_keys(
-    p, variant, codeInfoCol, input_dict, codeInfoId, ancestor_paths
+    p, variant, codeInfoCol, input_dict, codeInfoId, jsonSourceKeys, ancestor_paths
 ):
     for k in codeInfoCol["children"][codeInfoId]:
         children = codeInfoCol["children"][k]
@@ -95,7 +101,7 @@ def recursively_add_keys(
 
         if json_source:
             # Get pre-computed key path
-            key_path = ancestor_paths[k]
+            key_path = [*jsonSourceKeys, *ancestor_paths[k]]
             value = try_getting_value(variant, k, children)
 
             current_dict = add_key_path_to_dict(input_dict, key_path[:-1])
@@ -105,7 +111,9 @@ def recursively_add_keys(
                 current_dict[key_path[-1]] = value
 
         # Continue recursion regardless of whether this node has a jsonSource
-        recursively_add_keys(p, variant, codeInfoCol, input_dict, k, ancestor_paths)
+        recursively_add_keys(
+            p, variant, codeInfoCol, input_dict, k, jsonSourceKeys, ancestor_paths
+        )
 
 
 def add_key_path_to_dict(output, key_path):

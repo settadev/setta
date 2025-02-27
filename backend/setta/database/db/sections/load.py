@@ -255,6 +255,7 @@ def load_json_sources_into_data_structures(
             )
             s["defaultVariantId"] = s["variantId"]
 
+
 def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCols):
     filenames_loaded = set()
     jsonSourceMetadata_to_id = {}
