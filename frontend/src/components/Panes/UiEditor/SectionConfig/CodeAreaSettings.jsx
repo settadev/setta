@@ -4,7 +4,7 @@ import { useSectionInfos } from "state/definitions";
 const startMethods = [
   {
     group: "Start Methods",
-    items: ["fork", "spawn", "forkserver"].map((x) => ({ id: x, name: x })),
+    items: ["spawn", "fork", "forkserver"].map((x) => ({ id: x, name: x })),
   },
 ];
 

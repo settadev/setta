@@ -65,7 +65,7 @@
     "aspectRatioExtraWidth": 0,
     "columnWidth": null,
     "renderedValue": null,
-    "subprocessStartMethod": "fork",
+    "subprocessStartMethod": "spawn",
     "headingAsSectionName": false
   },
   "sectionVariant": {
