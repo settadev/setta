@@ -213,8 +213,9 @@ def load_json_sources_into_data_structures(
             f'Attempting to read {s["jsonSource"]} with keys {s["jsonSourceKeys"]}'
         )
         new_data = load_json_source(s["jsonSource"], s["jsonSourceKeys"])
-        filenames_loaded.update(merge_into_existing(new_data, s, sectionVariants, codeInfo, codeInfoCols))
-        
+        filenames_loaded.update(
+            merge_into_existing(new_data, s, sectionVariants, codeInfo, codeInfoCols)
+        )
 
     # delete variants that aren't associated with a loaded file
     to_delete = []
@@ -264,18 +265,26 @@ def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCo
     for filename, data in new_data.items():
         replacements = {}
         for newId, newInfo in data["codeInfo"].items():
-            existingId = jsonSourceMetadata_to_id.get(json.dumps(newInfo["jsonSourceMetadata"]))
+            existingId = jsonSourceMetadata_to_id.get(
+                json.dumps(newInfo["jsonSourceMetadata"])
+            )
             if existingId:
                 replacements[newId] = existingId
             else:
                 codeInfo[newId] = newInfo
-        
+
         for newId, existingId in replacements.items():
             del data["codeInfo"][newId]
-            data["codeInfoColChildren"][existingId] = [replacements.get(x, x) for x in data["codeInfoColChildren"][newId]]
-            data["codeInfoColChildren"][None] = [replacements.get(x, x) for x in data["codeInfoColChildren"][None]]
+            data["codeInfoColChildren"][existingId] = [
+                replacements.get(x, x) for x in data["codeInfoColChildren"][newId]
+            ]
+            data["codeInfoColChildren"][None] = [
+                replacements.get(x, x) for x in data["codeInfoColChildren"][None]
+            ]
             del data["codeInfoColChildren"][newId]
-            data["sectionVariantValues"][existingId] = data["sectionVariantValues"][newId]
+            data["sectionVariantValues"][existingId] = data["sectionVariantValues"][
+                newId
+            ]
             del data["sectionVariantValues"][newId]
 
         variantId = None
@@ -305,7 +314,6 @@ def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCo
         filenames_loaded.add(filename)
 
     return filenames_loaded
-
 
 
 def load_json_source(filename_glob, jsonSourceKeys):
