@@ -258,13 +258,11 @@ def load_json_sources_into_data_structures(
 def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCols):
     filenames_loaded = set()
     jsonSourceMetadata_to_id = {}
-
     ancestor_paths = build_ancestor_paths(codeInfo, codeInfoCols)
     for id, info in codeInfo.items():
         jsonSourceMetadata_to_id[
             createMetadataJsonString(info["jsonSource"], ancestor_paths[id])
         ] = id
-
 
     for filename, data in new_data.items():
         replacements = {}
@@ -273,7 +271,9 @@ def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCo
         )
         for newId, newInfo in data["codeInfo"].items():
             existingId = jsonSourceMetadata_to_id.get(
-                createMetadataJsonString(newInfo["jsonSource"], new_ancestor_paths[newId])
+                createMetadataJsonString(
+                    newInfo["jsonSource"], new_ancestor_paths[newId]
+                )
             )
             if existingId:
                 replacements[newId] = existingId
