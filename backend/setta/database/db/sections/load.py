@@ -388,7 +388,7 @@ def process_json_object_helper(output, obj, filename, current_path, metadataToId
 
     parent_id = None
     if len(current_path) > 0:
-        metadata = json.dumps(createMetadataJsonString(filename, current_path))
+        metadata = createMetadataJsonString(filename, current_path)
         parent_id = metadataToId.get(metadata)
         if not parent_id:
             parent_id = create_new_id()
@@ -406,7 +406,6 @@ def create_json_code_info(filename, key, value, output):
         name=key,
         editable=True,
         jsonSource=filename,
-        separators=(",", ":"),
     )
     output["codeInfoColChildren"][paramInfoId] = []
 
