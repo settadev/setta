@@ -1,13 +1,19 @@
-import { useState } from "react";
-import { getSectionVariant } from "state/actions/sectionInfos";
+import { useEffect, useState } from "react";
+import {
+  getDisplayedSectionVariant,
+  getSectionVariant,
+} from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 
 export function IframeSettings({ sectionId }) {
-  const [code, setCode] = useState("");
+  const iframeCode = useSectionInfos(
+    (x) => getDisplayedSectionVariant(sectionId, x).code,
+  );
+  const [code, setCode] = useState(iframeCode);
   const [error, setError] = useState("");
 
   const validateIframeCode = (code) => {
-    if (!code.toLowerCase().includes("<iframe")) {
+    if (code && !code.toLowerCase().includes("<iframe")) {
       return "Input must contain an iframe tag";
     }
     return "";
@@ -28,6 +34,10 @@ export function IframeSettings({ sectionId }) {
       });
     }
   };
+
+  useEffect(() => {
+    setCode(iframeCode);
+  }, [iframeCode]);
 
   return (
     <div className="flex h-full min-h-0 flex-col">
