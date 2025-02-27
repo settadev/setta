@@ -1,6 +1,7 @@
 import C from "constants/constants.json";
 import _ from "lodash";
 import { createNewId } from "utils/idNameCreation";
+import { newCodeInfo } from "utils/objs/codeInfo";
 import { newCodeInfoCol } from "utils/objs/codeInfoCol";
 import { getCodeInfoCol, getSectionVariant } from "./sectionInfos";
 
@@ -54,7 +55,36 @@ export function getOrCreateCodeInfoCol(variant, state) {
   return state.codeInfoCols[codeInfoColId];
 }
 
+export function newCodeInfoMaybeWithMetadata(
+  sectionId,
+  codeInfoName,
+  parentId,
+  state,
+) {
+  const { jsonSource, jsonSourceKeys } = state.x[sectionId];
+  let jsonSourceMetadata = {};
+  if (jsonSource) {
+    jsonSourceMetadata.filename = jsonSource;
+    jsonSourceMetadata.key = [
+      ...jsonSourceKeys,
+      getParamPath(sectionId, codeInfoName, parentId, state),
+    ];
+  }
+
+  return newCodeInfo({
+    id: createNewId(),
+    rcType: C.PARAMETER,
+    editable: true,
+    jsonSourceMetadata,
+  });
+}
+
 export function changeCodeInfoName(sectionId, paramInfoId, newName, state) {
+  const { jsonSource } = state.x[sectionId];
+  if (jsonSource) {
+    const key = state.codeInfo[paramInfoId].jsonSourceMetadata.key;
+    key[key.length - 1] = newName;
+  }
   state.codeInfo[paramInfoId].name = newName;
 }
 
