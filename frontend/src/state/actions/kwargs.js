@@ -1,6 +1,7 @@
 import C from "constants/constants.json";
 import { useSectionInfos } from "state/definitions";
 import { findAllParametersAndPathMaps } from "utils/getDescendants";
+import { createNewId } from "utils/idNameCreation";
 import { newCodeInfo } from "utils/objs/codeInfo";
 import { addCodeInfo, deleteCodeInfo } from "./codeInfo";
 import { getCodeInfoCol, getSectionVariant } from "./sectionInfos";
