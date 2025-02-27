@@ -273,6 +273,7 @@ def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCo
         for newId, existingId in replacements.items():
             del data["codeInfo"][newId]
             data["codeInfoColChildren"][existingId] = [replacements.get(x, x) for x in data["codeInfoColChildren"][newId]]
+            data["codeInfoColChildren"][None] = [replacements.get(x, x) for x in data["codeInfoColChildren"][None]]
             del data["codeInfoColChildren"][newId]
             data["sectionVariantValues"][existingId] = data["sectionVariantValues"][newId]
             del data["sectionVariantValues"][newId]
