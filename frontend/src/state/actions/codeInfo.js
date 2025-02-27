@@ -55,11 +55,9 @@ export function getOrCreateCodeInfoCol(variant, state) {
   return state.codeInfoCols[codeInfoColId];
 }
 
-export function newCodeInfoMaybeWithJsonSource(sectionId, state) {
+export function newCodeInfoMaybeWithJsonSource(props, sectionId, state) {
   return newCodeInfo({
-    id: createNewId(),
-    rcType: C.PARAMETER,
-    editable: true,
+    ...props,
     jsonSource: state.x[sectionId].jsonSource,
   });
 }

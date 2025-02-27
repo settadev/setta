@@ -17,10 +17,13 @@ import {
 import { getForSectionId } from "state/hooks/paramSweep";
 import { SECTION_DISPLAY_MODES } from "utils/constants";
 import { findAllParametersAndPathMaps } from "utils/getDescendants";
-import { newCodeInfo } from "utils/objs/codeInfo";
+import { createNewId } from "utils/idNameCreation";
 import { newEVEntry } from "utils/objs/ev";
 import { parseAllDocuments } from "yaml";
-import { getOrCreateCodeInfoCol } from "./codeInfo";
+import {
+  getOrCreateCodeInfoCol,
+  newCodeInfoMaybeWithJsonSource,
+} from "./codeInfo";
 import { parseRawDump, splitDocuments } from "./guiToYamlParsing";
 import { getCodeChildrenAndParentCodeInfoId } from "./sectionInfos";
 import { paramNameFromPathArray } from "./sections/sectionContents";
@@ -409,13 +412,17 @@ function sectionYamlToGUI(sectionId, yamlValue, originalObj) {
   const defaultValue = newEVEntry().value;
   for (const v of output) {
     if (!(v.id in cState)) {
-      newInfos[v.id] = newCodeInfo({
-        id: v.id,
-        name: v.key,
-        editable: v.editable ?? true,
-        rcType: C.PARAMETER,
-        isPinned: v.isPinned,
-      });
+      newInfos[v.id] = newCodeInfoMaybeWithJsonSource(
+        {
+          id: v.id,
+          name: v.key,
+          editable: v.editable ?? true,
+          rcType: C.PARAMETER,
+          isPinned: v.isPinned,
+        },
+        sectionId,
+        useSectionInfos.getState(),
+      );
     } else {
       updatedInfos[v.id] = { name: v.key, isPinned: v.isPinned };
     }

@@ -13,7 +13,11 @@ export function addKwarg({
   insertIdx = null,
   state,
 }) {
-  const kwargInfo = newCodeInfoMaybeWithJsonSource(sectionId, state);
+  const kwargInfo = newCodeInfoMaybeWithJsonSource(
+    { id: createNewId(), rcType: C.PARAMETER, editable: true },
+    sectionId,
+    state,
+  );
   addCodeInfo({
     sectionId,
     info: kwargInfo,
