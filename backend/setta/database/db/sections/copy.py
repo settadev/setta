@@ -18,6 +18,9 @@ def copy_sections(
     for section in new_sections.values():
         section["id"] = section_id_map[section["id"]]
         section["variantId"] = section_variant_id_map[section["variantId"]]
+        section["defaultVariantId"] = section_variant_id_map[
+            section["defaultVariantId"]
+        ]
         section["uiTypeId"] = ui_type_id_map[section["uiTypeId"]]
         if section["uiTypeColId"]:
             section["uiTypeColId"] = ui_type_col_id_map[section["uiTypeColId"]]
@@ -41,7 +44,7 @@ def copy_sections_and_other_info(x):
         x["codeInfoCols"], code_info_id_map
     )
     new_section_variants, section_variant_id_map = copy_section_variants(
-        x["sectionVariants"], code_info_id_map, code_info_col_id_map
+        x["sections"], x["sectionVariants"], code_info_id_map, code_info_col_id_map
     )
     new_ui_types, ui_type_id_map = copy_ui_types(x["uiTypes"])
     new_ui_type_cols, ui_type_col_id_map = copy_ui_type_cols(
