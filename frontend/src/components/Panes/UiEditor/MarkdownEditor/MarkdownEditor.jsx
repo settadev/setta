@@ -113,40 +113,16 @@ const _MarkdownEditorCore = React.forwardRef(
 const MarkdownEditorCore = React.memo(_MarkdownEditorCore);
 
 function getFirstHeadingOrText(markdown) {
-  // Adjusting the approach to capture the first 10 characters if no heading is found
-  const regex = /^(?:\n)?(#+\s*)(.*?)(\n|$)/m;
-
-  // Trim the markdown to remove leading whitespace
+  // Trim leading whitespace
   const trimmedMarkdown = markdown.trimStart();
 
-  // Apply the regex to the trimmed markdown
-  const match = trimmedMarkdown.match(regex);
+  // Look for the first heading anywhere in the text
+  const headingMatch = trimmedMarkdown.match(/(^|\n)(#+)\s*(.*?)(?=\n|$)/);
 
-  let output = "";
-  let returnHeading = false;
-
-  // If a match is found and it's at the start of the string, return the heading text
-  if (match && match.index === 0) {
-    output = match[2].trim();
-    returnHeading = true;
-  } else {
-    // If no heading is found at the start, find the first occurrence of a heading
-    const headingMatch = trimmedMarkdown.match(/(#+\s*)(.*?)(\n|$)/);
-    if (headingMatch) {
-      // Return the first 10 characters before the first heading, or the entire text if it's shorter
-      output = trimmedMarkdown
-        .substring(0, Math.min(20, headingMatch.index))
-        .trim();
-    } else {
-      // If no headings are found at all, return the first 10 characters of the markdown
-      output = trimmedMarkdown.substring(0, 20).trim();
-    }
+  if (headingMatch) {
+    // Return the heading text (group 3 captures the text after # and spaces)
+    return headingMatch[3].trim();
   }
 
-  if (output === "") {
-    return null;
-  } else if (!returnHeading) {
-    return output + "...";
-  }
-  return output;
+  return null;
 }
