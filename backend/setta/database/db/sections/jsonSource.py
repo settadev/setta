@@ -34,19 +34,7 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
             variant = p["sectionVariants"][variantId]
             codeInfoCol = p["codeInfoCols"][variant["codeInfoColId"]]
             filename = variant["name"]
-            for k, children in codeInfoCol["children"].items():
-                if k and p["codeInfo"][k]["jsonSourceMetadata"]:
-                    metadata = p["codeInfo"][k]["jsonSourceMetadata"]
-                    key_path = metadata["key"]
-                    value = try_getting_value(variant, k, children)
-
-                    current_dict = add_key_path_to_dict(
-                        to_be_saved[filename], key_path[:-1]
-                    )
-
-                    # Set the value at the final position
-                    if key_path:  # Only set if we have a path
-                        current_dict[key_path[-1]] = value
+            recursively_add_keys(p, variant, codeInfoCol, to_be_saved[filename], None)
 
             # Make sure the jsonSourceKeys are present.
             # (They might not be because they are completely empty)
@@ -58,6 +46,23 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
         save_json_to_file(filename, data)
 
     return to_be_saved
+
+
+def recursively_add_keys(p, variant, codeInfoCol, input_dict, codeInfoId):
+    for k in codeInfoCol["children"][codeInfoId]:
+        children = codeInfoCol["children"][k]
+        if p["codeInfo"][k]["jsonSourceMetadata"]:
+            metadata = p["codeInfo"][k]["jsonSourceMetadata"]
+            key_path = metadata["key"]
+            value = try_getting_value(variant, k, children)
+
+            current_dict = add_key_path_to_dict(input_dict, key_path[:-1])
+
+            # Set the value at the final position
+            if key_path:  # Only set if we have a path
+                current_dict[key_path[-1]] = value
+
+            recursively_add_keys(p, variant, codeInfoCol, input_dict, k)
 
 
 def try_getting_value(variant, codeInfoId, codeInfoChildren):
