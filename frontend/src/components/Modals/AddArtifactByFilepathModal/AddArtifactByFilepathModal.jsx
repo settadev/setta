@@ -1,10 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import C from "constants/constants.json";
-import { useCallback, useState } from "react";
-import {
-  dbCheckIfFileExists,
-  dbLoadArtifactFromDisk,
-} from "requests/artifacts";
+import { useState } from "react";
+import { dbLoadArtifactFromDisk } from "requests/artifacts";
 import {
   addArtifactAndMaybeCreateNewArtifactGroup,
   prepareArtifactForRendering,
@@ -12,20 +9,12 @@ import {
 import { setModalOpen } from "state/actions/modal";
 import { getSectionType } from "state/actions/sectionInfos";
 import { useModal } from "state/definitions";
-import { asyncDebounce } from "utils/utils";
+import { useFileExists } from "state/hooks/utils";
 
 export function AddArtifactByFilepathModal() {
   const sectionId = useModal((x) => x.modalData);
   const [filepath, setFilepath] = useState("");
-  const [fileExists, setFileExists] = useState(false);
-
-  const debouncedCheckIfFileExists = useCallback(
-    asyncDebounce(async (f) => {
-      const res = await dbCheckIfFileExists(f);
-      setFileExists(res.data);
-    }, 200),
-    [setFileExists],
-  );
+  const { fileExists, debouncedCheckIfFileExists } = useFileExists(200);
 
   const handleInputChange = (e) => {
     setFilepath(e.target.value);

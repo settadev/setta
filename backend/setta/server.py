@@ -16,6 +16,7 @@ from setta.lsp.utils import (
     create_lsp_readers,
     create_lsp_writers,
     create_lsps,
+    create_specific_file_watcher,
     kill_lsps,
     start_lsps,
 )
@@ -52,6 +53,9 @@ async def lifespan(app: FastAPI):
     app.state.file_watcher = create_file_watcher(app.state.lsps, app.state.lsp_writers)
     app.state.terminal_websockets = TerminalWebsockets()
     app.state.websocket_manager = WebsocketManager()
+    app.state.specific_file_watcher = create_specific_file_watcher(
+        app.state.websocket_manager
+    )
     app.state.tasks = Tasks(app.state.lsp_writers)
     app.state.lsp_readers = create_lsp_readers(
         app.state.lsps, app.state.websocket_manager
@@ -73,6 +77,7 @@ async def lifespan(app: FastAPI):
         app.state.lsp_writers,
     )
     app.state.file_watcher.start()
+    app.state.specific_file_watcher.start()
 
     if not is_dev_mode():
         # Mount the 'frontend/dist' directory at '/static'
@@ -98,6 +103,7 @@ async def lifespan(app: FastAPI):
     finally:
         app.state.tasks.close()
         app.state.file_watcher.stop()
+        app.state.specific_file_watcher.stop()
         await kill_lsps(app.state.lsps, app.state.lsp_readers)
 
 

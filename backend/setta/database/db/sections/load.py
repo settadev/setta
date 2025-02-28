@@ -7,10 +7,10 @@ from collections import defaultdict
 
 from setta.database.db.artifacts.load import load_artifact_groups
 from setta.database.db.codeInfo.utils import new_code_info_col, with_code_info_defaults
+from setta.database.db.sections.jsonSource import build_ancestor_paths
 from setta.database.db.sections.utils import with_section_defaults
 from setta.database.db.sectionVariants.utils import new_ev_entry, new_section_variant
 from setta.database.utils import create_new_id
-from setta.utils.constants import C
 
 from ..sectionVariants.load import load_section_variants
 from ..uiTypes.load import load_uitypecols, load_uitypes
@@ -210,40 +210,22 @@ def load_json_sources_into_data_structures(
         if v["jsonSource"] and ((not section_ids) or k in section_ids)
     }
     for s in sections.values():
+        logger.debug(
+            f'Attempting to read {s["jsonSource"]} with keys {s["jsonSourceKeys"]}'
+        )
         new_data = load_json_source(s["jsonSource"], s["jsonSourceKeys"])
-        for filename, data in new_data.items():
-            codeInfo.update(data["codeInfo"])
-            variantId = None
-            for vid in s["variantIds"]:
-                if sectionVariants[vid]["name"] == filename:
-                    variantId = vid
-                    break
-            if not variantId:
-                variantId, section_variant = new_section_variant(
-                    name=filename,
-                )
-                s["variantIds"].append(variantId)
-                sectionVariants[variantId] = section_variant
-
-            curr_section_variant = sectionVariants[variantId]
-            curr_section_variant["values"] = data["sectionVariantValues"]
-            codeInfoColId = curr_section_variant["codeInfoColId"]
-
-            if not codeInfoColId:
-                codeInfoColId = create_new_id()
-                curr_section_variant["codeInfoColId"] = codeInfoColId
-                codeInfoCols[codeInfoColId] = new_code_info_col()
-
-            codeInfoCols[codeInfoColId]["children"] = data["codeInfoColChildren"]
-
-            s["configLanguage"] = "json"
-            filenames_loaded.add(filename)
+        filenames_loaded.update(
+            merge_into_existing(new_data, s, sectionVariants, codeInfo, codeInfoCols)
+        )
 
     # delete variants that aren't associated with a loaded file
     to_delete = []
     for s in sections.values():
         for vid in s["variantIds"]:
             if sectionVariants[vid]["name"] not in filenames_loaded:
+                logger.debug(
+                    f'Removing variant {sectionVariants[vid]["name"]} because the associated json was not found'
+                )
                 to_delete.append(vid)
 
     for vid in to_delete:
@@ -255,15 +237,91 @@ def load_json_sources_into_data_structures(
         s["jsonSourceMissing"] = False
         s["variantIds"] = [v for v in s["variantIds"] if v in sectionVariants]
         if len(s["variantIds"]) == 0:
+            logger.debug("Section has no variantIds. Creating new section variant.")
             variantId, variant = new_section_variant()
-            s["variantIds"].append(variantId)
             sectionVariants[variantId] = variant
+            s["variantId"] = variantId
+            s["variantIds"].append(variantId)
             s["jsonSourceMissing"] = True
         elif s["variantId"] not in s["variantIds"]:
+            logger.debug(
+                "Selected variantId is not in list of variantIds. Changing selected variantId"
+            )
             s["variantId"] = s["variantIds"][0]
 
         if s["defaultVariantId"] not in s["variantIds"]:
+            logger.debug(
+                "Default variantId is not in list of variantIds. Changing default variantId"
+            )
             s["defaultVariantId"] = s["variantId"]
+
+
+def merge_into_existing(new_data, section, sectionVariants, codeInfo, codeInfoCols):
+    filenames_loaded = set()
+    jsonSourceMetadata_to_id = {}
+    ancestor_paths = build_ancestor_paths(codeInfo, codeInfoCols)
+    for id, info in codeInfo.items():
+        jsonSourceMetadata_to_id[
+            createMetadataJsonString(info["jsonSource"], ancestor_paths[id])
+        ] = id
+
+    for filename, data in new_data.items():
+        replacements = {}
+        new_ancestor_paths = build_ancestor_paths(
+            data["codeInfo"], {None: {"children": data["codeInfoColChildren"]}}
+        )
+        for newId, newInfo in data["codeInfo"].items():
+            existingId = jsonSourceMetadata_to_id.get(
+                createMetadataJsonString(
+                    newInfo["jsonSource"], new_ancestor_paths[newId]
+                )
+            )
+            if existingId:
+                replacements[newId] = existingId
+            else:
+                codeInfo[newId] = newInfo
+
+        for newId, existingId in replacements.items():
+            del data["codeInfo"][newId]
+            data["codeInfoColChildren"][existingId] = [
+                replacements.get(x, x) for x in data["codeInfoColChildren"][newId]
+            ]
+            data["codeInfoColChildren"][None] = [
+                replacements.get(x, x) for x in data["codeInfoColChildren"][None]
+            ]
+            del data["codeInfoColChildren"][newId]
+            data["sectionVariantValues"][existingId] = data["sectionVariantValues"][
+                newId
+            ]
+            del data["sectionVariantValues"][newId]
+
+        variantId = None
+        for vid in section["variantIds"]:
+            if sectionVariants[vid]["name"] == filename:
+                variantId = vid
+                break
+        if not variantId:
+            variantId, section_variant = new_section_variant(
+                name=filename,
+            )
+            section["variantIds"].append(variantId)
+            sectionVariants[variantId] = section_variant
+
+        curr_section_variant = sectionVariants[variantId]
+        curr_section_variant["values"] = data["sectionVariantValues"]
+        codeInfoColId = curr_section_variant["codeInfoColId"]
+
+        if not codeInfoColId:
+            codeInfoColId = create_new_id()
+            curr_section_variant["codeInfoColId"] = codeInfoColId
+            codeInfoCols[codeInfoColId] = new_code_info_col()
+
+        codeInfoCols[codeInfoColId]["children"] = data["codeInfoColChildren"]
+
+        section["configLanguage"] = "json"
+        filenames_loaded.add(filename)
+
+    return filenames_loaded
 
 
 def load_json_source(filename_glob, jsonSourceKeys):
@@ -274,83 +332,97 @@ def load_json_source(filename_glob, jsonSourceKeys):
         try:
             with open(filename, "r") as f:
                 jsonSourceData = json.load(f)
-        except:
+        except json.JSONDecodeError:
+            jsonSourceData = {}
+        except FileNotFoundError:
             logger.debug(f"couldn't find: {filename}")
             continue
 
-        new_data[filename] = {
-            "codeInfo": {},
-            "codeInfoColChildren": {},
-            "sectionVariantValues": {},
-        }
-
-        try:
-            for k in jsonSourceKeys:
-                jsonSourceData = jsonSourceData[k]
-        except:
-            # TODO print warning or something
-            pass
-
-        process_json_object(
-            new_data, jsonSourceData, filename, filename_glob, jsonSourceKeys
+        new_data[filename] = process_json_object(
+            jsonSourceData, filename, jsonSourceKeys
         )
-
-        if len(jsonSourceKeys) > 0:
-            # point directly from None (the root) to the children
-            highest_key = create_json_code_info_key(filename_glob, jsonSourceKeys)
-            codeInfoChildren = new_data[filename]["codeInfoColChildren"]
-            codeInfoChildren[None] = codeInfoChildren[highest_key]
-            del codeInfoChildren[highest_key]
 
     return new_data
 
 
-def process_json_object(output, obj, filename, filename_glob, current_path):
+def process_json_object(jsonSourceData, filename, jsonSourceKeys):
+    new_data = {
+        "codeInfo": {},
+        "codeInfoColChildren": {},
+        "sectionVariantValues": {},
+    }
+
+    try:
+        for k in jsonSourceKeys:
+            jsonSourceData = jsonSourceData[k]
+    except:
+        # TODO print warning or something
+        pass
+
+    metadataToId = {}
+
+    highest_key = process_json_object_helper(
+        new_data, jsonSourceData, filename, jsonSourceKeys, metadataToId
+    )
+
+    if len(jsonSourceKeys) > 0:
+        # point directly from None (the root) to the children
+        codeInfoChildren = new_data["codeInfoColChildren"]
+        codeInfoChildren[None] = codeInfoChildren[highest_key]
+        del codeInfoChildren[highest_key]
+
+    return new_data
+
+
+def process_json_object_helper(output, obj, filename, current_path, metadataToId):
     if not isinstance(obj, dict):
         return
 
     children_keys = []
     for k, v in obj.items():
         path = current_path + [k]
-        full_key, is_dict = create_json_code_info(
-            filename, filename_glob, path, k, v, output
-        )
-        children_keys.append(full_key)
+        paramInfoId, is_dict = create_json_code_info(filename, k, v, output)
+        metadataToId[createMetadataJsonString(filename, path)] = paramInfoId
+        children_keys.append(paramInfoId)
         if is_dict:
-            process_json_object(output, v, filename, filename_glob, path)
+            process_json_object_helper(output, v, filename, path, metadataToId)
 
     parent_id = None
     if len(current_path) > 0:
-        parent_id = create_json_code_info_key(filename_glob, current_path)
+        metadata = createMetadataJsonString(filename, current_path)
+        parent_id = metadataToId.get(metadata)
+        if not parent_id:
+            parent_id = create_new_id()
+            metadataToId[metadata] = parent_id
 
-    output[filename]["codeInfoColChildren"][parent_id] = children_keys
+    output["codeInfoColChildren"][parent_id] = children_keys
+    return parent_id
 
 
-def create_json_code_info(filename, filename_glob, path, key, value, output):
-    full_key = create_json_code_info_key(filename_glob, path)
+def create_json_code_info(filename, key, value, output):
+    paramInfoId = create_new_id()
     # Create code info entry
-    output[filename]["codeInfo"][full_key] = with_code_info_defaults(
-        id=full_key, name=key
+    output["codeInfo"][paramInfoId] = with_code_info_defaults(
+        id=paramInfoId,
+        name=key,
+        editable=True,
+        jsonSource=filename,
     )
-    output[filename]["codeInfoColChildren"][full_key] = []
+    output["codeInfoColChildren"][paramInfoId] = []
 
     is_dict = isinstance(value, dict)
     # Create variant value entry
     if is_dict:
         # For objects, store empty value and process children
-        output[filename]["sectionVariantValues"][full_key] = new_ev_entry()
+        output["sectionVariantValues"][paramInfoId] = new_ev_entry()
     else:
         # For non-objects, store the value directly
-        output[filename]["sectionVariantValues"][full_key] = new_ev_entry(
+        output["sectionVariantValues"][paramInfoId] = new_ev_entry(
             value=json.dumps(value)
         )
 
-    return full_key, is_dict
+    return paramInfoId, is_dict
 
 
-def create_json_code_info_key(filename_glob, path):
-    # specify separators to make json.dumps equivalent to JSON.stringify
-    key = json.dumps(
-        {"filenameGlob": filename_glob, "key": path}, separators=(",", ":")
-    )
-    return f"{C.JSON_SOURCE_PREFIX}{key}"
+def createMetadataJsonString(filename, path):
+    return json.dumps({"filename": filename, "key": path})

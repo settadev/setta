@@ -1,7 +1,9 @@
+import C from "constants/constants.json";
 import _ from "lodash";
 import { createNewId } from "utils/idNameCreation";
+import { newCodeInfo } from "utils/objs/codeInfo";
 import { newCodeInfoCol } from "utils/objs/codeInfoCol";
-import { getSectionVariant } from "./sectionInfos";
+import { getCodeInfoCol, getSectionVariant } from "./sectionInfos";
 
 export function addCodeInfo({ sectionId, info, parent, insertIdx, state }) {
   state.codeInfo[info.id] = info;
@@ -51,4 +53,40 @@ export function getOrCreateCodeInfoCol(variant, state) {
   }
 
   return state.codeInfoCols[codeInfoColId];
+}
+
+export function newCodeInfoMaybeWithJsonSource(props, sectionId, state) {
+  return newCodeInfo({
+    ...props,
+    jsonSource: state.x[sectionId].jsonSource,
+  });
+}
+
+export function getParamPath(sectionId, paramName, parentId, state) {
+  const path = [paramName];
+  while (parentId) {
+    const info = state.codeInfo[parentId];
+    if (info.rcType === C.PARAMETER) {
+      path.push(info.name);
+      parentId = getCodeInfoParentId(sectionId, parentId, state);
+    } else {
+      break;
+    }
+  }
+
+  path.reverse();
+  return path;
+}
+
+export function getCodeInfoParentId(sectionId, codeInfoId, state) {
+  const codeInfoCol = getCodeInfoCol(sectionId, state);
+  for (const [cid, children] of Object.entries(codeInfoCol.children)) {
+    if (children.includes(codeInfoId)) {
+      if (cid === "null") {
+        return null;
+      }
+      return cid;
+    }
+  }
+  return null;
 }

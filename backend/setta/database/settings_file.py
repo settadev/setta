@@ -110,5 +110,5 @@ class MetaSettingsFile:
 
     def save_settings_project(self, p):
         save_json_source_data(p)
-        filter_data_for_json_export(p, keepCodeInfoThatHaveUITypes=False)
+        filter_data_for_json_export(p)
         save_json_to_file(self.path_meta_settings, p)

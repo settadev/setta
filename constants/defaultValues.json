@@ -65,7 +65,7 @@
     "aspectRatioExtraWidth": 0,
     "columnWidth": null,
     "renderedValue": null,
-    "subprocessStartMethod": "fork",
+    "subprocessStartMethod": "spawn",
     "headingAsSectionName": false
   },
   "sectionVariant": {
@@ -94,7 +94,8 @@
     "isFrozen": false,
     "isSelected": false,
     "evRefs": [],
-    "ignoreTypeErrors": false
+    "ignoreTypeErrors": false,
+    "jsonSource": null
   },
   "codeInfoCol": {
     "children": { "null": [] }

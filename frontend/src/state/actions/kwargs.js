@@ -1,9 +1,12 @@
 import C from "constants/constants.json";
 import { useSectionInfos } from "state/definitions";
 import { findAllParametersAndPathMaps } from "utils/getDescendants";
-import { createNewParamId, createRandomName } from "utils/idNameCreation";
-import { newCodeInfo } from "utils/objs/codeInfo";
-import { addCodeInfo, deleteCodeInfo } from "./codeInfo";
+import { createNewId } from "utils/idNameCreation";
+import {
+  addCodeInfo,
+  deleteCodeInfo,
+  newCodeInfoMaybeWithJsonSource,
+} from "./codeInfo";
 import { getCodeInfoCol, getSectionVariant } from "./sectionInfos";
 
 export function addKwarg({
@@ -12,21 +15,11 @@ export function addKwarg({
   insertIdx = null,
   state,
 }) {
-  const { jsonSource, jsonSourceKeys } = state.x[sectionId];
-  let actualName = name;
-  let paramPath = null;
-  if (jsonSource) {
-    if (!actualName) {
-      actualName = createRandomName();
-    }
-    paramPath = getParamPath(actualName, parentId, state);
-  }
-  const kwargInfo = newCodeInfo({
-    id: createNewParamId(paramPath, jsonSource, jsonSourceKeys),
-    name: actualName,
-    rcType: C.PARAMETER,
-    editable: true,
-  });
+  const kwargInfo = newCodeInfoMaybeWithJsonSource(
+    { id: createNewId(), rcType: C.PARAMETER, editable: true },
+    sectionId,
+    state,
+  );
   addCodeInfo({
     sectionId,
     info: kwargInfo,
@@ -114,23 +107,6 @@ function getKwargIds(sectionId, codeInfoId, _state) {
   const state = _state ?? useSectionInfos.getState();
   const codeInfoChildren = getCodeInfoCol(sectionId, state).children;
   return codeInfoChildren[codeInfoId].filter((x) => state.codeInfo[x].editable);
-}
-
-function getParamPath(name, parentId, state) {
-  const path = [name];
-  let id = parentId;
-  while (id) {
-    const info = state.codeInfo[id];
-    if (info.rcType === C.PARAMETER) {
-      path.push(info.name);
-      id = info.parentId;
-    } else {
-      break;
-    }
-  }
-
-  path.reverse();
-  return path;
 }
 
 export function getAllSelectedParamIds(sectionId, state) {

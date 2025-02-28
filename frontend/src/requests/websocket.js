@@ -4,6 +4,7 @@ import {
   updateInMemorySubprocessInfo,
   updateInteractiveArtifacts,
 } from "state/actions/interactive";
+import { updateJSONSourceContents } from "state/actions/jsonSource";
 import { setNotificationMessage } from "state/actions/notification";
 import { setTemporaryMiscState } from "state/actions/temporaryMiscState";
 import { processTypeErrors } from "state/actions/typeErrors";
@@ -66,6 +67,8 @@ function receiveMessage(message) {
     updateInteractiveArtifacts(m.content);
   } else if (m.messageType === C.WS_IN_MEMORY_FN_AVG_RUN_TIME) {
     updateInMemorySubprocessInfo(m.content);
+  } else if (m.messageType === C.WS_SPECIFIC_FILE_WATCHER_UPDATE) {
+    updateJSONSourceContents(m.content);
   } else if (m.id) {
     setTemporaryMiscState(m.id, m.content);
   }

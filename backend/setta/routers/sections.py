@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from setta.code_gen.export_selected import (
@@ -21,6 +21,7 @@ from setta.database.db.sections.copy import (
 )
 from setta.database.db.sections.jsonSource import save_json_source_data
 from setta.database.db.sections.load import load_json_sources_into_data_structures
+from setta.routers.dependencies import get_specific_file_watcher
 from setta.utils.constants import C
 from setta.utils.generate_new_filename import generate_new_filename
 
@@ -53,8 +54,7 @@ class GlobalParamSweepSectionToYamlRequest(BaseModel):
 
 class LoadSectionJSONSourceRequest(BaseModel):
     project: dict
-    sectionId: str
-    jsonSource: str
+    sectionIdToJSONSource: Dict[str, str]
 
 
 class SaveSectionJSONSourceRequest(BaseModel):
@@ -67,12 +67,20 @@ class NewJSONVersionNameRequest(BaseModel):
     filenameGlob: str
 
 
+class CreateFileRequest(BaseModel):
+    filepath: str
+
+
 class GetJSONSourcePathToBeDeleted(BaseModel):
     variantName: str
 
 
 class DeleteFileRequest(BaseModel):
     filepath: str
+
+
+class FileWatchListRequest(BaseModel):
+    filepaths: List[str]
 
 
 @router.post(C.ROUTE_COPY_SECTIONS)
@@ -126,13 +134,14 @@ def route_global_param_sweep_section_to_yaml(x: GlobalParamSweepSectionToYamlReq
 @router.post(C.ROUTE_LOAD_SECTION_JSON_SOURCE)
 def route_load_section_json_source(x: LoadSectionJSONSourceRequest):
     p = x.project
-    p["sections"][x.sectionId]["jsonSource"] = x.jsonSource
+    for k, v in x.sectionIdToJSONSource.items():
+        p["sections"][k]["jsonSource"] = v
     load_json_sources_into_data_structures(
         p["sections"],
         p["codeInfo"],
         p["codeInfoCols"],
         p["sectionVariants"],
-        section_ids=[x.sectionId],
+        section_ids=list(x.sectionIdToJSONSource.keys()),
     )
     return {"project": p}
 
@@ -143,6 +152,12 @@ def route_new_json_version_name(x: NewJSONVersionNameRequest):
     Path(new_filename).parent.mkdir(parents=True, exist_ok=True)
     Path(new_filename).touch()
     return new_filename
+
+
+@router.post(C.ROUTE_CREATE_FILE)
+def route_create_file(x: CreateFileRequest):
+    Path(x.filepath).parent.mkdir(parents=True, exist_ok=True)
+    Path(x.filepath).touch()
 
 
 @router.post(C.ROUTE_SAVE_SECTION_JSON_SOURCE)
@@ -172,3 +187,11 @@ def route_delete_file(x: DeleteFileRequest):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Failed to delete file: {str(e)}",
         )
+
+
+@router.post(C.ROUTE_FILE_WATCH_LIST)
+def route_file_watch_list(
+    x: FileWatchListRequest, specific_file_watcher=Depends(get_specific_file_watcher)
+):
+    # x.filepaths is the current list of file paths or glob patterns that should be watched
+    specific_file_watcher.update_watch_list(x.filepaths)

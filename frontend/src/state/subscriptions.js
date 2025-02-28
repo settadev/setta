@@ -2,6 +2,7 @@ import C from "constants/constants.json";
 import { useDndChildren } from "forks/dnd-kit/dndChildren";
 import { useReactFlow } from "forks/xyflow/core/store";
 import _ from "lodash";
+import { dbFilesWatchList } from "requests/jsonSource";
 import {
   useArtifacts,
   useEVRefRegex,
@@ -66,6 +67,16 @@ export function subscribe() {
       updateRunGroupsWithNewHierarchy(newVal, oldVal);
     },
     { equalityFn: _.isEqual },
+  );
+
+  useSectionInfos.subscribe(
+    jsonSourceSubscriptionFn,
+    (newVal) => {
+      dbFilesWatchList([...newVal]);
+    },
+    {
+      equalityFn: _.isEqual,
+    },
   );
 
   useReactFlow.subscribe(
@@ -234,4 +245,14 @@ function artifactNamePathTypeToIdSubscriptionFn(state) {
     output[id] = { name: a["name"], path: a["path"], type: a["type"] };
   }
   return output;
+}
+
+function jsonSourceSubscriptionFn(state) {
+  const jsonSourceSet = new Set();
+  for (const s of Object.values(state.x)) {
+    if (s.jsonSource) {
+      jsonSourceSet.add(s.jsonSource);
+    }
+  }
+  return jsonSourceSet;
 }
