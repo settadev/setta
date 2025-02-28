@@ -24,7 +24,6 @@ import {
 } from "state/hooks/terminals/terminal";
 import { createNewId } from "utils/idNameCreation";
 import { newEVEntry } from "utils/objs/ev";
-import { templatePrefix } from "utils/utils";
 import { requestBase64FromCanvas } from "../temporaryMiscState";
 import { generateParamSweepCombinations } from "./generateParamSweepCombinations";
 import { generateSectionParamSweepVersionCombinations } from "./generateSectionParamSweepVersionCombinations";
@@ -273,31 +272,32 @@ function* getProjectVariants(project, paramSweepSectionVariantIds) {
 
 // TODO: refine this logic. Has to be really clear what happens in each case.
 function getRunCodeBlocks(project, isRunGroup) {
-  if (isRunGroup) {
-    // use all code sections when running a run group
-    const ids = [];
-    for (const s of Object.values(project.sections)) {
-      const sectionType =
-        project.uiTypes[s.uiTypeId]?.type ?? BASE_UI_TYPES[s.uiTypeId].type;
-      if (sectionType === C.CODE) {
-        ids.push(s.id);
-      }
-    }
-    if (ids.length > 0) {
-      return ids;
-    }
-  } else {
-    // use only the section with the gen code template var
-    for (const s of Object.values(project.sections)) {
-      const templateVars = project.sectionVariants[s.variantId].templateVars;
-      const genCodeTemplateVar = templateVars.find(
-        (t) => t.keyword === templatePrefix(C.SETTA_GENERATED_PYTHON),
-      );
-      if (genCodeTemplateVar) {
-        return [s.id];
-      }
+  // if (isRunGroup) {
+  // use all code sections when running a run group
+  const ids = [];
+  for (const s of Object.values(project.sections)) {
+    const sectionType =
+      project.uiTypes[s.uiTypeId]?.type ?? BASE_UI_TYPES[s.uiTypeId].type;
+    if (sectionType === C.CODE) {
+      ids.push(s.id);
     }
   }
+  if (ids.length > 0) {
+    return ids;
+  }
+  // } else {
+  // TODO: need this?
+  // // use only the section with the gen code template var
+  // for (const s of Object.values(project.sections)) {
+  //   const templateVars = project.sectionVariants[s.variantId].templateVars;
+  //   const genCodeTemplateVar = templateVars.find(
+  //     (t) => t.keyword === templatePrefix(C.SETTA_GENERATED_PYTHON),
+  //   );
+  //   if (genCodeTemplateVar) {
+  //     return [s.id];
+  //   }
+  // }
+  // }
   // otherwise the backend will figure out something
   return null;
 }
