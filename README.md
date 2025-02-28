@@ -13,6 +13,7 @@
 ## News
 
 **February 27**: [v0.0.9](https://github.com/settadev/setta/releases/tag/v0.0.9)
+- Improvements to the JSON file referencing mechanism.
 
 **February 24**: [v0.0.8](https://github.com/settadev/setta/releases/tag/v0.0.8)
 - Added options to the `export-db` cli command. 
