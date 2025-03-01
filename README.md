@@ -12,19 +12,15 @@
 
 ## News
 
+**March 1**: [v0.0.10](https://github.com/settadev/setta/releases/tag/v0.0.10)
+- Made JSON source sections more user-friendly.
+
 **February 27**: [v0.0.9](https://github.com/settadev/setta/releases/tag/v0.0.9)
 - Improvements to the JSON file referencing mechanism.
 
 **February 24**: [v0.0.8](https://github.com/settadev/setta/releases/tag/v0.0.8)
 - Added options to the `export-db` cli command. 
 - Allow artifacts to be renamed directly in the side pane.
-
-**February 23**: [v0.0.7](https://github.com/settadev/setta/releases/tag/v0.0.7)
-- Added a new "Chat" section type for sending chats and displaying chat history. Here's what it looks like:
-<p align="center">
-<img width="350" src="https://github.com/user-attachments/assets/65fd504e-4dcb-42db-b32e-d21c540354ee" />
-
-</p>
 
 
 ## What does Setta do?
