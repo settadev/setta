@@ -356,3 +356,7 @@ export function getAncestorSameVisibility(sectionId, state) {
 
   return false;
 }
+
+export function getIsUserView(viewingEditingMode) {
+  return viewingEditingMode === VIEWING_EDITING_MODE.USER;
+}

@@ -5,7 +5,6 @@ import React from "react";
 import { TbSortDescending2 } from "react-icons/tb";
 import { useSectionInfos } from "state/definitions";
 import { useIsSeriesElement } from "state/hooks/uiTypes";
-import { VIEWING_EDITING_MODE } from "utils/constants";
 import { Incrementer } from "../SectionParts/Incrementer";
 import { DeleteOrHideButton } from "./DeleteOrHideButton";
 import { LockPositionButton } from "./LockPositionButton";
@@ -21,10 +20,10 @@ function _SectionHeader({
   sectionTypeName,
   isInOtherProjectConfigs,
   viewingEditingMode,
+  isUserView,
   isRoot,
 }) {
   const isSeriesElement = useIsSeriesElement(sectionId) && !isRoot;
-  const isUserView = viewingEditingMode === VIEWING_EDITING_MODE.USER;
 
   // DOM: maybe get rid of the extra div under header?
 
