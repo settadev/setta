@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaRegSnowflake } from "react-icons/fa";
 import { FiFileText } from "react-icons/fi";
 import { HiHome } from "react-icons/hi";
+import { loadJsonContents } from "state/actions/jsonSource";
 import { createNewVersionMaybeWithJSON } from "state/actions/newVersion";
 import {
   onClickSetVariantId,
@@ -12,6 +13,7 @@ import {
 import {
   deleteSectionVariantAndMaybeJsonFile,
   setDefaultSectionVariant,
+  updateSectionInfos,
 } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { useEditableOnSubmit } from "state/hooks/editableText";
@@ -152,11 +154,13 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
           }`}
           onClick={(e) => {
             e.stopPropagation();
-            useSectionInfos.setState((x) => {
-              const newVal = !x.variants[id].isJsonSource;
-              x.variants[id].isJsonSource = newVal;
-              x.variants[id].configLanguage = newVal ? "json" : "python";
+            const newIsJsonSource = !isJsonSource;
+            const newConfigLanguage = newIsJsonSource ? "json" : "python";
+            useSectionInfos.setState((state) => {
+              state.variants[id].isJsonSource = newIsJsonSource;
+              state.variants[id].configLanguage = newConfigLanguage;
             });
+            maybeLoadJsonContents(id);
           }}
         >
           <FiFileText />
@@ -173,6 +177,7 @@ function OneItemEditing({ sectionId, id, isCurr, deletable }) {
     useSectionInfos.setState((x) => {
       x.variants[id].name = v;
     });
+    maybeLoadJsonContents(id);
   }
 
   function conditionToSetName(v) {
@@ -218,4 +223,20 @@ function OneItemEditing({ sectionId, id, isCurr, deletable }) {
       )}
     </li>
   );
+}
+
+async function maybeLoadJsonContents(variantId) {
+  if (useSectionInfos.getState().variants[variantId].isJsonSource) {
+    const { sectionVariants, codeInfo, codeInfoCols } = await loadJsonContents([
+      variantId,
+    ]);
+    useSectionInfos.setState((state) => {
+      updateSectionInfos({
+        sectionVariants,
+        codeInfo,
+        codeInfoCols,
+        state,
+      });
+    });
+  }
 }

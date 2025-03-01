@@ -217,7 +217,10 @@ def load_json_sources_into_data_structures(
         )
         variant["jsonSourcMissing"] = isMissing
         if not isMissing:
-            codeInfoCol = codeInfoCols.get(variant["codeInfoColId"], {"children": {}})
+            if not variant["codeInfoColId"]:
+                variant["codeInfoColId"] = create_new_id()
+                codeInfoCols[variant["codeInfoColId"]] = new_code_info_col()
+            codeInfoCol = codeInfoCols[variant["codeInfoColId"]]
             merge_into_existing(new_data, variant, codeInfo, codeInfoCol)
 
 
