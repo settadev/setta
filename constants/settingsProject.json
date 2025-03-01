@@ -43,23 +43,38 @@
   "sectionVariants": {
     "19f203aa-cae6-4ccc-928c-dab0194ade77": {
       "name": "setta_files/setta-settings.json",
-      "codeInfoColId": "088e4b38-c05d-4b28-ab20-18763c0ac73d"
+      "codeInfoColId": "088e4b38-c05d-4b28-ab20-18763c0ac73d",
+      "isJsonSource": true,
+      "jsonSourceKeys": ["shortcuts"],
+      "configLanguage": "json"
     },
     "f3cb4189-2692-4e75-b58f-76d632f44205": {
       "name": "setta_files/setta-settings.json",
-      "codeInfoColId": "5f3093c9-2baa-4a46-b5ae-a36a7c1f17f2"
+      "codeInfoColId": "5f3093c9-2baa-4a46-b5ae-a36a7c1f17f2",
+      "isJsonSource": true,
+      "jsonSourceKeys": ["gui"],
+      "configLanguage": "json"
     },
     "36d29a06-7971-48d1-a1d2-23480f770d74": {
       "name": "setta_files/setta-settings.json",
-      "codeInfoColId": "c88201be-0ff6-4f54-be88-6d2e448dcee8"
+      "codeInfoColId": "c88201be-0ff6-4f54-be88-6d2e448dcee8",
+      "isJsonSource": true,
+      "jsonSourceKeys": ["backend"],
+      "configLanguage": "json"
     },
     "4490975a-8d8d-4f02-8ed4-f48f8258f1ec": {
       "name": "setta_files/setta-settings.json",
-      "codeInfoColId": "ed42bd5c-edfb-4620-8477-58bbb84ee69b"
+      "codeInfoColId": "ed42bd5c-edfb-4620-8477-58bbb84ee69b",
+      "isJsonSource": true,
+      "jsonSourceKeys": ["languageServer"],
+      "configLanguage": "json"
     },
     "d2c7059a-8e28-488a-aa33-056476652d5e": {
       "name": "setta_files/setta-settings.json",
-      "codeInfoColId": "baa5c9db-c2db-42c7-9cab-fda5cadf861c"
+      "codeInfoColId": "baa5c9db-c2db-42c7-9cab-fda5cadf861c",
+      "isJsonSource": true,
+      "jsonSourceKeys": ["sections"],
+      "configLanguage": "json"
     }
   },
   "artifacts": {},
@@ -206,10 +221,7 @@
       "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
       "defaultVariantId": "19f203aa-cae6-4ccc-928c-dab0194ade77",
       "variantIds": ["19f203aa-cae6-4ccc-928c-dab0194ade77"],
-      "configLanguage": "json",
-      "hideSearch": true,
-      "jsonSource": "setta_files/setta-settings*.json",
-      "jsonSourceKeys": ["shortcuts"]
+      "jsonSourceGlob": "setta_files/setta-settings*.json"
     },
     "6b264a9a-0f87-4288-80aa-45cc6b16db96": {
       "id": "6b264a9a-0f87-4288-80aa-45cc6b16db96",
@@ -222,10 +234,7 @@
       "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
       "defaultVariantId": "f3cb4189-2692-4e75-b58f-76d632f44205",
       "variantIds": ["f3cb4189-2692-4e75-b58f-76d632f44205"],
-      "configLanguage": "json",
-      "hideSearch": true,
-      "jsonSource": "setta_files/setta-settings*.json",
-      "jsonSourceKeys": ["gui"]
+      "jsonSourceGlob": "setta_files/setta-settings*.json"
     },
     "f74b5aaf-d11d-4153-b55b-9c18e11e3a73": {
       "id": "f74b5aaf-d11d-4153-b55b-9c18e11e3a73",
@@ -238,10 +247,7 @@
       "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
       "defaultVariantId": "36d29a06-7971-48d1-a1d2-23480f770d74",
       "variantIds": ["36d29a06-7971-48d1-a1d2-23480f770d74"],
-      "configLanguage": "json",
-      "hideSearch": true,
-      "jsonSource": "setta_files/setta-settings*.json",
-      "jsonSourceKeys": ["backend"]
+      "jsonSourceGlob": "setta_files/setta-settings*.json"
     },
     "8389d4b3-0a1e-4c44-819b-7c745d6c3f1b": {
       "id": "8389d4b3-0a1e-4c44-819b-7c745d6c3f1b",
@@ -254,10 +260,7 @@
       "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
       "defaultVariantId": "4490975a-8d8d-4f02-8ed4-f48f8258f1ec",
       "variantIds": ["4490975a-8d8d-4f02-8ed4-f48f8258f1ec"],
-      "configLanguage": "json",
-      "hideSearch": true,
-      "jsonSource": "setta_files/setta-settings*.json",
-      "jsonSourceKeys": ["languageServer"]
+      "jsonSourceGlob": "setta_files/setta-settings*.json"
     },
     "514c2046-25de-4b0a-b6f9-fca1dd14ad8e": {
       "id": "514c2046-25de-4b0a-b6f9-fca1dd14ad8e",
@@ -270,10 +273,7 @@
       "uiTypeColId": "04f95495-52ba-4277-a79e-228bb1c6a5bc",
       "defaultVariantId": "d2c7059a-8e28-488a-aa33-056476652d5e",
       "variantIds": ["d2c7059a-8e28-488a-aa33-056476652d5e"],
-      "configLanguage": "json",
-      "hideSearch": true,
-      "jsonSource": "setta_files/setta-settings*.json",
-      "jsonSourceKeys": ["sections"]
+      "jsonSourceGlob": "setta_files/setta-settings*.json"
     }
   },
   "codeInfo": {

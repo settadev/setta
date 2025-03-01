@@ -77,9 +77,9 @@ class MetaSettingsFile:
         return settings_slice_to_path
 
     def find_path_for_settings_slice(self, p, slice):
-        for sectionId, section in p["sections"].items():
-            if section["jsonSourceKeys"] == [slice]:
-                variant = get_selected_section_variant(p, sectionId)
+        for sectionId in p["sections"].keys():
+            variant = get_selected_section_variant(p, sectionId)
+            if variant["jsonSourceKeys"] == [slice]:
                 return variant["name"]
         return None
 

@@ -54,7 +54,7 @@ class GlobalParamSweepSectionToYamlRequest(BaseModel):
 
 class LoadSectionJSONSourceRequest(BaseModel):
     project: dict
-    sectionIdToJSONSource: Dict[str, str]
+    variantIdsToLoad: List[str]
 
 
 class SaveSectionJSONSourceRequest(BaseModel):
@@ -134,14 +134,11 @@ def route_global_param_sweep_section_to_yaml(x: GlobalParamSweepSectionToYamlReq
 @router.post(C.ROUTE_LOAD_SECTION_JSON_SOURCE)
 def route_load_section_json_source(x: LoadSectionJSONSourceRequest):
     p = x.project
-    for k, v in x.sectionIdToJSONSource.items():
-        p["sections"][k]["jsonSource"] = v
     load_json_sources_into_data_structures(
-        p["sections"],
         p["codeInfo"],
         p["codeInfoCols"],
         p["sectionVariants"],
-        section_ids=list(x.sectionIdToJSONSource.keys()),
+        variant_ids=x.variantIdsToLoad,
     )
     return {"project": p}
 

@@ -10,11 +10,11 @@ from setta.utils.utils import (
 )
 
 
-def save_json_source_data(p, section_ids=None, forking_from=None):
-    sections = {
+def save_json_source_data(p, variant_ids=None, forking_from=None):
+    variants = {
         k: v
-        for k, v in p["sections"].items()
-        if v.get("jsonSource", None) and ((not section_ids) or k in section_ids)
+        for k, v in p["sectionVariants"].items()
+        if ((not variant_ids) or k in variant_ids)
     }
 
     to_be_saved = defaultdict(dict)
@@ -28,29 +28,27 @@ def save_json_source_data(p, section_ids=None, forking_from=None):
 
     ancestor_paths = build_ancestor_paths(p["codeInfo"], p["codeInfoCols"])
 
-    for s in sections.values():
-        if not s["jsonSource"] or s["jsonSourceMissing"]:
+    for variant in variants.values():
+        if not variant["isJsonSource"]:
             continue
 
-        for variantId in s["variantIds"]:
-            variant = p["sectionVariants"][variantId]
-            codeInfoColId = variant["codeInfoColId"]
-            codeInfoCol = p["codeInfoCols"][codeInfoColId]
-            filename = variant["name"]
+        codeInfoColId = variant["codeInfoColId"]
+        codeInfoCol = p["codeInfoCols"][codeInfoColId]
+        filename = variant["name"]
 
-            recursively_add_keys(
-                p,
-                variant,
-                codeInfoCol,
-                to_be_saved[filename],
-                None,
-                s["jsonSourceKeys"],
-                ancestor_paths,
-            )
+        recursively_add_keys(
+            p,
+            variant,
+            codeInfoCol,
+            to_be_saved[filename],
+            None,
+            variant["jsonSourceKeys"],
+            ancestor_paths,
+        )
 
-            # Make sure the jsonSourceKeys are present.
-            # (They might not be because they are completely empty)
-            add_key_path_to_dict(to_be_saved[filename], s["jsonSourceKeys"])
+        # Make sure the jsonSourceKeys are present.
+        # (They might not be because they are completely empty)
+        add_key_path_to_dict(to_be_saved[filename], variant["jsonSourceKeys"])
 
     # Save each file
     for filename, data in to_be_saved.items():

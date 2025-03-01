@@ -106,10 +106,8 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
     (
         "social",
         "codeLanguage",
-        "configLanguage",
         "runInMemory",
         "isFrozen",
-        "jsonSource",
         "hideParams",
         "hideSearch",
         "hideUnpinnedParams",
@@ -123,6 +121,7 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "isReadOnlyTerminal",
         "subprocessStartMethod",
         "headingAsSectionName",
+        "jsonSourceGlob",
     )
 )
 
@@ -136,7 +135,16 @@ SECTION_CONFIG_TABLE_DATA_JSON_FIELDS = set(
     )
 )
 
-SECTION_VARIANT_ID_TABLE_DATA_JSON_FIELDS = set(["code", "description", "isFrozen"])
+SECTION_VARIANT_ID_TABLE_DATA_JSON_FIELDS = set(
+    [
+        "code",
+        "description",
+        "isFrozen",
+        "configLanguage",
+        "isJsonSource",
+        "jsonSourceKeys",
+    ]
+)
 
 SECTION_VARIANT_EV_TABLE_DATA_JSON_FIELDS = set(["value"])
 

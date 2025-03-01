@@ -2,19 +2,11 @@ from setta.database.utils import remap_ids, rename_keys
 from setta.utils.generate_memorable_string import generate_memorable_string
 
 
-def copy_section_variants(
-    sections, section_variants, code_info_id_map, code_info_col_id_map
-):
+def copy_section_variants(section_variants, code_info_id_map, code_info_col_id_map):
     new_section_variants, section_variant_id_map = remap_ids(section_variants)
-    keep_old_name = set()
-    for s in sections.values():
-        if not s["jsonSource"]:
-            continue
-        for v in s["variantIds"]:
-            keep_old_name.add(section_variant_id_map[v])
 
-    for id, obj in new_section_variants.items():
-        if id not in keep_old_name:
+    for obj in new_section_variants.values():
+        if not obj["isJsonSource"]:
             obj["name"] = generate_memorable_string()
         obj["values"] = rename_keys(obj["values"], code_info_id_map)
         if obj["codeInfoColId"]:

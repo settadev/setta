@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { dbLoadSectionJSONSource } from "requests/jsonSource";
 import { useSectionInfos } from "state/definitions";
 import { updateSectionInfos } from "./sectionInfos";
@@ -7,26 +6,28 @@ export async function updateJSONSourceContents(updatedFileInfo) {
   const { absPath, relPath, destAbsPath, destRelPath, matchingGlobPatterns } =
     updatedFileInfo;
 
-  const sectionIdToJSONSource = {};
-  for (const s of Object.values(useSectionInfos.getState().x)) {
+  const variantIdsToLoad = [];
+  for (const [id, v] of Object.entries(useSectionInfos.getState().variants)) {
+    if (!v.isJsonSource) {
+      continue;
+    }
+
     if (
-      !(absPath && s.jsonSource === absPath) &&
-      !(relPath && s.jsonSource === relPath) &&
-      !(destAbsPath && s.jsonSource === destAbsPath) &&
-      !(destRelPath && s.jsonSource === destRelPath) &&
-      !matchingGlobPatterns.includes(s.jsonSource)
+      !(absPath && v.name === absPath) &&
+      !(relPath && v.name === relPath) &&
+      !(destAbsPath && v.name === destAbsPath) &&
+      !(destRelPath && v.name === destRelPath)
     ) {
       continue;
     }
-    sectionIdToJSONSource[s.id] = s.jsonSource;
+    variantIdsToLoad.push(id);
   }
 
-  const { sections, sectionVariants, codeInfo, codeInfoCols } =
-    await loadJsonContents(sectionIdToJSONSource);
+  const { sectionVariants, codeInfo, codeInfoCols } =
+    await loadJsonContents(variantIdsToLoad);
 
   useSectionInfos.setState((state) => {
     updateSectionInfos({
-      sections,
       sectionVariants,
       codeInfo,
       codeInfoCols,
@@ -35,19 +36,17 @@ export async function updateJSONSourceContents(updatedFileInfo) {
   });
 }
 
-export async function loadJsonContents(sectionIdToJSONSource) {
+export async function loadJsonContents(variantIdsToLoad) {
   let codeInfo = null,
     codeInfoCols = null,
-    sectionVariants = null,
-    sections = null;
+    sectionVariants = null;
 
-  if (_.size(sectionIdToJSONSource) > 0) {
-    const res = await dbLoadSectionJSONSource(sectionIdToJSONSource);
+  if (variantIdsToLoad.length > 0) {
+    const res = await dbLoadSectionJSONSource(variantIdsToLoad);
     if (res.status === 200) {
-      ({ codeInfo, codeInfoCols, sectionVariants, sections } =
-        res.data.project);
+      ({ codeInfo, codeInfoCols, sectionVariants } = res.data.project);
     }
   }
 
-  return { sections, sectionVariants, codeInfo, codeInfoCols };
+  return { sectionVariants, codeInfo, codeInfoCols };
 }

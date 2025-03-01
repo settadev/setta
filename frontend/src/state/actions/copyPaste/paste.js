@@ -73,12 +73,6 @@ function removeSingletonSectionsIfAlreadyPresent(pasteData) {
   }
 
   const toRemove = [];
-  const usedJsonSources = new Set();
-  for (const s of Object.values(useSectionInfos.getState().x)) {
-    if (s.jsonSource) {
-      usedJsonSources.add(s.jsonSource);
-    }
-  }
 
   for (const s of Object.values(sections)) {
     const uiTypeName = uiTypes[s.uiTypeId].type;
@@ -89,12 +83,6 @@ function removeSingletonSectionsIfAlreadyPresent(pasteData) {
       toRemove.push(s.id);
       toRemove.push(s.paramSweepSectionId);
       setNotificationMessage("Can't have more than 1 global section!");
-    }
-    if (usedJsonSources.has(s.jsonSource)) {
-      toRemove.push(s.id);
-      setNotificationMessage(
-        "Can't have more than 1 section referring to the same json source",
-      );
     }
   }
 

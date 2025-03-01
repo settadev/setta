@@ -18,9 +18,10 @@ export function ParamNameInput({
     name: value,
     variantIsFrozen,
   } = useSectionInfos((x) => {
+    const { isFrozen, configLanguage } = getSectionVariant(sectionId, x);
     return {
-      variantIsFrozen: getSectionVariant(sectionId, x).isFrozen,
-      configLanguage: x.x[sectionId].configLanguage,
+      variantIsFrozen: isFrozen,
+      configLanguage,
       name: x.codeInfo[paramInfoId].name,
     };
   }, _.isEqual);

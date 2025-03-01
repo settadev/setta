@@ -21,7 +21,6 @@
     "paramSweepSectionId": null,
     "nonPresetUITypeIds": [],
     "codeLanguage": "python",
-    "configLanguage": "python",
     "runInMemory": false,
     "isFrozen": false,
     "isHorizontalOrientation": false,
@@ -54,11 +53,8 @@
     "isReadOnlyTerminal": false,
     "renderMarkdown": false,
     "positionAndSizeLocked": false,
-    "jsonSource": "",
-    "jsonSourceKeys": [],
     "selectedVariantIds": {},
     "paramFilter": "",
-    "jsonSourceMissing": false,
     "isInOtherProjectConfigs": false,
     "aspectRatio": false,
     "aspectRatioExtraHeight": 0,
@@ -66,7 +62,8 @@
     "columnWidth": null,
     "renderedValue": null,
     "subprocessStartMethod": "spawn",
-    "headingAsSectionName": false
+    "headingAsSectionName": false,
+    "jsonSourceGlob": null
   },
   "sectionVariant": {
     "name": "",
@@ -80,7 +77,11 @@
     "templateVars": [],
     "isFrozen": false,
     "sweep": [],
-    "runGroup": {}
+    "runGroup": {},
+    "configLanguage": "python",
+    "isJsonSource": false,
+    "jsonSourceKeys": [],
+    "jsonSourceMissing": false
   },
   "codeInfo": {
     "id": null,

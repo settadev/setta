@@ -35,7 +35,7 @@ def add_defaults_to_project(p):
 def add_defaults_to_project_and_load_json_sources(p):
     add_defaults_to_project(p)
     load_json_sources_into_data_structures(
-        p["sections"], p["codeInfo"], p["codeInfoCols"], p["sectionVariants"]
+        p["codeInfo"], p["codeInfoCols"], p["sectionVariants"]
     )
 
 

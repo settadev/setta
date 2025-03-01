@@ -128,9 +128,7 @@ def load_project_config(db, project_config_name, do_load_json_sources=True):
     load_ev_refs_into_data_structures(db, sectionVariants, codeInfo)
     load_template_vars_into_data_structures(db, sectionVariants)
     if do_load_json_sources:
-        load_json_sources_into_data_structures(
-            sections, codeInfo, codeInfoCols, sectionVariants
-        )
+        load_json_sources_into_data_structures(codeInfo, codeInfoCols, sectionVariants)
 
     return {
         "projectConfig": projectConfig,
