@@ -2,11 +2,11 @@ import C from "constants/constants.json";
 import _ from "lodash";
 import React from "react";
 import {
+  getSectionShouldRender,
   getSectionType,
   getSectionViewingEditingModeVisibility,
 } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
-import { VIEWING_EDITING_MODE } from "utils/constants";
 import { ContainerSwitch } from "./ContainerSwitch";
 import { MaybeManyNestedSections } from "./ManyNestedSections";
 import { SectionContainerCore } from "./SectionContainerCore";
@@ -22,7 +22,7 @@ function _SectionContainer({ sectionId, isTopLevel, dragListeners }) {
     };
   });
 
-  if (viewingEditingMode === VIEWING_EDITING_MODE.USER && !visibility) {
+  if (!getSectionShouldRender(visibility, viewingEditingMode)) {
     return null;
   }
 
