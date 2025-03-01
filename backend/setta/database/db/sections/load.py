@@ -217,25 +217,28 @@ def load_json_sources_into_data_structures(
         )
         variant["jsonSourcMissing"] = isMissing
         if not isMissing:
-            merge_into_existing(new_data, variant, codeInfo, codeInfoCols)
+            codeInfoCol = codeInfoCols[variant["codeInfoColId"]]
+            merge_into_existing(new_data, variant, codeInfo, codeInfoCol)
 
 
-def merge_into_existing(data, sectionVariant, codeInfo, codeInfoCols):
-    print("******merge_into_existing*******", data, flush=True)
+def merge_into_existing(data, sectionVariant, codeInfo, codeInfoCol):
+    filename = sectionVariant["name"]
     jsonSourceMetadata_to_id = {}
-    ancestor_paths = build_ancestor_paths(codeInfo, codeInfoCols)
-    for id, info in codeInfo.items():
+    print("building ancestor paths")
+    ancestor_paths = build_ancestor_paths(codeInfo, codeInfoCol)
+    for id in ancestor_paths:
         jsonSourceMetadata_to_id[
-            createMetadataJsonString(info["jsonSource"], ancestor_paths[id])
+            createMetadataJsonString(filename, ancestor_paths[id])
         ] = id
 
     replacements = {}
+    print("building NEW ancestor paths")
     new_ancestor_paths = build_ancestor_paths(
-        data["codeInfo"], {None: {"children": data["codeInfoColChildren"]}}
+        data["codeInfo"], {"children": data["codeInfoColChildren"]}
     )
     for newId, newInfo in data["codeInfo"].items():
         existingId = jsonSourceMetadata_to_id.get(
-            createMetadataJsonString(newInfo["jsonSource"], new_ancestor_paths[newId])
+            createMetadataJsonString(filename, new_ancestor_paths[newId])
         )
         if existingId:
             replacements[newId] = existingId
@@ -255,8 +258,7 @@ def merge_into_existing(data, sectionVariant, codeInfo, codeInfoCols):
         del data["sectionVariantValues"][newId]
 
     sectionVariant["values"] = data["sectionVariantValues"]
-    codeInfoColId = sectionVariant["codeInfoColId"]
-    codeInfoCols[codeInfoColId]["children"] = data["codeInfoColChildren"]
+    codeInfoCol["children"] = data["codeInfoColChildren"]
 
 
 def load_json_source(filename, jsonSourceKeys):
@@ -314,7 +316,7 @@ def process_json_object_helper(output, obj, filename, current_path, metadataToId
     children_keys = []
     for k, v in obj.items():
         path = current_path + [k]
-        paramInfoId, is_dict = create_json_code_info(filename, k, v, output)
+        paramInfoId, is_dict = create_json_code_info(k, v, output)
         metadataToId[createMetadataJsonString(filename, path)] = paramInfoId
         children_keys.append(paramInfoId)
         if is_dict:
@@ -332,14 +334,13 @@ def process_json_object_helper(output, obj, filename, current_path, metadataToId
     return parent_id
 
 
-def create_json_code_info(filename, key, value, output):
+def create_json_code_info(key, value, output):
     paramInfoId = create_new_id()
     # Create code info entry
     output["codeInfo"][paramInfoId] = with_code_info_defaults(
         id=paramInfoId,
         name=key,
         editable=True,
-        jsonSource=filename,
     )
     output["codeInfoColChildren"][paramInfoId] = []
 

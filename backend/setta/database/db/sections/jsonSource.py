@@ -21,16 +21,16 @@ def save_json_source_data(p, variant_ids=None):
 
     p["codeInfoCols"] = replace_null_keys_with_none(p["codeInfoCols"])
 
-    ancestor_paths = build_ancestor_paths(p["codeInfo"], p["codeInfoCols"])
-
     for variant in variants.values():
         if not variant["isJsonSource"]:
             continue
-
         codeInfoColId = variant["codeInfoColId"]
+        if not codeInfoColId:
+            continue
         codeInfoCol = p["codeInfoCols"][codeInfoColId]
         filename = variant["name"]
 
+        ancestor_paths = build_ancestor_paths(p["codeInfo"], codeInfoCol)
         recursively_add_keys(
             p,
             variant,
@@ -52,18 +52,19 @@ def save_json_source_data(p, variant_ids=None):
     return to_be_saved
 
 
-def build_ancestor_paths(codeInfo, codeInfoCols):
+def build_ancestor_paths(codeInfo, codeInfoCol):
     parent_map = {}
-    for col in codeInfoCols.values():
-        for parent_id, children in col["children"].items():
-            for child_id in children:
-                parent_map[(codeInfo[child_id]["jsonSource"], child_id)] = parent_id
+    for parent_id, children in codeInfoCol["children"].items():
+        for child_id in children:
+            parent_map[child_id] = parent_id
+
+    print("parent_map", parent_map, flush=True)
 
     ancestor_paths = {}
-    for node_id in codeInfo:
-        if node_id not in ancestor_paths:
+    for id in parent_map.keys():
+        if id not in ancestor_paths:
             path = []
-            current_id = node_id
+            current_id = id
 
             # Traverse up to build the path
             while current_id is not None:
@@ -72,14 +73,12 @@ def build_ancestor_paths(codeInfo, codeInfoCols):
                     path.insert(0, name)
 
                     # Get parent using the map
-                    parent_id = parent_map.get(
-                        (codeInfo[current_id]["jsonSource"], current_id)
-                    )
+                    parent_id = parent_map.get(current_id)
                     current_id = parent_id
                 else:
                     break
 
-            ancestor_paths[node_id] = path
+            ancestor_paths[id] = path
 
     return ancestor_paths
 
@@ -89,20 +88,16 @@ def recursively_add_keys(
 ):
     for k in codeInfoCol["children"][codeInfoId]:
         children = codeInfoCol["children"][k]
-        json_source = p["codeInfo"][k].get("jsonSource")
 
-        if json_source:
-            # Get pre-computed key path
-            key_path = [*jsonSourceKeys, *ancestor_paths[k]]
-            value = try_getting_value(variant, k, children)
+        # Get pre-computed key path
+        key_path = [*jsonSourceKeys, *ancestor_paths[k]]
+        value = try_getting_value(variant, k, children)
+        current_dict = add_key_path_to_dict(input_dict, key_path[:-1])
 
-            current_dict = add_key_path_to_dict(input_dict, key_path[:-1])
+        # Set the value at the final position
+        if key_path:  # Only set if we have a path
+            current_dict[key_path[-1]] = value
 
-            # Set the value at the final position
-            if key_path:  # Only set if we have a path
-                current_dict[key_path[-1]] = value
-
-        # Continue recursion regardless of whether this node has a jsonSource
         recursively_add_keys(
             p, variant, codeInfoCol, input_dict, k, jsonSourceKeys, ancestor_paths
         )
@@ -125,54 +120,7 @@ def try_getting_value(variant, codeInfoId, codeInfoChildren):
     return {}
 
 
-def condition_keep_code_info(codeInfo, jsonCodeInfoWithUIType):
-    if not codeInfo:
-        return False
-    return not codeInfo["jsonSource"] or codeInfo["id"] in jsonCodeInfoWithUIType
-
-
-def remove_json_source_data(p):
+def remove_json_source_values(p):
     for variant in p["sectionVariants"].values():
-        variant["values"] = {
-            k: v
-            for k, v in variant["values"].items()
-            if not p["codeInfo"][k]["jsonSource"]
-        }
-
-    jsonCodeInfoWithUIType = set()
-    for uiTypeCol in p["uiTypeCols"].values():
-        for paramInfoId, uiTypeInfo in uiTypeCol.items():
-            # we want to know which json source params have an associated uiTypeId
-            # only if it's not the base TEXT type, since that's the default
-            if (
-                p["codeInfo"][paramInfoId]["jsonSource"]
-                and uiTypeInfo["uiTypeId"] != BASE_UI_TYPE_IDS[C.TEXT]
-            ):
-                jsonCodeInfoWithUIType.add(paramInfoId)
-
-    p["codeInfo"] = {
-        k: v
-        for k, v in p["codeInfo"].items()
-        if condition_keep_code_info(v, jsonCodeInfoWithUIType)
-    }
-
-    for codeInfoColId in p["codeInfoCols"].keys():
-        codeInfoCol = p["codeInfoCols"][codeInfoColId]
-        codeInfoCol["children"] = {
-            k: v
-            for k, v in codeInfoCol["children"].items()
-            if k is None
-            or condition_keep_code_info(
-                p["codeInfo"].get(k),
-                jsonCodeInfoWithUIType,
-            )
-        }
-        for id, children in codeInfoCol["children"].items():
-            codeInfoCol["children"][id] = [
-                c
-                for c in children
-                if condition_keep_code_info(
-                    p["codeInfo"].get(c),
-                    jsonCodeInfoWithUIType,
-                )
-            ]
+        if variant["isJsonSource"]:
+            variant["values"] = {}

@@ -5,7 +5,7 @@ from setta.database.db.codeInfo.utils import (
     add_defaults_to_code_info,
     add_defaults_to_code_info_cols,
 )
-from setta.database.db.sections.jsonSource import remove_json_source_data
+from setta.database.db.sections.jsonSource import remove_json_source_values
 from setta.database.db.sections.load import load_json_sources_into_data_structures
 from setta.database.db.sections.utils import add_defaults_to_sections
 from setta.database.db.sectionVariants.utils import add_defaults_to_section_variants
@@ -44,7 +44,7 @@ def remove_empty(x):
 
 
 def filter_data_for_json_export(p):
-    remove_json_source_data(p)
+    remove_json_source_values(p)
 
     p["projectConfig"] = filter_dict(
         p["projectConfig"],

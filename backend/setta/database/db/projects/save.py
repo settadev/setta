@@ -15,7 +15,7 @@ from setta.utils.generate_memorable_string import generate_memorable_available_s
 from setta.utils.utils import filter_dict
 
 from ..codeInfo.save import save_code_info, save_code_info_col
-from ..sections.jsonSource import remove_json_source_data, save_json_source_data
+from ..sections.jsonSource import remove_json_source_values, save_json_source_data
 from ..sections.save import save_sections
 from ..sectionVariants.save import save_section_variants
 from ..uiTypes.save import save_ui_type_cols, save_ui_types
@@ -24,7 +24,7 @@ from ..uiTypes.save import save_ui_type_cols, save_ui_types
 def save_project_details(db, p, do_save_json_source_data=True):
     if do_save_json_source_data:
         save_json_source_data(p)
-    remove_json_source_data(p)
+    remove_json_source_values(p)
     save_artifacts(db, p["artifacts"])
     save_artifact_groups(db, p["artifactGroups"], p["sections"])
     save_code_info(db, p["codeInfo"])
