@@ -1,6 +1,6 @@
 import { getFloatingBoxHandlers } from "components/Utils/FloatingBox";
 import { PaneContainer } from "components/Utils/PaneContainer";
-import { BiHelpCircle } from "react-icons/bi";
+import { BiCustomize, BiHelpCircle } from "react-icons/bi";
 import { localStorageFns } from "state/hooks/localStorage";
 import { OVERVIEW } from "utils/constants";
 import { overviewPaneOnKeyDown } from "utils/tabbingLogic";
@@ -11,6 +11,7 @@ import {
 } from "../paneFns";
 import { ProjectConfigs } from "./ProjectConfigs";
 import { ProjectOverview } from "./ProjectOverview";
+import { ViewingEditingMode } from "./ViewingEditingMode";
 
 const paneName = OVERVIEW;
 
@@ -47,6 +48,13 @@ export function Overview() {
           {...getFloatingBoxHandlers({ content: "Config Preview" })}
         >
           <i className="gg-git-branch !scale-100" />
+        </TabButton>
+        <TabButton
+          tabName="tab3"
+          {...commonProps}
+          {...getFloatingBoxHandlers({ content: "Viewing/Editing Mode" })}
+        >
+          <BiCustomize />
         </TabButton>
         <a
           href="https://docs.setta.dev"
@@ -92,5 +100,7 @@ function TabContent({ tab }) {
       return <ProjectOverview />;
     case "tab2":
       return <ProjectConfigs />;
+    case "tab3":
+      return <ViewingEditingMode />;
   }
 }
