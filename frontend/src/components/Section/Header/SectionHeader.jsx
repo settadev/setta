@@ -3,12 +3,11 @@ import { StandardPopover } from "components/Utils/atoms/popover/standardpopover"
 import C from "constants/constants.json";
 import React from "react";
 import { TbSortDescending2 } from "react-icons/tb";
-import { deleteSections } from "state/actions/sections/deleteSections";
-import { maybeIncrementProjectStateVersion } from "state/actions/undo";
-import { useSectionInfos } from "state/definitions";
+import { useProjectConfig, useSectionInfos } from "state/definitions";
 import { useIsSeriesElement } from "state/hooks/uiTypes";
+import { VIEWING_EDITING_MODE } from "utils/constants";
 import { Incrementer } from "../SectionParts/Incrementer";
-import { CustomCloseButton } from "./CustomCloseButton";
+import { DeleteOrHideButton } from "./DeleteOrHideButton";
 import { LockPositionButton } from "./LockPositionButton";
 import MenuButton from "./MenuButton/MenuButton";
 import { MinimizeButton } from "./MinimizeButton";
@@ -23,14 +22,9 @@ function _SectionHeader({
   isInOtherProjectConfigs,
   isRoot,
 }) {
-  const onCustomCloseButtonClick = () => {
-    useSectionInfos.setState((state) => {
-      deleteSections([sectionId], state);
-    });
-    maybeIncrementProjectStateVersion(true);
-  };
-
   const isSeriesElement = useIsSeriesElement(sectionId) && !isRoot;
+  const viewingEditingMode = useProjectConfig((x) => x.viewingEditingMode);
+  const isUserView = viewingEditingMode === VIEWING_EDITING_MODE.USER;
 
   // DOM: maybe get rid of the extra div under header?
 
@@ -70,9 +64,14 @@ function _SectionHeader({
             <ToggleRunInMemoryButton sectionId={sectionId} />{" "}
           </>
         )}
-        <LockPositionButton sectionId={sectionId} />
-        {!isRoot && <MinimizeButton sectionId={sectionId} />}
-        <CustomCloseButton onClick={onCustomCloseButtonClick} />
+        {!isUserView && <LockPositionButton sectionId={sectionId} />}
+        {!isUserView && !isRoot && <MinimizeButton sectionId={sectionId} />}
+        {!isUserView && (
+          <DeleteOrHideButton
+            sectionId={sectionId}
+            viewingEditingMode={viewingEditingMode}
+          />
+        )}
       </div>
     </header>
   );

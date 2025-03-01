@@ -29,6 +29,7 @@
     "hideSearch": false,
     "hideUnpinnedParams": false,
     "displayMode": "GUI",
+    "visibility": { "DEV": true, "USER": true },
     "pinnedAreaHeight": "auto",
     "isMinimized": false,
     "canvasSettings": {

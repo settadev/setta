@@ -111,6 +111,7 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "hideSearch",
         "hideUnpinnedParams",
         "displayMode",
+        "visibility",
         "canvasSettings",
         "chartSettings",
         "renderMarkdown",

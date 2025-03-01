@@ -12,7 +12,7 @@ export function ViewingEditingMode({}) {
       icon: <MdDeveloperMode size={20} />,
     },
     {
-      id: VIEWING_EDITING_MODE.USER_VIEW,
+      id: VIEWING_EDITING_MODE.USER,
       label: "User View",
       icon: <MdPersonOutline size={20} />,
     },
