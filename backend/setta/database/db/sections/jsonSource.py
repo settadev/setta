@@ -30,7 +30,7 @@ def save_json_source_data(p, variant_ids=None):
         codeInfoCol = p["codeInfoCols"][codeInfoColId]
         filename = variant["name"]
 
-        ancestor_paths = build_ancestor_paths(p["codeInfo"], codeInfoCol)
+        ancestor_paths = build_ancestor_paths(p["codeInfo"], codeInfoCol["children"])
         recursively_add_keys(
             p,
             variant,
@@ -52,9 +52,9 @@ def save_json_source_data(p, variant_ids=None):
     return to_be_saved
 
 
-def build_ancestor_paths(codeInfo, codeInfoCol):
+def build_ancestor_paths(codeInfo, codeInfoColChildren):
     parent_map = {}
-    for parent_id, children in codeInfoCol["children"].items():
+    for parent_id, children in codeInfoColChildren.items():
         for child_id in children:
             parent_map[child_id] = parent_id
 

@@ -217,7 +217,7 @@ def load_json_sources_into_data_structures(
         )
         variant["jsonSourcMissing"] = isMissing
         if not isMissing:
-            codeInfoCol = codeInfoCols[variant["codeInfoColId"]]
+            codeInfoCol = codeInfoCols.get(variant["codeInfoColId"], {"children": {}})
             merge_into_existing(new_data, variant, codeInfo, codeInfoCol)
 
 
@@ -232,7 +232,7 @@ def merge_into_existing(data, sectionVariant, codeInfo, codeInfoCol):
 
     replacements = {}
     new_ancestor_paths = build_ancestor_paths(
-        data["codeInfo"], {"children": data["codeInfoColChildren"]}
+        data["codeInfo"], data["codeInfoColChildren"]
     )
     for newId, newInfo in data["codeInfo"].items():
         existingId = jsonSourceMetadata_to_id.get(
