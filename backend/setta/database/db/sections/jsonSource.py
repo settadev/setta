@@ -1,13 +1,6 @@
-import json
 from collections import defaultdict
 
-from setta.utils.constants import BASE_UI_TYPE_IDS, C
-from setta.utils.utils import (
-    recursive_dict_merge,
-    replace_null_keys_with_none,
-    save_json_to_file,
-    try_json,
-)
+from setta.utils.utils import replace_null_keys_with_none, save_json_to_file, try_json
 
 
 def save_json_source_data(p, variant_ids=None):

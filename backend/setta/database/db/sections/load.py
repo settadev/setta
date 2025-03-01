@@ -1,5 +1,4 @@
 import copy
-import glob
 import itertools
 import json
 import logging
@@ -9,7 +8,7 @@ from setta.database.db.artifacts.load import load_artifact_groups
 from setta.database.db.codeInfo.utils import new_code_info_col, with_code_info_defaults
 from setta.database.db.sections.jsonSource import build_ancestor_paths
 from setta.database.db.sections.utils import with_section_defaults
-from setta.database.db.sectionVariants.utils import new_ev_entry, new_section_variant
+from setta.database.db.sectionVariants.utils import new_ev_entry
 from setta.database.utils import create_new_id
 
 from ..sectionVariants.load import load_section_variants

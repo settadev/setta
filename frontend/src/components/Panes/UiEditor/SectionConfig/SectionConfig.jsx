@@ -8,7 +8,6 @@ import { CodeAreaSettings } from "./CodeAreaSettings";
 import { DrawAreaSettings } from "./DrawAreaSettings";
 import { IframeSettings } from "./IframeSettings";
 import { ImageAreaSettings } from "./ImageAreaSettings";
-import { InputAreaSettings } from "./InputAreaSettings";
 import { SocialAreaSettings } from "./SocialAreaSettings";
 import { TextBlockSettings } from "./TextBlockSettings";
 
