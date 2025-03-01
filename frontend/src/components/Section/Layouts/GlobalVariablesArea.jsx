@@ -9,13 +9,11 @@ function _GlobalVariablesArea({ sectionId, bgColor, isUserView }) {
 
   return !showYaml ? (
     <>
-      {!isUserView && (
-        <KwargsControls
-          sectionId={sectionId}
-          objInfoId={null}
-          bgColor={bgColor}
-        />
-      )}
+      <KwargsControls
+        sectionId={sectionId}
+        objInfoId={null}
+        bgColor={bgColor}
+      />
       <ParamGroupContainer sectionId={sectionId} />
     </>
   ) : (

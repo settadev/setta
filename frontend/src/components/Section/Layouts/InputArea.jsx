@@ -31,13 +31,11 @@ function _InputArea({ sectionId, bgColor, isUserView }) {
       )}
       {!showYaml && !hideParams && (
         <>
-          {!isUserView && (
-            <KwargsControls
-              sectionId={sectionId}
-              objInfoId={selectedItem}
-              bgColor={bgColor}
-            />
-          )}
+          <KwargsControls
+            sectionId={sectionId}
+            objInfoId={selectedItem}
+            bgColor={bgColor}
+          />
           <ParamGroupContainer sectionId={sectionId} />
         </>
       )}
