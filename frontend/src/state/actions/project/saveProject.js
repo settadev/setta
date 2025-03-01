@@ -138,6 +138,7 @@ function getProjectConfigMetadata() {
     id: state.id,
     name: state.name,
     previewImgColor: state.previewImgColor,
+    viewingEditingMode: state.viewingEditingMode,
   };
 
   output.viewport = useReactFlow.getState().fitViewOnInit

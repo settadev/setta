@@ -1,20 +1,30 @@
-import { useState } from "react";
 import { MdDeveloperMode, MdEdit, MdPersonOutline } from "react-icons/md";
+import { useProjectConfig } from "state/definitions";
+import { VIEWING_EDITING_MODE } from "utils/constants";
 
-export function ViewingEditingMode({ onChange }) {
-  const [selectedMode, setSelectedMode] = useState("user"); // Default to user view
+export function ViewingEditingMode({}) {
+  const selectedMode = useProjectConfig((x) => x.viewingEditingMode);
 
   const modes = [
-    { id: "dev", label: "Developer View", icon: <MdDeveloperMode size={20} /> },
-    { id: "user", label: "User View", icon: <MdPersonOutline size={20} /> },
-    { id: "edit", label: "Edit User View", icon: <MdEdit size={20} /> },
+    {
+      id: VIEWING_EDITING_MODE.DEV,
+      label: "Developer View",
+      icon: <MdDeveloperMode size={20} />,
+    },
+    {
+      id: VIEWING_EDITING_MODE.USER_VIEW,
+      label: "User View",
+      icon: <MdPersonOutline size={20} />,
+    },
+    {
+      id: VIEWING_EDITING_MODE.USER_EDIT,
+      label: "Edit User View",
+      icon: <MdEdit size={20} />,
+    },
   ];
 
   const handleModeChange = (modeId) => {
-    setSelectedMode(modeId);
-    if (onChange) {
-      onChange(modeId);
-    }
+    useProjectConfig.setState({ viewingEditingMode: modeId });
   };
 
   return (
