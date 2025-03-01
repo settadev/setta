@@ -6,7 +6,7 @@ import {
   saveAsNewProjectConfig,
   saveProject,
 } from "state/actions/project/saveProject";
-import { useProjectConfig } from "state/definitions";
+import { useSectionInfos } from "state/definitions";
 import { useGetAllProjectConfigMetadataForFileMenu } from "state/hooks/project";
 import { MODAL_TYPE } from "utils/constants";
 
@@ -15,7 +15,7 @@ export function FileMenuSaveAsModal({ open, modalType }) {
   const navigateToAnotherConfig = useNavigateToAnotherConfig();
 
   async function onClickSaveAsProject({ selected, filename }) {
-    if (selected === useProjectConfig.getState().id) {
+    if (selected === useSectionInfos.getState().projectConfig.id) {
       saveProject();
     } else {
       selected

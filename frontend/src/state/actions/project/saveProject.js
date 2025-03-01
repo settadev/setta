@@ -10,7 +10,6 @@ import {
 import { dbSaveSettingsProject } from "requests/settings";
 import {
   useNodeInternals,
-  useProjectConfig,
   useSectionColumnWidth,
   useSectionInfos,
   useSettings,
@@ -95,7 +94,7 @@ export function getProjectData({
 export async function saveProject() {
   let res;
   setNotificationMessage("Saving...");
-  if (useProjectConfig.getState().name === SETTINGS_PROJECT_NAME) {
+  if (useSectionInfos.getState().projectConfig.name === SETTINGS_PROJECT_NAME) {
     res = await dbSaveSettingsProject(getProjectData({}));
     if (res.status === 200) {
       useSettings.setState(res.data);
@@ -133,7 +132,7 @@ async function saveProjectAs({ fn, otherArgs }) {
 }
 
 function getProjectConfigMetadata() {
-  const state = useProjectConfig.getState();
+  const state = useSectionInfos.getState().projectConfig;
   const output = {
     id: state.id,
     name: state.name,

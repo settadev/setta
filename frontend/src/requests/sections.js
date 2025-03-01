@@ -9,7 +9,7 @@ import { setNotificationMessage } from "state/actions/notification";
 import { getProjectDataToGenerateCode } from "state/actions/project/generateCode";
 import { getSectionInfo } from "state/actions/sectionInfos";
 import { sendMessageAndWait } from "state/actions/temporaryMiscState";
-import { useProjectConfig, useTypeErrors } from "state/definitions";
+import { useSectionInfos, useTypeErrors } from "state/definitions";
 import { createNewId } from "utils/idNameCreation";
 import { asyncDebounce } from "utils/utils";
 import { sendMessage } from "./websocket";
@@ -64,7 +64,7 @@ export async function dbCodeAreaCompletion({
   codeLanguage,
 }) {
   const { id: projectConfigId, name: projectConfigName } =
-    useProjectConfig.getState();
+    useSectionInfos.getState().projectConfig;
   const { name: sectionName } = getSectionInfo(sectionId);
 
   const candidateEVRefs = findCandidateEVRefs({
@@ -113,7 +113,7 @@ export async function dbTextFieldCompletion({
   messageType = "textFieldCompletion",
 }) {
   const { id: projectConfigId, name: projectConfigName } =
-    useProjectConfig.getState();
+    useSectionInfos.getState().projectConfig;
 
   const candidateEVRefs = findCandidateEVRefs({
     sectionId,

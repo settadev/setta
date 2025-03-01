@@ -1,14 +1,10 @@
 import _ from "lodash";
-import {
-  useProjectConfig,
-  useSectionInfos,
-  useTypeErrors,
-} from "state/definitions";
+import { useSectionInfos, useTypeErrors } from "state/definitions";
 import { setNotificationMessage } from "./notification";
 
 export function processTypeErrors(content) {
   const { projectConfigId, codeSectionId, diagnostics } = content;
-  if (projectConfigId !== useProjectConfig.getState().id) {
+  if (projectConfigId !== useSectionInfos.getState().projectConfig.id) {
     return;
   }
 

@@ -1,9 +1,11 @@
 import { MdDeveloperMode, MdEdit, MdPersonOutline } from "react-icons/md";
-import { useProjectConfig } from "state/definitions";
+import { useSectionInfos } from "state/definitions";
 import { VIEWING_EDITING_MODE } from "utils/constants";
 
 export function ViewingEditingMode({}) {
-  const selectedMode = useProjectConfig((x) => x.viewingEditingMode);
+  const selectedMode = useSectionInfos(
+    (x) => x.projectConfig.viewingEditingMode,
+  );
 
   const modes = [
     {
@@ -24,7 +26,9 @@ export function ViewingEditingMode({}) {
   ];
 
   const handleModeChange = (modeId) => {
-    useProjectConfig.setState({ viewingEditingMode: modeId });
+    useSectionInfos.setState((state) => {
+      state.projectConfig.viewingEditingMode = modeId;
+    });
   };
 
   return (

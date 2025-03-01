@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { HiOutlineDuplicate } from "react-icons/hi";
 import { dbAddDefaultDataForJSONImport } from "requests/projects";
 import { loadProjectState } from "state/actions/project/loadProject";
-import { useProjectConfig } from "state/definitions";
+import { useSectionInfos } from "state/definitions";
 import { useExportProjectJson } from "state/hooks/project";
 import { resetProjectStores } from "state/utils";
 
@@ -36,7 +36,7 @@ export function ImportJSONModal({ modalType }) {
   async function onClick() {
     const project = JSON.parse(value);
     // replace id and name with current project config's id and name.
-    const { id, name } = useProjectConfig.getState();
+    const { id, name } = useSectionInfos.getState().projectConfig;
     project["projectConfig"] = { ...project["projectConfig"], id, name };
     const res = await dbAddDefaultDataForJSONImport(project);
     if (res.status === 200) {

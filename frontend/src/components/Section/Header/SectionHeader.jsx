@@ -3,7 +3,7 @@ import { StandardPopover } from "components/Utils/atoms/popover/standardpopover"
 import C from "constants/constants.json";
 import React from "react";
 import { TbSortDescending2 } from "react-icons/tb";
-import { useProjectConfig, useSectionInfos } from "state/definitions";
+import { useSectionInfos } from "state/definitions";
 import { useIsSeriesElement } from "state/hooks/uiTypes";
 import { VIEWING_EDITING_MODE } from "utils/constants";
 import { Incrementer } from "../SectionParts/Incrementer";
@@ -23,7 +23,9 @@ function _SectionHeader({
   isRoot,
 }) {
   const isSeriesElement = useIsSeriesElement(sectionId) && !isRoot;
-  const viewingEditingMode = useProjectConfig((x) => x.viewingEditingMode);
+  const viewingEditingMode = useSectionInfos(
+    (x) => x.projectConfig.viewingEditingMode,
+  );
   const isUserView = viewingEditingMode === VIEWING_EDITING_MODE.USER;
 
   // DOM: maybe get rid of the extra div under header?

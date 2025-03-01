@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 
 import C from "constants/constants.json";
-import { useSectionViewingEditingModeVisibility } from "state/actions/sectionInfos";
+import { getSectionViewingEditingModeVisibility } from "state/actions/sectionInfos";
 import { useActiveSection, useSectionInfos } from "state/definitions";
 import { useShouldDisablePointerEvents } from "state/hooks/keyActivations";
 import { useSectionRefAndInit } from "state/hooks/sectionRef";
@@ -32,8 +32,9 @@ function _Container({
     draggableRef && draggableRef(e);
   }
 
-  const { visibility, viewingEditingMode } =
-    useSectionViewingEditingModeVisibility(sectionId);
+  const { visibility, viewingEditingMode } = useSectionInfos((state) =>
+    getSectionViewingEditingModeVisibility(sectionId, state),
+  );
   const commonProps = { ref: totalRef, ...trueDragListeners };
   const visibilityStyling =
     !visibility && viewingEditingMode === VIEWING_EDITING_MODE.USER_EDIT

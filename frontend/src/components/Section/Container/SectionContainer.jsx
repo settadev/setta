@@ -1,16 +1,30 @@
 import C from "constants/constants.json";
 import _ from "lodash";
 import React from "react";
-import { getSectionType } from "state/actions/sectionInfos";
+import {
+  getSectionType,
+  getSectionViewingEditingModeVisibility,
+} from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
+import { VIEWING_EDITING_MODE } from "utils/constants";
 import { ContainerSwitch } from "./ContainerSwitch";
 import { MaybeManyNestedSections } from "./ManyNestedSections";
 import { SectionContainerCore } from "./SectionContainerCore";
 
 function _SectionContainer({ sectionId, isTopLevel, dragListeners }) {
-  const isGroup = useSectionInfos(
-    (x) => getSectionType(sectionId, x) === C.GROUP,
-  );
+  const { visibility, viewingEditingMode, isGroup } = useSectionInfos((x) => {
+    const { visibility, viewingEditingMode } =
+      getSectionViewingEditingModeVisibility(sectionId, x);
+    return {
+      visibility,
+      viewingEditingMode,
+      isGroup: getSectionType(sectionId, x) === C.GROUP,
+    };
+  });
+
+  if (viewingEditingMode === VIEWING_EDITING_MODE.USER && !visibility) {
+    return null;
+  }
 
   return (
     <ContainerSwitch
