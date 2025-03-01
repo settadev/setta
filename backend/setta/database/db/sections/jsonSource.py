@@ -10,7 +10,7 @@ from setta.utils.utils import (
 )
 
 
-def save_json_source_data(p, variant_ids=None, forking_from=None):
+def save_json_source_data(p, variant_ids=None):
     variants = {
         k: v
         for k, v in p["sectionVariants"].items()
@@ -18,11 +18,6 @@ def save_json_source_data(p, variant_ids=None, forking_from=None):
     }
 
     to_be_saved = defaultdict(dict)
-
-    forking_from_data = {}
-    if forking_from:
-        with open(forking_from, "r") as f:
-            forking_from_data = json.load(f)
 
     p["codeInfoCols"] = replace_null_keys_with_none(p["codeInfoCols"])
 
@@ -52,7 +47,6 @@ def save_json_source_data(p, variant_ids=None, forking_from=None):
 
     # Save each file
     for filename, data in to_be_saved.items():
-        data = recursive_dict_merge(forking_from_data, data)
         save_json_to_file(filename, data)
 
     return to_be_saved

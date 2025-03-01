@@ -59,8 +59,7 @@ class LoadSectionJSONSourceRequest(BaseModel):
 
 class SaveSectionJSONSourceRequest(BaseModel):
     project: dict
-    sectionId: str
-    forking_from: str
+    variantId: str
 
 
 class NewJSONVersionNameRequest(BaseModel):
@@ -159,7 +158,7 @@ def route_create_file(x: CreateFileRequest):
 
 @router.post(C.ROUTE_SAVE_SECTION_JSON_SOURCE)
 def route_save_section_json_source(x: SaveSectionJSONSourceRequest):
-    save_json_source_data(x.project, [x.sectionId], x.forking_from)
+    save_json_source_data(x.project, [x.variantId])
 
 
 @router.post(C.ROUTE_GET_JSON_SOURCE_PATH_TO_BE_DELETED)

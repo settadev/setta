@@ -1,4 +1,3 @@
-import { dbSaveSectionJSONSource } from "requests/jsonSource";
 import { dbNewVersionFilename } from "requests/sectionVariants";
 import { setNotificationMessage } from "state/actions/notification";
 import {
@@ -27,11 +26,9 @@ export function createNewVersion(sectionId, newVersionName, state) {
   return { newVariantId, oldVariantId: currVariantId };
 }
 
-async function maybeSaveNewJSONVersion(sectionId, isJsonSource, oldVariantId) {
+async function maybeSaveNewJSONVersion(newVariantId, isJsonSource) {
   if (isJsonSource) {
-    const { name: oldVariantName } =
-      useSectionInfos.getState().variants[oldVariantId];
-    await dbSaveSectionJSONSource(sectionId, oldVariantName);
+    await dbSaveSectionJSONSource(newVariantId);
   }
   setNotificationMessage("New Version Created");
 }
@@ -54,14 +51,10 @@ export async function createNewVersionMaybeWithJSON(sectionId) {
     isJsonSource,
     jsonSourceGlob,
   );
-  let newVariantId, oldVariantId;
+  let newVariantId;
   useSectionInfos.setState((state) => {
-    ({ newVariantId, oldVariantId } = createNewVersion(
-      sectionId,
-      newVersionName,
-      state,
-    ));
+    ({ newVariantId } = createNewVersion(sectionId, newVersionName, state));
   });
   maybeRunGuiToYaml(sectionId, newVariantId);
-  maybeSaveNewJSONVersion(sectionId, isJsonSource, oldVariantId);
+  maybeSaveNewJSONVersion(newVariantId, isJsonSource);
 }
