@@ -85,7 +85,7 @@ function TabsVisible({ tab }) {
   const title = {
     tab1: "Overview",
     tab2: "Project Configs",
-    tab3: "Display Modes",
+    tab3: "View Modes",
   }[tab];
   return (
     <div
