@@ -337,3 +337,18 @@ export function getSectionVisibilityKey(viewingEditingMode) {
       return VIEWING_EDITING_MODE.USER;
   }
 }
+
+export function getAncestorSameVisibility(sectionId, state) {
+  const { viewingEditingMode } = state.projectConfig;
+  let { parentId } = state.x[sectionId];
+  const key = getSectionVisibilityKey(viewingEditingMode);
+  const targetVisibility = state.x[sectionId].visibility[key];
+
+  while (parentId) {
+    if (state.x[parentId].visibility[key] === targetVisibility) return true;
+
+    ({ parentId } = state.x[parentId]);
+  }
+
+  return false;
+}

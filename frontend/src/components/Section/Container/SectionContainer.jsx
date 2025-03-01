@@ -32,6 +32,8 @@ function _SectionContainer({ sectionId, isTopLevel, dragListeners }) {
       sectionId={sectionId}
       dragListeners={dragListeners}
       isTopLevel={isTopLevel}
+      visibility={visibility}
+      viewingEditingMode={viewingEditingMode}
     >
       {!isGroup && <SectionContainerCore sectionId={sectionId} />}
       <MaybeManyNestedSections sectionId={sectionId} isGroup={isGroup} />

@@ -2,11 +2,9 @@ import _ from "lodash";
 import React from "react";
 
 import C from "constants/constants.json";
-import { getSectionViewingEditingModeVisibility } from "state/actions/sectionInfos";
 import { useActiveSection, useSectionInfos } from "state/definitions";
 import { useShouldDisablePointerEvents } from "state/hooks/keyActivations";
 import { useSectionRefAndInit } from "state/hooks/sectionRef";
-import { VIEWING_EDITING_MODE } from "utils/constants";
 import { sectionContainerCoreOnKeyDown } from "utils/tabbingLogic";
 import { ChangeOrientationButton } from "../Header/ChangeOrientationButton";
 import { LockPositionButton } from "../Header/LockPositionButton";
@@ -32,14 +30,7 @@ function _Container({
     draggableRef && draggableRef(e);
   }
 
-  const { visibility, viewingEditingMode } = useSectionInfos((state) =>
-    getSectionViewingEditingModeVisibility(sectionId, state),
-  );
   const commonProps = { ref: totalRef, ...trueDragListeners };
-  const visibilityStyling =
-    !visibility && viewingEditingMode === VIEWING_EDITING_MODE.USER_EDIT
-      ? { opacity: 0.3 }
-      : {};
 
   return isGroup ? (
     <ContainerGroup
@@ -47,14 +38,14 @@ function _Container({
       commonProps={commonProps}
       refForPosition={refForPosition}
       className={className}
-      style={{ ...style, ...visibilityStyling }}
+      style={style}
     >
       {children}
     </ContainerGroup>
   ) : (
     <div
       className={`${className} focus-visible:outline-none`}
-      style={{ ...style, ...visibilityStyling }}
+      style={style}
       {...commonProps}
       onKeyDown={(e) =>
         sectionContainerCoreOnKeyDown(e, refForPosition, sectionId)
