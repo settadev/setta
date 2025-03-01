@@ -20,12 +20,10 @@ function _SectionHeader({
   isActiveSection,
   sectionTypeName,
   isInOtherProjectConfigs,
+  viewingEditingMode,
   isRoot,
 }) {
   const isSeriesElement = useIsSeriesElement(sectionId) && !isRoot;
-  const viewingEditingMode = useSectionInfos(
-    (x) => x.projectConfig.viewingEditingMode,
-  );
   const isUserView = viewingEditingMode === VIEWING_EDITING_MODE.USER;
 
   // DOM: maybe get rid of the extra div under header?

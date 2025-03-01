@@ -7,6 +7,7 @@ import { useShouldDisablePointerEvents } from "state/hooks/keyActivations";
 import { useSectionRefAndInit } from "state/hooks/sectionRef";
 import { sectionContainerCoreOnKeyDown } from "utils/tabbingLogic";
 import { ChangeOrientationButton } from "../Header/ChangeOrientationButton";
+import { DeleteOrHideButton } from "../Header/DeleteOrHideButton";
 import { LockPositionButton } from "../Header/LockPositionButton";
 import MenuButton from "../Header/MenuButton/MenuButton";
 import { SectionTitle } from "../Header/SectionTitle";
@@ -20,6 +21,7 @@ function _Container({
   className,
   style,
   trueDragListeners,
+  viewingEditingMode,
   children,
 }) {
   const refForPosition = useSectionRefAndInit(sectionId, "withNested");
@@ -37,6 +39,7 @@ function _Container({
       sectionId={sectionId}
       commonProps={commonProps}
       refForPosition={refForPosition}
+      viewingEditingMode={viewingEditingMode}
       className={className}
       style={style}
     >
@@ -63,6 +66,7 @@ function ContainerGroup({
   sectionId,
   commonProps,
   refForPosition,
+  viewingEditingMode,
   className,
   style,
   children,
@@ -121,6 +125,10 @@ function ContainerGroup({
         <div className="z-10 ml-auto flex items-center">
           <ChangeOrientationButton sectionId={sectionId} />
           <LockPositionButton sectionId={sectionId} />
+          <DeleteOrHideButton
+            sectionId={sectionId}
+            viewingEditingMode={viewingEditingMode}
+          />
         </div>
       </div>
 

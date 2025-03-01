@@ -27,6 +27,7 @@ export function SectionContainerCoreResizable({
   sectionTypeName,
   isActiveSection,
   isInOtherProjectConfigs,
+  viewingEditingMode,
   positionAndSizeLocked,
 }) {
   const { isMinimized, isYouTube } = useSectionInfos((x) => {
@@ -52,6 +53,7 @@ export function SectionContainerCoreResizable({
         isActiveSection={isActiveSection}
         sectionTypeName={sectionTypeName}
         isInOtherProjectConfigs={isInOtherProjectConfigs}
+        viewingEditingMode={viewingEditingMode}
         isRoot={isRoot}
       />
       {isRoot && <Incrementer sectionId={sectionId} isRoot={isRoot} />}

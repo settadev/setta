@@ -93,6 +93,7 @@ function _DndWatcherAndContainer({
       droppableRef={droppableRef}
       draggableRef={draggableRef}
       trueDragListeners={trueDragListeners}
+      viewingEditingMode={viewingEditingMode}
       className={className}
       style={fullStyle}
     >
