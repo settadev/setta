@@ -79,7 +79,7 @@ function getRequiredUIEditorTabs(uiTypeName) {
     case C.SECTION:
     case C.GLOBAL_VARIABLES:
       return [
-        SECTION_CONFIG_TAB,
+        // SECTION_CONFIG_TAB,
         UI_CONFIG_TAB,
         QUICKINFO_CONFIG_TAB,
         SECTION_VARIANTS_TAB,

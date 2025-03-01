@@ -5,6 +5,7 @@ import { updateSectionInfos } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { useFileExists } from "state/hooks/utils";
 
+// TODO: enable this stuff again, but it should show jsonSourceGlob I guess
 export function InputAreaSettings({ sectionId }) {
   const { fileExists, debouncedCheckIfFileExists } = useFileExists(200);
 

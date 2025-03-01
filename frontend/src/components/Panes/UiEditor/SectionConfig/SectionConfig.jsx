@@ -31,9 +31,9 @@ function SpecializedConfiguration({ sectionId }) {
     return getSectionType(sectionId, x);
   });
   switch (sectionType) {
-    case C.SECTION:
-    case C.GLOBAL_VARIABLES:
-      return <InputAreaSettings sectionId={sectionId} />;
+    // case C.SECTION:
+    // case C.GLOBAL_VARIABLES:
+    //   return <InputAreaSettings sectionId={sectionId} />;
     case C.CODE:
       return <CodeAreaSettings sectionId={sectionId} />;
     case C.TEXT_BLOCK:
