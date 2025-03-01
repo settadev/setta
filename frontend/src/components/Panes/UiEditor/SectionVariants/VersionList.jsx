@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { useState } from "react";
 import { FaRegSnowflake } from "react-icons/fa";
+import { FiFileText } from "react-icons/fi";
 import { HiHome } from "react-icons/hi";
 import { createNewVersionMaybeWithJSON } from "state/actions/newVersion";
 import {
@@ -11,7 +12,6 @@ import {
 import {
   deleteSectionVariantAndMaybeJsonFile,
   setDefaultSectionVariant,
-  toggleVariantFrozenState,
 } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { useEditableOnSubmit } from "state/hooks/editableText";
@@ -91,10 +91,11 @@ function EVItems({ sectionId, isEditing }) {
 }
 
 function OneItem({ sectionId, id, isCurr, isDefault }) {
-  const { name, isFrozen } = useSectionInfos(
+  const { name, isFrozen, isJsonSource } = useSectionInfos(
     (x) => ({
       name: x.variants[id].name,
       isFrozen: x.variants[id].isFrozen,
+      isJsonSource: x.variants[id].isJsonSource,
     }),
     _.isEqual,
   );
@@ -136,10 +137,29 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
           }`}
           onClick={(e) => {
             e.stopPropagation();
-            toggleVariantFrozenState(id);
+            useSectionInfos.setState((x) => {
+              x.variants[id].isFrozen = !x.variants[id].isFrozen;
+            });
           }}
         >
           <FaRegSnowflake />
+        </button>
+        <button
+          className={`cursor-pointer bg-transparent ${
+            isJsonSource
+              ? "text-orange-500"
+              : "text-transparent hover:!text-orange-400 group-hover/versionitem:text-setta-400/50"
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            useSectionInfos.setState((x) => {
+              const newVal = !x.variants[id].isJsonSource;
+              x.variants[id].isJsonSource = newVal;
+              x.variants[id].configLanguage = newVal ? "json" : "python";
+            });
+          }}
+        >
+          <FiFileText />
         </button>
       </div>
     </li>
