@@ -111,6 +111,7 @@ function createNodesMapFromProjectConfigChildren(projectConfig) {
       position: { x: v.x, y: v.y },
       zIndex: v.zIndex,
       tempZIndex: v.zIndex,
+      visibility: true,
     });
   }
 

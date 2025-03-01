@@ -112,7 +112,10 @@ export function justMoveANode(id, position) {
 export function updateNodeVisibility(idToVisibility) {
   const newNodes = getNewNodes();
   for (const [id, visibility] of Object.entries(idToVisibility)) {
-    newNodes.get(id).visibility = visibility;
+    const n = newNodes.get(id);
+    if (n) {
+      n.visibility = visibility;
+    }
   }
   useNodeInternals.setState({ x: newNodes });
 }
