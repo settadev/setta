@@ -58,8 +58,6 @@ def build_ancestor_paths(codeInfo, codeInfoCol):
         for child_id in children:
             parent_map[child_id] = parent_id
 
-    print("parent_map", parent_map, flush=True)
-
     ancestor_paths = {}
     for id in parent_map.keys():
         if id not in ancestor_paths:

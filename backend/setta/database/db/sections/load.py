@@ -224,7 +224,6 @@ def load_json_sources_into_data_structures(
 def merge_into_existing(data, sectionVariant, codeInfo, codeInfoCol):
     filename = sectionVariant["name"]
     jsonSourceMetadata_to_id = {}
-    print("building ancestor paths")
     ancestor_paths = build_ancestor_paths(codeInfo, codeInfoCol)
     for id in ancestor_paths:
         jsonSourceMetadata_to_id[
@@ -232,7 +231,6 @@ def merge_into_existing(data, sectionVariant, codeInfo, codeInfoCol):
         ] = id
 
     replacements = {}
-    print("building NEW ancestor paths")
     new_ancestor_paths = build_ancestor_paths(
         data["codeInfo"], {"children": data["codeInfoColChildren"]}
     )
