@@ -129,7 +129,7 @@ function SectionSearchCore({
     description,
     configLanguage,
   } = useSectionInfos((x) => {
-    const configLanguage = x.x[dataSectionId].configLanguage;
+    const { configLanguage } = getSectionVariant(dataSectionId, x);
     if (selectedItem) {
       const { name, evRefs, description } = x.codeInfo[selectedItem];
       return { name, evRefs, description, configLanguage };

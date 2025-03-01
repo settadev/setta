@@ -44,13 +44,12 @@ export function ParamUI({
   const isSelectingParams = useMisc((x) => x.isSelectingParams);
   const { uiType, configLanguage, defaultVal, disabledOrFrozen } =
     useSectionInfos((x) => {
+      const { isFrozen, configLanguage } = getSectionVariant(sectionId, x);
       return {
         uiType: getParamUIType(sectionId, paramInfoId, x),
-        configLanguage: x.x[sectionId].configLanguage,
+        configLanguage: configLanguage,
         defaultVal: x.codeInfo[paramInfoId].defaultVal,
-        disabledOrFrozen:
-          x.codeInfo[paramInfoId].isDisabled ||
-          getSectionVariant(sectionId, x).isFrozen,
+        disabledOrFrozen: x.codeInfo[paramInfoId].isDisabled || isFrozen,
       };
     }, _.isEqual);
   const waitingForResult = useTextFieldWaitingForLSPResult({
@@ -185,7 +184,7 @@ export function ParamSweepUI({
   const { uiType, configLanguage } = useSectionInfos((x) => {
     return {
       uiType: getParamUIType(dataSectionId, paramInfoId, x),
-      configLanguage: x.x[dataSectionId].configLanguage,
+      configLanguage: getSectionVariant(dataSectionId, x).configLanguage,
     };
   }, _.isEqual);
   const waitingForResult = useTextFieldWaitingForLSPResult({

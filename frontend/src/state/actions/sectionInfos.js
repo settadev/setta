@@ -227,12 +227,6 @@ export function getAllSectionsForDeletionOrCopying(sectionIds, state) {
   return idsToDelete;
 }
 
-export function toggleVariantFrozenState(variantId) {
-  useSectionInfos.setState((x) => {
-    x.variants[variantId].isFrozen = !x.variants[variantId].isFrozen;
-  });
-}
-
 export function setDefaultSectionVariant(sectionId, variantId) {
   useSectionInfos.setState((x) => {
     x.x[sectionId].defaultVariantId = variantId;
@@ -293,9 +287,8 @@ export async function deleteSectionVariantAndMaybeJsonFile(
   isCurr,
 ) {
   const state = useSectionInfos.getState();
-  const { jsonSource } = state.x[sectionId];
-  if (jsonSource) {
-    const { name: variantName } = state.variants[variantId];
+  const { name: variantName, isJsonSource } = state.variants[variantId];
+  if (isJsonSource) {
     const res = await dbGetJSONSourcePathToBeDeleted(variantName);
     if (res.status == 200) {
       openDeleteJSONSourceFileModal(res.data);

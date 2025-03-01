@@ -1,7 +1,9 @@
 import _ from "lodash";
 import { useState } from "react";
 import { FaRegSnowflake } from "react-icons/fa";
+import { FiFileText } from "react-icons/fi";
 import { HiHome } from "react-icons/hi";
+import { loadJsonContents } from "state/actions/jsonSource";
 import { createNewVersionMaybeWithJSON } from "state/actions/newVersion";
 import {
   onClickSetVariantId,
@@ -11,7 +13,7 @@ import {
 import {
   deleteSectionVariantAndMaybeJsonFile,
   setDefaultSectionVariant,
-  toggleVariantFrozenState,
+  updateSectionInfos,
 } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { useEditableOnSubmit } from "state/hooks/editableText";
@@ -91,10 +93,11 @@ function EVItems({ sectionId, isEditing }) {
 }
 
 function OneItem({ sectionId, id, isCurr, isDefault }) {
-  const { name, isFrozen } = useSectionInfos(
+  const { name, isFrozen, isJsonSource } = useSectionInfos(
     (x) => ({
       name: x.variants[id].name,
       isFrozen: x.variants[id].isFrozen,
+      isJsonSource: x.variants[id].isJsonSource,
     }),
     _.isEqual,
   );
@@ -136,10 +139,31 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
           }`}
           onClick={(e) => {
             e.stopPropagation();
-            toggleVariantFrozenState(id);
+            useSectionInfos.setState((x) => {
+              x.variants[id].isFrozen = !x.variants[id].isFrozen;
+            });
           }}
         >
           <FaRegSnowflake />
+        </button>
+        <button
+          className={`cursor-pointer bg-transparent ${
+            isJsonSource
+              ? "text-orange-500"
+              : "text-transparent hover:!text-orange-400 group-hover/versionitem:text-setta-400/50"
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            const newIsJsonSource = !isJsonSource;
+            const newConfigLanguage = newIsJsonSource ? "json" : "python";
+            useSectionInfos.setState((state) => {
+              state.variants[id].isJsonSource = newIsJsonSource;
+              state.variants[id].configLanguage = newConfigLanguage;
+            });
+            maybeLoadJsonContents(id);
+          }}
+        >
+          <FiFileText />
         </button>
       </div>
     </li>
@@ -153,6 +177,7 @@ function OneItemEditing({ sectionId, id, isCurr, deletable }) {
     useSectionInfos.setState((x) => {
       x.variants[id].name = v;
     });
+    maybeLoadJsonContents(id);
   }
 
   function conditionToSetName(v) {
@@ -198,4 +223,20 @@ function OneItemEditing({ sectionId, id, isCurr, deletable }) {
       )}
     </li>
   );
+}
+
+async function maybeLoadJsonContents(variantId) {
+  if (useSectionInfos.getState().variants[variantId].isJsonSource) {
+    const { sectionVariants, codeInfo, codeInfoCols } = await loadJsonContents([
+      variantId,
+    ]);
+    useSectionInfos.setState((state) => {
+      updateSectionInfos({
+        sectionVariants,
+        codeInfo,
+        codeInfoCols,
+        state,
+      });
+    });
+  }
 }
