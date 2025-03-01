@@ -2,7 +2,8 @@ import C from "constants/constants.json";
 import { useDndChildren } from "forks/dnd-kit/dndChildren";
 import _ from "lodash";
 import { dbGetJSONSourcePathToBeDeleted } from "requests/jsonSource";
-import { useSectionInfos } from "state/definitions";
+import { useProjectConfig, useSectionInfos } from "state/definitions";
+import { VIEWING_EDITING_MODE } from "utils/constants";
 import { createNewId } from "utils/idNameCreation";
 import { newCodeInfoCol } from "utils/objs/codeInfoCol";
 import { newEVEntry } from "utils/objs/ev";
@@ -314,4 +315,23 @@ function deleteSectionVariant(sectionId, variantId, isCurr) {
     }
     delete state.variants[variantId];
   });
+}
+
+export function useSectionViewingEditingModeVisibility(sectionId) {
+  const viewingEditingMode = useProjectConfig((x) => x.viewingEditingMode);
+  const visibility = useSectionInfos(
+    (x) =>
+      x.x[sectionId].visibility[getSectionVisibilityKey(viewingEditingMode)],
+  );
+  return { visibility, viewingEditingMode };
+}
+
+export function getSectionVisibilityKey(viewingEditingMode) {
+  switch (viewingEditingMode) {
+    case VIEWING_EDITING_MODE.DEV:
+    case VIEWING_EDITING_MODE.USER:
+      return viewingEditingMode;
+    case VIEWING_EDITING_MODE.USER_EDIT:
+      return VIEWING_EDITING_MODE.USER;
+  }
 }
