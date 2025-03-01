@@ -62,8 +62,7 @@
     "columnWidth": null,
     "renderedValue": null,
     "subprocessStartMethod": "spawn",
-    "headingAsSectionName": false,
-    "jsonSourceGlob": null
+    "headingAsSectionName": false
   },
   "sectionVariant": {
     "name": "",

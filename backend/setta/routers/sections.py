@@ -63,7 +63,7 @@ class SaveSectionJSONSourceRequest(BaseModel):
 
 
 class NewJSONVersionNameRequest(BaseModel):
-    filenameGlob: str
+    filename: str
 
 
 class CreateFileRequest(BaseModel):
@@ -144,7 +144,7 @@ def route_load_section_json_source(x: LoadSectionJSONSourceRequest):
 
 @router.post(C.ROUTE_NEW_JSON_VERSION_NAME)
 def route_new_json_version_name(x: NewJSONVersionNameRequest):
-    new_filename = generate_new_filename(x.filenameGlob)
+    new_filename = generate_new_filename(x.filename)
     Path(new_filename).parent.mkdir(parents=True, exist_ok=True)
     Path(new_filename).touch()
     return new_filename

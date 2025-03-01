@@ -1,9 +1,7 @@
+import { dbSaveSectionJSONSource } from "requests/jsonSource";
 import { dbNewVersionFilename } from "requests/sectionVariants";
 import { setNotificationMessage } from "state/actions/notification";
-import {
-  duplicateCodeInfoCol,
-  getSectionInfo,
-} from "state/actions/sectionInfos";
+import { duplicateCodeInfoCol } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { createRandomName } from "utils/idNameCreation";
 import { maybeRunGuiToYaml } from "./guiToYaml";
@@ -33,9 +31,9 @@ async function maybeSaveNewJSONVersion(newVariantId, isJsonSource) {
   setNotificationMessage("New Version Created");
 }
 
-async function createNewVersionName(currName, isJsonSource, jsonSourceGlob) {
+async function createNewVersionName(currName, isJsonSource) {
   if (isJsonSource) {
-    const res = await dbNewVersionFilename(currName, jsonSourceGlob);
+    const res = await dbNewVersionFilename(currName);
     if (res.status === 200) {
       return res.data;
     }
@@ -44,13 +42,8 @@ async function createNewVersionName(currName, isJsonSource, jsonSourceGlob) {
 }
 
 export async function createNewVersionMaybeWithJSON(sectionId) {
-  const { jsonSourceGlob } = getSectionInfo(sectionId);
   const { name, isJsonSource } = getSectionVariant(sectionId);
-  const newVersionName = await createNewVersionName(
-    name,
-    isJsonSource,
-    jsonSourceGlob,
-  );
+  const newVersionName = await createNewVersionName(name, isJsonSource);
   let newVariantId;
   useSectionInfos.setState((state) => {
     ({ newVariantId } = createNewVersion(sectionId, newVersionName, state));
