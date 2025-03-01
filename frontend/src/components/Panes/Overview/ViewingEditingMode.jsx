@@ -1,8 +1,10 @@
-import { MdDeveloperMode, MdEdit, MdPersonOutline } from "react-icons/md";
+import { FiEdit3 } from "react-icons/fi";
+import { HiCode } from "react-icons/hi";
+import { TbUser } from "react-icons/tb";
 import { useSectionInfos } from "state/definitions";
 import { VIEWING_EDITING_MODE } from "utils/constants";
 
-export function ViewingEditingMode({}) {
+export function ViewingEditingMode() {
   const selectedMode = useSectionInfos(
     (x) => x.projectConfig.viewingEditingMode,
   );
@@ -11,17 +13,17 @@ export function ViewingEditingMode({}) {
     {
       id: VIEWING_EDITING_MODE.DEV,
       label: "Developer View",
-      icon: <MdDeveloperMode size={20} />,
+      icon: <HiCode size={20} />,
     },
     {
       id: VIEWING_EDITING_MODE.USER,
       label: "User View",
-      icon: <MdPersonOutline size={20} />,
+      icon: <TbUser size={20} />,
     },
     {
       id: VIEWING_EDITING_MODE.USER_EDIT,
       label: "Edit User View",
-      icon: <MdEdit size={20} />,
+      icon: <FiEdit3 size={20} />,
     },
   ];
 
@@ -36,25 +38,17 @@ export function ViewingEditingMode({}) {
       {modes.map((mode) => (
         <button
           key={mode.id}
-          className={`
-                        flex flex-col items-center justify-center rounded p-2 transition-all
-                        ${
-                          selectedMode === mode.id
-                            ? "bg-white text-blue-600 shadow-sm dark:bg-setta-800"
-                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-setta-800/50"
-                        }
-                    `}
+          className={`flex flex-1 items-center gap-2 rounded p-2 transition-all ${selectedMode === mode.id ? "bg-white text-blue-600 shadow-sm dark:bg-setta-800" : "text-setta-700 hover:bg-setta-100 dark:text-setta-300 dark:hover:bg-setta-800/50"} cursor-pointer text-xs`}
           onClick={() => handleModeChange(mode.id)}
           title={mode.label}
         >
           <span
-            className={`flex items-center justify-center ${selectedMode === mode.id ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}
+            className={`flex items-center justify-center ${selectedMode === mode.id ? "text-blue-600 dark:text-blue-400" : "text-setta-500 dark:text-setta-400"}`}
           >
             {mode.icon}
           </span>
-          <span className="mt-1 text-center text-[9px] leading-tight">
-            {mode.label}
-          </span>
+
+          {mode.label}
         </button>
       ))}
     </div>
