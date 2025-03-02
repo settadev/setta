@@ -1,5 +1,6 @@
 import { getFloatingBoxHandlers } from "components/Utils/FloatingBox";
 import { PaneContainer } from "components/Utils/PaneContainer";
+import { Controls } from "forks/xyflow/controls";
 import { BiHelpCircle } from "react-icons/bi";
 import { HiOutlineEye } from "react-icons/hi";
 import { localStorageFns } from "state/hooks/localStorage";
@@ -57,6 +58,7 @@ export function Overview() {
         >
           <HiOutlineEye size={20} />
         </TabButton>
+        <Controls />
         <a
           href="https://docs.setta.dev"
           target="_blank"
