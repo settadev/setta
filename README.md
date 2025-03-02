@@ -16,10 +16,16 @@
 - Added User View mode. This allows you to quickly create a simplified version of your UI.
 Here's an example of what Developer View and User View look like:
 
-| Developer View | User View |
-| -- | -- |
-<img src="https://github.com/user-attachments/assets/4ecbb85a-1857-413c-b768-9ac17f226b6f" /> | <img src="https://github.com/user-attachments/assets/1126649e-7559-4785-80b9-7eda6466c2e0" />
-
+<table>
+  <tr>
+    <th width="50%">Developer View</th>
+    <th width="50%">User View</th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/4ecbb85a-1857-413c-b768-9ac17f226b6f" /></td>
+    <td><img src="https://github.com/user-attachments/assets/1126649e-7559-4785-80b9-7eda6466c2e0" /></td>
+  </tr>
+</table>
 
 **March 1**: [v0.0.10](https://github.com/settadev/setta/releases/tag/v0.0.10)
 - Made JSON source sections more user-friendly.
