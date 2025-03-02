@@ -241,65 +241,28 @@ export function useImgArtifactAreaSize(sectionId, image) {
 
 export function setDrawAreaSectionSize({
   sectionId,
-  imgSize,
-  isNewImg,
   sectionWidth,
   sectionHeight,
   state,
 }) {
   let canvasSize = {};
-  const extraHeight = 120;
+  const extraHeight = 30;
   const extraWidth = 24;
 
-  if (imgSize) {
-    if (sectionWidth === "auto" || sectionHeight === "auto" || isNewImg) {
-      const sectionType = C.DRAW;
-      const minHeight = getMinSectionHeight({ sectionType });
-      const minWidth = getMinSectionWidth({ sectionType });
-      canvasSize = adjustSizeToBeAtLeastMin(
-        imgSize.height,
-        imgSize.width,
-        minHeight - extraHeight,
-        minWidth - extraWidth,
-      );
-      setSectionSize(
-        sectionId,
-        {
-          width: canvasSize.width + extraWidth,
-          height: canvasSize.height + extraHeight,
-        },
-        state,
-      );
-    } else {
-      canvasSize.width = sectionWidth - extraWidth;
-      canvasSize.height = sectionHeight - extraHeight;
-    }
-
-    if (isNewImg) {
-      setAspectRatioInfo({
-        sectionId,
-        aspectRatio: imgSize.width / imgSize.height,
-        aspectRatioExtraHeight: extraHeight,
-        aspectRatioExtraWidth: extraWidth,
-        state,
-      });
-    }
-  } else {
-    const [defaultWidth, defaultHeight] = [500, 500];
-    canvasSize.width =
-      sectionWidth === "auto" ? defaultWidth : sectionWidth - extraWidth;
-    canvasSize.height =
-      sectionHeight === "auto" ? defaultHeight : sectionHeight - extraHeight;
-    if (sectionWidth === "auto" || sectionHeight === "auto") {
-      setSectionSize(
-        sectionId,
-        {
-          width: canvasSize.width + extraWidth,
-          height: canvasSize.height + extraHeight,
-        },
-        state,
-      );
-    }
+  const [defaultWidth, defaultHeight] = [500, 500];
+  canvasSize.width =
+    sectionWidth === "auto" ? defaultWidth : sectionWidth - extraWidth;
+  canvasSize.height =
+    sectionHeight === "auto" ? defaultHeight : sectionHeight - extraHeight;
+  if (sectionWidth === "auto" || sectionHeight === "auto") {
+    setSectionSize(
+      sectionId,
+      {
+        width: canvasSize.width + extraWidth,
+        height: canvasSize.height + extraHeight,
+      },
+      state,
+    );
   }
 
   return canvasSize;

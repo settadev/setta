@@ -41,73 +41,18 @@ function resizeDraftCanvasAndKeepProperties(draftCanvasRef, width, height) {
   dCtx.globalAlpha = globalAlpha;
 }
 
-export function setCanvasSize({
-  sectionId,
-  canvasRef,
-  tempCanvasRefs,
-  draftCanvasRef,
-  height,
-  width,
-  artifactIdUsedToSetCanvasSize,
-  state,
-}) {
-  // TODO: decide if we want to uncomment this stuff which uses image size to set section/canvas size.
-  // const sectionState = useSectionInfos.getState();
-  // const artifactState = useArtifacts.getState().x;
-  // let imgSize = maybeGetImgSizeFromArtifact(
-  //   artifactState[artifactIdUsedToSetCanvasSize],
-  // );
-  // let isNewImg = false;
-
-  // if (!imgSize) {
-  //   for (const layerId of sectionState.x[sectionId].artifactGroupIds) {
-  //     const layer = sectionState.artifactGroups[layerId];
-
-  //     for (const t of layer.artifactTransforms) {
-  //       const id = t.artifactId;
-  //       if (!(id in artifactState)) {
-  //         continue;
-  //       }
-  //       const artifact = artifactState[id];
-  //       imgSize = maybeGetImgSizeFromArtifact(artifact);
-  //       if (imgSize) {
-  //         state.x[sectionId].canvasSettings.artifactIdUsedToSetCanvasSize = id;
-  //         isNewImg = true;
-  //         break;
-  //       }
-  //     }
-
-  //     if (imgSize) {
-  //       break;
-  //     }
-  //   }
-  // }
-
-  let imgSize = null;
-  let isNewImg = false;
-
+export function setCanvasSize({ sectionId, canvas, height, width, state }) {
   const canvasSize = setDrawAreaSectionSize({
     sectionId,
-    imgSize,
-    isNewImg,
     sectionHeight: height,
     sectionWidth: width,
     state,
   });
 
-  canvasRef.current.width = canvasSize.width;
-  canvasRef.current.height = canvasSize.height;
+  console.log("canvasSize", canvasSize);
 
-  for (const c of Object.values(tempCanvasRefs.current)) {
-    c.width = canvasSize.width;
-    c.height = canvasSize.height;
-  }
-
-  resizeDraftCanvasAndKeepProperties(
-    draftCanvasRef,
-    canvasSize.width,
-    canvasSize.height,
-  );
+  canvas.width = canvasSize.width;
+  canvas.height = canvasSize.height;
 }
 
 export function getXY(e) {
