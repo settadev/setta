@@ -246,7 +246,7 @@ export function setDrawAreaSectionSize({
   state,
 }) {
   let canvasSize = {};
-  const extraHeight = 30;
+  const extraHeight = 84.8;
   const extraWidth = 24;
 
   const [defaultWidth, defaultHeight] = [500, 500];
