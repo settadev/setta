@@ -49,6 +49,7 @@
     "d3-selection": "3.0.0",
     "d3-zoom": "3.0.0",
     "downshift": "8.2.3",
+    "fabric": "6.6.1",
     "get-youtube-id": "1.0.1",
     "immer": "10.0.2",
     "katex": "0.16.11",
