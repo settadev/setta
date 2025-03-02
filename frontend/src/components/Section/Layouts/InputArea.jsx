@@ -8,7 +8,7 @@ import { ParamGroupContainer } from "../../Params/GroupContainer";
 import { KwargsControls } from "../SectionParts/KwargsControls";
 import { SectionSearch } from "../SectionParts/Search";
 
-function _InputArea({ sectionId, bgColor }) {
+function _InputArea({ sectionId, bgColor, isUserView }) {
   const { selectedItem, hideSearch, hideParams, isJsonSource } =
     useSectionInfos((x) => {
       const { selectedItem, isJsonSource } = getDisplayedSectionVariant(

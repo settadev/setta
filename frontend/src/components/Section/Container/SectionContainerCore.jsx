@@ -8,7 +8,7 @@ import "./dndline.css";
 import { SectionContainerCoreResizable } from "./SectionContainerCoreResizabe";
 import { getOnSectionClick, getOutlineColor } from "./utils";
 
-function _SectionContainerCore({ sectionId }) {
+function _SectionContainerCore({ sectionId, viewingEditingMode }) {
   const {
     sectionTypeName,
     jsonSourceMissing,
@@ -26,10 +26,14 @@ function _SectionContainerCore({ sectionId }) {
   const refForPosition = useSectionRefAndInit(sectionId, "selfOnly");
   const isGlobalVariables = sectionTypeName === C.GLOBAL_VARIABLES;
 
+  // const boxShadow = !positionAndSizeLocked
+  //   ? isActiveSection
+  //     ? "shadow-2xl dark:shadow-setta-925"
+  //     : "shadow-md dark:shadow-setta-900/30 [&:active:not(:has(button:active,:active.setta-prevent-section-active-css))]:shadow-2xl dark:[&:active:not(:has(button:active,:active.setta-prevent-section-active-css))]:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.7)]"
+  //   : "";
+
   const boxShadow = !positionAndSizeLocked
-    ? isActiveSection
-      ? "shadow-2xl dark:shadow-setta-925"
-      : "shadow-md dark:shadow-setta-900/30 [&:active:not(:has(button:active,:active.setta-prevent-section-active-css))]:shadow-2xl dark:[&:active:not(:has(button:active,:active.setta-prevent-section-active-css))]:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.7)]"
+    ? "shadow-md dark:shadow-setta-900/30"
     : "";
 
   const outlineColor = getOutlineColor({
@@ -51,6 +55,7 @@ function _SectionContainerCore({ sectionId }) {
         sectionTypeName={sectionTypeName}
         isActiveSection={isActiveSection}
         isInOtherProjectConfigs={isInOtherProjectConfigs}
+        viewingEditingMode={viewingEditingMode}
         positionAndSizeLocked={positionAndSizeLocked}
       />
     </section>
@@ -58,5 +63,5 @@ function _SectionContainerCore({ sectionId }) {
 }
 export const SectionContainerCore = React.memo(
   _SectionContainerCore,
-  () => true,
+  (p, n) => p.viewingEditingMode === n.viewingEditingMode,
 );

@@ -12,15 +12,14 @@
 
 ## News
 
+**March 2**: [v0.0.11](https://github.com/settadev/setta/releases/tag/v0.0.11)
+- Added User View mode. Here's an example of what User View looks like compared to Developer View:
+
 **March 1**: [v0.0.10](https://github.com/settadev/setta/releases/tag/v0.0.10)
 - Made JSON source sections more user-friendly.
 
 **February 27**: [v0.0.9](https://github.com/settadev/setta/releases/tag/v0.0.9)
 - Improvements to the JSON file referencing mechanism.
-
-**February 24**: [v0.0.8](https://github.com/settadev/setta/releases/tag/v0.0.8)
-- Added options to the `export-db` cli command. 
-- Allow artifacts to be renamed directly in the side pane.
 
 
 ## What does Setta do?

@@ -5,7 +5,14 @@ import _ from "lodash";
 import { useMisc, useNodeInternals, useSectionRefs } from "state/definitions";
 
 export function getNodes(s = null) {
-  return Array.from(s ? s.x.values() : useNodeInternals.getState().x.values());
+  const source = s ? s.x : useNodeInternals.getState().x;
+  const result = [];
+  for (const n of source.values()) {
+    if (n.visibility) {
+      result.push(n);
+    }
+  }
+  return result;
 }
 
 export function addNodes(nodes) {
@@ -99,6 +106,17 @@ export function raiseTempZIndex(nodes) {
 export function justMoveANode(id, position) {
   const newNodes = getNewNodes();
   newNodes.get(id).position = position;
+  useNodeInternals.setState({ x: newNodes });
+}
+
+export function updateNodeVisibility(idToVisibility) {
+  const newNodes = getNewNodes();
+  for (const [id, visibility] of Object.entries(idToVisibility)) {
+    const n = newNodes.get(id);
+    if (n) {
+      n.visibility = visibility;
+    }
+  }
   useNodeInternals.setState({ x: newNodes });
 }
 

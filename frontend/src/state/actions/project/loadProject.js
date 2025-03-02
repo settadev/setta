@@ -6,7 +6,6 @@ import { dbCreateProjectConfig, dbLoadProjectConfig } from "requests/projects";
 import { dbLoadSettingsProject } from "requests/settings";
 import {
   useNodeInternals,
-  useProjectConfig,
   useSectionColumnWidth,
   useSectionInfos,
 } from "state/definitions";
@@ -46,9 +45,6 @@ export async function loadProjectState({
   uiTypes,
   uiTypeCols,
 }) {
-  useProjectConfig.setState({
-    ..._.omit(projectConfig, ["children", "viewport"]),
-  });
   if (!projectConfig.viewport) {
     useReactFlow.setState({ fitViewOnInit: true, fitViewOnInitDone: false });
   } else {
@@ -60,6 +56,7 @@ export async function loadProjectState({
     });
   }
   useSectionInfos.setState({
+    projectConfig: _.omit(projectConfig, ["children", "viewport"]),
     x: sections,
     variants: sectionVariants,
     uiTypes: { ...uiTypes, ...BASE_UI_TYPES },
@@ -114,6 +111,7 @@ function createNodesMapFromProjectConfigChildren(projectConfig) {
       position: { x: v.x, y: v.y },
       zIndex: v.zIndex,
       tempZIndex: v.zIndex,
+      visibility: true,
     });
   }
 

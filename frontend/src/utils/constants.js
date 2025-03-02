@@ -150,3 +150,9 @@ export const RENAME_REFERENCES_ON_SECTION_MOVE_MODES = {
   ALWAYS_RENAME: "Always Rename",
   NEVER_RENAME: "Never Rename",
 };
+
+export const VIEWING_EDITING_MODE = {
+  DEV: "DEV",
+  USER: "USER",
+  USER_EDIT: "USER_EDIT",
+};

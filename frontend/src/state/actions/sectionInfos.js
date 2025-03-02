@@ -3,6 +3,7 @@ import { useDndChildren } from "forks/dnd-kit/dndChildren";
 import _ from "lodash";
 import { dbGetJSONSourcePathToBeDeleted } from "requests/jsonSource";
 import { useSectionInfos } from "state/definitions";
+import { VIEWING_EDITING_MODE } from "utils/constants";
 import { createNewId } from "utils/idNameCreation";
 import { newCodeInfoCol } from "utils/objs/codeInfoCol";
 import { newEVEntry } from "utils/objs/ev";
@@ -314,4 +315,48 @@ function deleteSectionVariant(sectionId, variantId, isCurr) {
     }
     delete state.variants[variantId];
   });
+}
+
+export function getSectionShouldRender(visibility, viewingEditingMode) {
+  return visibility || viewingEditingMode !== VIEWING_EDITING_MODE.USER;
+}
+
+export function getSectionViewingEditingModeVisibility(sectionId, state) {
+  const { viewingEditingMode } = state.projectConfig;
+  return {
+    visibility:
+      state.x[sectionId].visibility[
+        getSectionVisibilityKey(viewingEditingMode)
+      ],
+    viewingEditingMode,
+  };
+}
+
+export function getSectionVisibilityKey(viewingEditingMode) {
+  switch (viewingEditingMode) {
+    case VIEWING_EDITING_MODE.DEV:
+    case VIEWING_EDITING_MODE.USER:
+      return viewingEditingMode;
+    case VIEWING_EDITING_MODE.USER_EDIT:
+      return VIEWING_EDITING_MODE.USER;
+  }
+}
+
+export function getAncestorSameVisibility(sectionId, state) {
+  const { viewingEditingMode } = state.projectConfig;
+  let { parentId } = state.x[sectionId];
+  const key = getSectionVisibilityKey(viewingEditingMode);
+  const targetVisibility = state.x[sectionId].visibility[key];
+
+  while (parentId) {
+    if (state.x[parentId].visibility[key] === targetVisibility) return true;
+
+    ({ parentId } = state.x[parentId]);
+  }
+
+  return false;
+}
+
+export function getIsUserView(viewingEditingMode) {
+  return viewingEditingMode === VIEWING_EDITING_MODE.USER;
 }

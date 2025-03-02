@@ -1,6 +1,7 @@
 import { getFloatingBoxHandlers } from "components/Utils/FloatingBox";
 import { PaneContainer } from "components/Utils/PaneContainer";
 import { BiHelpCircle } from "react-icons/bi";
+import { HiOutlineEye } from "react-icons/hi";
 import { localStorageFns } from "state/hooks/localStorage";
 import { OVERVIEW } from "utils/constants";
 import { overviewPaneOnKeyDown } from "utils/tabbingLogic";
@@ -11,6 +12,7 @@ import {
 } from "../paneFns";
 import { ProjectConfigs } from "./ProjectConfigs";
 import { ProjectOverview } from "./ProjectOverview";
+import { ViewingEditingMode } from "./ViewingEditingMode";
 
 const paneName = OVERVIEW;
 
@@ -48,10 +50,18 @@ export function Overview() {
         >
           <i className="gg-git-branch !scale-100" />
         </TabButton>
+        <TabButton
+          tabName="tab3"
+          {...commonProps}
+          {...getFloatingBoxHandlers({ content: "Viewing/Editing Mode" })}
+        >
+          <HiOutlineEye size={20} />
+        </TabButton>
         <a
           href="https://docs.setta.dev"
           target="_blank"
           className="focus-visible:ring-light-blue-500 absolute bottom-2 left-1 flex h-10 w-10 cursor-pointer items-center justify-center text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500"
+          rel="noreferrer"
         >
           <BiHelpCircle />
         </a>
@@ -72,7 +82,11 @@ export function Overview() {
 
 function TabsVisible({ tab }) {
   // const title = tabNameToPretty[tab];
-  const title = { tab1: "Overview", tab2: "Project Configs" }[tab];
+  const title = {
+    tab1: "Overview",
+    tab2: "Project Configs",
+    tab3: "View Modes",
+  }[tab];
   return (
     <div
       className="mx-[1px] flex h-full min-h-0 w-[calc(100%_-_3rem)] min-w-0 flex-1
@@ -92,5 +106,7 @@ function TabContent({ tab }) {
       return <ProjectOverview />;
     case "tab2":
       return <ProjectConfigs />;
+    case "tab3":
+      return <ViewingEditingMode />;
   }
 }

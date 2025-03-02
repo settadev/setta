@@ -111,6 +111,7 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "hideSearch",
         "hideUnpinnedParams",
         "displayMode",
+        "visibility",
         "canvasSettings",
         "chartSettings",
         "renderMarkdown",
@@ -155,4 +156,6 @@ UI_TYPE_TABLE_DATA_JSON_FIELDS = set(
     ]
 )
 
-PROJECT_CONFIG_TABLE_DATA_JSON_FIELDS = set(["viewport", "previewImgColor"])
+PROJECT_CONFIG_TABLE_DATA_JSON_FIELDS = set(
+    ["viewport", "previewImgColor", "viewingEditingMode"]
+)
