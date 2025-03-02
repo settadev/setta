@@ -72,7 +72,7 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
 
   return (
     <div
-      className="mb-10 mt-auto flex w-8 flex-col items-center gap-1 overflow-hidden rounded-md border px-0.5 pb-2 pt-1.5 dark:border-setta-800"
+      className="mb-11 mt-auto flex w-8 flex-col items-center gap-1 overflow-hidden rounded-md border px-0.5 pb-2 pt-1.5 dark:border-setta-800"
       data-testid="rf__controls"
     >
       <button
@@ -94,7 +94,7 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
         <FaMinus size={15} />
       </button>
       <button
-        className={`react-flow__controls-fitview focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500  overflow-clip${fitViewOnInit ? styleForActive : ""}`}
+        className={`react-flow__controls-fitview focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600  dark:hover:text-setta-500 ${fitViewOnInit ? styleForActive : ""}`}
         onClick={onFitViewHandler}
         title="fit view"
         aria-label="fit view"
