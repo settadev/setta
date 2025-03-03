@@ -15,6 +15,17 @@
 **March 3**: [v0.0.12](https://github.com/settadev/setta/releases/tag/v0.0.12)
 - Moved the zoom/map/view controls into the left side pane:
 
+<table>
+  <tr>
+    <th width="50%">Before</th>
+    <th width="50%">After</th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/2f7088fb-65ad-4744-b8d5-ea8c93c47962" /></td>
+    <td><img src="https://github.com/user-attachments/assets/aca41d9c-00e0-4853-81a7-a709c50f24fd" /></td>
+  </tr>
+</table>
+
 
 **March 2**: [v0.0.11](https://github.com/settadev/setta/releases/tag/v0.0.11)
 - Added User View mode. This allows you to quickly create a simplified version of your UI.
