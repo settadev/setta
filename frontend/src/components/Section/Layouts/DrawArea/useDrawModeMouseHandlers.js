@@ -311,13 +311,27 @@ function drawingOnMouseMove({
   localArtifactTransformsRef,
 }) {
   return (e) => {
-    if (!isDrawing) {
+    if (!isDrawing || !prevPointRef.current) {
       return false;
     }
+
     const point = getXY(e);
+
+    // Skip if the point is too close to the previous point (< 1 pixel distance)
+    const prevPoint = prevPointRef.current;
+    const dx = point[0] - prevPoint[0];
+    const dy = point[1] - prevPoint[1];
+    const distSquared = dx * dx + dy * dy;
+
+    // Skip points that are too close together (less than 1px away)
+    if (distSquared < 1) {
+      return false;
+    }
+
     const currStrokesRef = isEraser ? eraserStrokesRef : strokesRef;
     const currStroke =
       currStrokesRef.current[currStrokesRef.current.length - 1];
+
     if (!currStroke) {
       return false;
     }
@@ -325,6 +339,8 @@ function drawingOnMouseMove({
     if (isEraser) {
       currStroke.points.push(point);
       prevPointRef.current = point;
+
+      // Use a more lightweight update for eraser preview
       drawAllLayers(
         sectionId,
         canvasRef,
@@ -335,6 +351,7 @@ function drawingOnMouseMove({
         { [activeLayerId]: eraserStrokesRef.current },
       );
     } else if (currStroke.points.length >= canvasTransferQueueLength) {
+      // Time to transfer to main canvas
       setGlobalBrushStrokesAndDrawAllLayers(
         sectionId,
         currBrushStrokeArtifactId,
@@ -344,10 +361,12 @@ function drawingOnMouseMove({
         draftCanvasRef,
         false,
       );
+
       const currentBrushStrokeTransformInfo =
         localArtifactTransformsRef.current.find(
           (l) => l.artifactId === currBrushStrokeArtifactId,
         );
+
       if (currentBrushStrokeTransformInfo) {
         startNewStroke(
           draftCanvasRef,
@@ -356,8 +375,10 @@ function drawingOnMouseMove({
           getInverseTransform(currentBrushStrokeTransformInfo.transform),
         );
       }
+
       prevPointRef.current = point;
     } else {
+      // Just draw line segment on draft canvas
       drawStroke(draftCanvasRef, prevPointRef.current, point);
       currStroke.points.push(point);
       prevPointRef.current = point;
