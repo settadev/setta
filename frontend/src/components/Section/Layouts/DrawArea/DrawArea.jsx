@@ -4,16 +4,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export const DrawArea = () => {
   const containerRef = useRef(null);
   const [mode, setMode] = useState("brush");
+  const [opacity, setOpacity] = useState(1);
   const stageRef = useRef(null);
   const layerRef = useRef(null);
   const isPaintRef = useRef(false);
   const lastLineRef = useRef(null);
   const modeRef = useRef(mode);
+  const opacityRef = useRef(opacity);
 
-  // Update the ref whenever mode changes
+  // Update the refs whenever mode or opacity changes
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+
+  useEffect(() => {
+    opacityRef.current = opacity;
+  }, [opacity]);
 
   // Define handlers with useCallback to maintain reference stability
   const handleMouseDown = useCallback((e) => {
@@ -22,12 +28,17 @@ export const DrawArea = () => {
     isPaintRef.current = true;
     const pos = stageRef.current.getPointerPosition();
 
-    // Use modeRef.current instead of mode to get the latest value
+    // Use modeRef.current and opacityRef.current to get the latest values
     const currentMode = modeRef.current;
+    const currentOpacity = opacityRef.current;
+
+    console.log("mode in mouseDown", currentMode);
+    console.log("opacity in mouseDown", currentOpacity);
 
     lastLineRef.current = new Konva.Line({
       stroke: "#df4b26",
       strokeWidth: 5,
+      opacity: currentMode === "brush" ? currentOpacity : 1, // Apply opacity for brush mode only
       globalCompositeOperation:
         currentMode === "brush" ? "source-over" : "destination-out",
       lineCap: "round",
@@ -96,21 +107,45 @@ export const DrawArea = () => {
   }, [handleMouseDown, handleMouseUp, handleMouseMove]);
 
   const handleToolChange = (e) => {
+    console.log("handleToolChange", e.target.value);
     setMode(e.target.value);
+  };
+
+  const handleOpacityChange = (e) => {
+    const newOpacity = parseFloat(e.target.value);
+    console.log("handleOpacityChange", newOpacity);
+    setOpacity(newOpacity);
   };
 
   return (
     <div className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
-      <div className="bg-gray-100 p-2">
-        <label className="mr-2">Tool:</label>
-        <select
-          value={mode}
-          onChange={handleToolChange}
-          className="rounded border border-gray-300 px-2 py-1"
-        >
-          <option value="brush">Brush</option>
-          <option value="eraser">Eraser</option>
-        </select>
+      <div className="flex items-center space-x-4 bg-gray-100 p-2">
+        <div>
+          <label className="mr-2">Tool:</label>
+          <select
+            value={mode}
+            onChange={handleToolChange}
+            className="rounded border border-gray-300 px-2 py-1"
+          >
+            <option value="brush">Brush</option>
+            <option value="eraser">Eraser</option>
+          </select>
+        </div>
+
+        <div className="flex items-center">
+          <label className="mr-2">Opacity:</label>
+          <input
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value={opacity}
+            onChange={handleOpacityChange}
+            className={`w-32 ${mode === "eraser" ? "opacity-50" : ""}`}
+            disabled={mode === "eraser"}
+          />
+          <span className="ml-2 w-8">{(opacity * 100).toFixed(0)}%</span>
+        </div>
       </div>
       <div
         ref={containerRef}
