@@ -5,21 +5,31 @@ export const DrawArea = () => {
   const containerRef = useRef(null);
   const [mode, setMode] = useState("brush");
   const [opacity, setOpacity] = useState(1);
+  const [brushSize, setBrushSize] = useState(5);
+  const [eraserSize, setEraserSize] = useState(20);
   const stageRef = useRef(null);
   const layerRef = useRef(null);
   const isPaintRef = useRef(false);
   const lastLineRef = useRef(null);
+
   const modeRef = useRef(mode);
   const opacityRef = useRef(opacity);
+  const brushSizeRef = useRef(brushSize);
+  const eraserSizeRef = useRef(eraserSize);
 
-  // Update the refs whenever mode or opacity changes
+  // Update the refs whenever values change
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
-
   useEffect(() => {
     opacityRef.current = opacity;
   }, [opacity]);
+  useEffect(() => {
+    brushSizeRef.current = brushSize;
+  }, [brushSize]);
+  useEffect(() => {
+    eraserSizeRef.current = eraserSize;
+  }, [eraserSize]);
 
   // Define handlers with useCallback to maintain reference stability
   const handleMouseDown = useCallback((e) => {
@@ -28,17 +38,20 @@ export const DrawArea = () => {
     isPaintRef.current = true;
     const pos = stageRef.current.getPointerPosition();
 
-    // Use modeRef.current and opacityRef.current to get the latest values
+    // Use refs to get the latest values
     const currentMode = modeRef.current;
     const currentOpacity = opacityRef.current;
+    const currentBrushSize = brushSizeRef.current;
+    const currentEraserSize = eraserSizeRef.current;
 
-    console.log("mode in mouseDown", currentMode);
-    console.log("opacity in mouseDown", currentOpacity);
+    // Choose size based on current mode
+    const strokeWidth =
+      currentMode === "brush" ? currentBrushSize : currentEraserSize;
 
     lastLineRef.current = new Konva.Line({
       stroke: "#df4b26",
-      strokeWidth: 5,
-      opacity: currentMode === "brush" ? currentOpacity : 1, // Apply opacity for brush mode only
+      strokeWidth: strokeWidth,
+      opacity: currentMode === "brush" ? currentOpacity : 1,
       globalCompositeOperation:
         currentMode === "brush" ? "source-over" : "destination-out",
       lineCap: "round",
@@ -107,19 +120,27 @@ export const DrawArea = () => {
   }, [handleMouseDown, handleMouseUp, handleMouseMove]);
 
   const handleToolChange = (e) => {
-    console.log("handleToolChange", e.target.value);
     setMode(e.target.value);
   };
 
   const handleOpacityChange = (e) => {
     const newOpacity = parseFloat(e.target.value);
-    console.log("handleOpacityChange", newOpacity);
     setOpacity(newOpacity);
+  };
+
+  const handleBrushSizeChange = (e) => {
+    const newSize = parseInt(e.target.value, 10);
+    setBrushSize(newSize);
+  };
+
+  const handleEraserSizeChange = (e) => {
+    const newSize = parseInt(e.target.value, 10);
+    setEraserSize(newSize);
   };
 
   return (
     <div className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
-      <div className="flex items-center space-x-4 bg-gray-100 p-2">
+      <div className="flex flex-wrap gap-4 bg-gray-100 p-2">
         <div>
           <label className="mr-2">Tool:</label>
           <select
@@ -145,6 +166,34 @@ export const DrawArea = () => {
             disabled={mode === "eraser"}
           />
           <span className="ml-2 w-8">{(opacity * 100).toFixed(0)}%</span>
+        </div>
+
+        <div className="flex items-center">
+          <label className="mr-2">Brush Size:</label>
+          <input
+            type="range"
+            min="1"
+            max="50"
+            value={brushSize}
+            onChange={handleBrushSizeChange}
+            className={`w-32 ${mode !== "brush" ? "opacity-50" : ""}`}
+            disabled={mode !== "brush"}
+          />
+          <span className="ml-2 w-8">{brushSize}px</span>
+        </div>
+
+        <div className="flex items-center">
+          <label className="mr-2">Eraser Size:</label>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={eraserSize}
+            onChange={handleEraserSizeChange}
+            className={`w-32 ${mode !== "eraser" ? "opacity-50" : ""}`}
+            disabled={mode !== "eraser"}
+          />
+          <span className="ml-2 w-8">{eraserSize}px</span>
         </div>
       </div>
       <div
