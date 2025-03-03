@@ -52,35 +52,55 @@ export const DrawArea = () => {
     layersRef.current = layers;
   }, [layers]);
 
-  // Function to update layer's lines opacity
-  const updateLayerLinesOpacity = useCallback((layerId) => {
+  // Function to update layer's cache and opacity
+  const updateLayerCache = useCallback((layerId) => {
+    const konvaLayer = konvaLayersRef.current[layerId];
+    if (!konvaLayer) return;
+
     const layerData = layersRef.current.find((l) => l.id === layerId);
     if (!layerData) return;
 
-    const layerOpacity = layerData.opacity;
+    // Reset all non-eraser lines to their original opacity first
     const layerLines = layerLinesRef.current[layerId] || [];
-
     layerLines.forEach((line) => {
-      // Only adjust non-eraser lines
       if (line.attrs.globalCompositeOperation !== "destination-out") {
-        // Use the stored original opacity value
-        const originalOpacity = line.attrs._originalOpacity || 1;
-        line.opacity(originalOpacity * layerOpacity);
+        // Set each line to its original full opacity
+        line.opacity(line.attrs._originalOpacity || 1);
       }
     });
 
-    // Redraw the layer
-    if (konvaLayersRef.current[layerId]) {
-      konvaLayersRef.current[layerId].batchDraw();
+    // First clear any existing cache
+    konvaLayer.clearCache();
+
+    // Apply the layer's opacity to the whole layer
+    konvaLayer.opacity(layerData.opacity);
+
+    // Cache the layer to ensure proper opacity rendering
+    // Only cache if there's actual content in the layer
+    if (layerLines.length > 0) {
+      // We need to calculate the bounding box of all shapes
+      // or just use the stage dimensions for simplicity
+      const stage = stageRef.current;
+      if (stage) {
+        konvaLayer.cache({
+          x: 0,
+          y: 0,
+          width: stage.width(),
+          height: stage.height(),
+        });
+      }
     }
+
+    // Redraw the layer
+    konvaLayer.batchDraw();
   }, []);
 
-  // Update all layer opacities when needed
+  // Update all layer caches when needed
   useEffect(() => {
-    Object.keys(layerLinesRef.current).forEach((layerId) => {
-      updateLayerLinesOpacity(parseInt(layerId, 10));
+    Object.keys(konvaLayersRef.current).forEach((layerId) => {
+      updateLayerCache(parseInt(layerId, 10));
     });
-  }, [layers, updateLayerLinesOpacity]);
+  }, [layers, updateLayerCache]);
 
   // Define handlers with useCallback to maintain reference stability
   const handleMouseDown = useCallback((e) => {
@@ -97,22 +117,17 @@ export const DrawArea = () => {
     const currentEraserSize = eraserSizeRef.current;
     const currentBrushColor = brushColorRef.current;
     const currentLayerId = activeLayerIdRef.current;
-    const currentLayers = layersRef.current;
 
     // Choose size based on current mode
     const strokeWidth =
       currentMode === "brush" ? currentBrushSize : currentEraserSize;
 
-    // Get layer opacity
-    const layerData = currentLayers.find((l) => l.id === currentLayerId);
-    const layerOpacity = layerData ? layerData.opacity : 1;
-
     // Create the new line
     lastLineRef.current = new Konva.Line({
       stroke: currentBrushColor,
       strokeWidth: strokeWidth,
-      // For erasers, always use full opacity; for brushes, apply both opacities
-      opacity: currentMode === "brush" ? currentOpacity * layerOpacity : 1,
+      // For brushes, use the brush opacity; for erasers, always full opacity
+      opacity: currentMode === "brush" ? currentOpacity : 1,
       // Store original opacity for future adjustments
       _originalOpacity: currentOpacity,
       _isEraser: currentMode === "eraser",
@@ -135,7 +150,20 @@ export const DrawArea = () => {
 
   const handleMouseUp = useCallback(() => {
     isPaintRef.current = false;
-  }, []);
+
+    // When line drawing is complete, update the layer's cache
+    if (lastLineRef.current) {
+      const currentLayerId = activeLayerIdRef.current;
+
+      // Clear the layer's cache before updating it
+      if (konvaLayersRef.current[currentLayerId]) {
+        konvaLayersRef.current[currentLayerId].clearCache();
+      }
+
+      // Update the cache with the new line included
+      updateLayerCache(currentLayerId);
+    }
+  }, [updateLayerCache]);
 
   const handleMouseMove = useCallback((e) => {
     if (!isPaintRef.current || !lastLineRef.current || !stageRef.current)
@@ -147,6 +175,12 @@ export const DrawArea = () => {
     const pos = stageRef.current.getPointerPosition();
     const newPoints = lastLineRef.current.points().concat([pos.x, pos.y]);
     lastLineRef.current.points(newPoints);
+
+    // Update the layer temporarily without full cache rebuild for performance
+    const currentLayerId = activeLayerIdRef.current;
+    if (konvaLayersRef.current[currentLayerId]) {
+      konvaLayersRef.current[currentLayerId].batchDraw();
+    }
   }, []);
 
   // Initialize the stage and layers
@@ -178,6 +212,11 @@ export const DrawArea = () => {
       if (containerRef.current) {
         stage.width(containerRef.current.offsetWidth);
         stage.height(containerRef.current.offsetHeight);
+
+        // Update all caches when resizing
+        Object.keys(konvaLayersRef.current).forEach((layerId) => {
+          updateLayerCache(parseInt(layerId, 10));
+        });
       }
     });
 
@@ -190,7 +229,7 @@ export const DrawArea = () => {
         stageRef.current.destroy();
       }
     };
-  }, [handleMouseDown, handleMouseUp, handleMouseMove]);
+  }, [handleMouseDown, handleMouseUp, handleMouseMove, updateLayerCache]);
 
   // Update Konva layers when React layers state changes
   useEffect(() => {
@@ -222,8 +261,10 @@ export const DrawArea = () => {
     // Make sure the layers are in the correct order
     layers.forEach((layer, index) => {
       konvaLayersRef.current[layer.id].setZIndex(index);
+      // Update layer cache after reordering
+      updateLayerCache(layer.id);
     });
-  }, [layers]);
+  }, [layers, updateLayerCache]);
 
   const handleToolChange = (e) => {
     setMode(e.target.value);
