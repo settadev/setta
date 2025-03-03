@@ -89,7 +89,7 @@ export const DrawAreaControls = ({
         onClick={setToEditMode}
       >
         <IoMove />
-      </button>
+      </button> */}
 
       <StandardPopover
         arrowClasses="fill-white dark:fill-setta-800"
@@ -102,10 +102,13 @@ export const DrawAreaControls = ({
         }
         header={"Layer Opacity"}
       >
-        <LayerSettings opacity={layerOpacity} setOpacity={setLayerOpacity} />
+        <LayerSettings
+          opacity={layers.find((l) => l.id === activeLayerId)?.opacity}
+          setOpacity={(v) => onLayerOpacityChange(activeLayerId, v)}
+        />
       </StandardPopover>
 
-      <StandardPopover
+      {/* <StandardPopover
         arrowClasses="fill-white dark:fill-setta-800"
         contentClasses="z-20 bg-white dark:bg-setta-800 flex relative px-2 py-1 rounded-lg min-w-48"
         trigger={
