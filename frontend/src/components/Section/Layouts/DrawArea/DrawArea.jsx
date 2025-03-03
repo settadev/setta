@@ -5,6 +5,7 @@ import { useMouseHandlers } from "./mouseHandlers";
 import { useKonvaStage } from "./useKonvaStage";
 import { useKonvaTransformer } from "./useKonvaTransformer";
 import { useUpdateKonvaLayers } from "./useUpdateKonvaLayers";
+import { createPrepareLineForTransform } from "./utils";
 
 export const DrawArea = () => {
   const containerRef = useRef(null);
@@ -132,36 +133,12 @@ export const DrawArea = () => {
     });
   }, [mode, layers, updateLayerCache]);
 
-  // Add this function to your component to prepare lines for transformation
-  const prepareLineForTransform = (line) => {
-    // Ensure the line has all transform-related properties set
-    line.transformsEnabled("all");
-    line.draggable(true);
-
-    // Add event handlers directly to the line for better transform interaction
-    line.on("transformstart", () => {
-      const currentLayerId = activeLayerIdRef.current;
-      const currentLayer = konvaLayersRef.current[currentLayerId];
-      if (currentLayer && currentLayer.isCached()) {
-        currentLayer.clearCache();
-      }
-    });
-
-    line.on("transform", () => {
-      // Force update during transformation
-      if (transformerRef.current) {
-        transformerRef.current.forceUpdate();
-      }
-    });
-
-    line.on("transformend", () => {
-      const currentLayerId = activeLayerIdRef.current;
-      const currentLayer = konvaLayersRef.current[currentLayerId];
-      if (currentLayer) {
-        updateLayerCache(currentLayerId);
-      }
-    });
-  };
+  const prepareLineForTransform = createPrepareLineForTransform(
+    activeLayerIdRef,
+    konvaLayersRef,
+    transformerRef,
+    updateLayerCache,
+  );
 
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useMouseHandlers({
     stageRef,
