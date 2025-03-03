@@ -12,6 +12,10 @@
 
 ## News
 
+**March 3**: [v0.0.12](https://github.com/settadev/setta/releases/tag/v0.0.12)
+- Moved the zoom/map/view controls into the left side pane:
+
+
 **March 2**: [v0.0.11](https://github.com/settadev/setta/releases/tag/v0.0.11)
 - Added User View mode. This allows you to quickly create a simplified version of your UI.
 Here's an example of what Developer View and User View look like:
@@ -29,10 +33,6 @@ Here's an example of what Developer View and User View look like:
 
 **March 1**: [v0.0.10](https://github.com/settadev/setta/releases/tag/v0.0.10)
 - Made JSON source sections more user-friendly.
-
-**February 27**: [v0.0.9](https://github.com/settadev/setta/releases/tag/v0.0.9)
-- Improvements to the JSON file referencing mechanism.
-
 
 ## What does Setta do?
 
