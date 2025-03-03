@@ -36,7 +36,7 @@ export const DrawAreaControls = ({
       />
       <div className="flex self-stretch">
         <button
-          className={`flex w-8 cursor-pointer items-center justify-center gap-1 rounded-l-lg bg-setta-200/30 py-1 text-xs ${mode === "eraser" ? "text-blue-500" : "text-setta-700 dark:text-setta-400"}  hover:bg-setta-200 dark:bg-setta-800/50  dark:hover:bg-setta-900`}
+          className={`flex w-8 cursor-pointer items-center justify-center gap-1 rounded-l-lg bg-setta-200/30 py-1 text-xs ${mode === "brush" ? "text-blue-500" : "text-setta-700 dark:text-setta-400"}  hover:bg-setta-200 dark:bg-setta-800/50  dark:hover:bg-setta-900`}
           onClick={() => onToolChange("brush")}
         >
           <BiPaint />
@@ -61,10 +61,10 @@ export const DrawAreaControls = ({
           />
         </StandardPopover>
       </div>
-      {/* <div className="flex self-stretch">
+      <div className="flex self-stretch">
         <button
-          className={`flex w-8 cursor-pointer  items-center justify-center gap-1 rounded-l-lg bg-setta-200/30 py-1 text-xs ${mode === "draw" && isEraser ? "text-blue-500" : "text-setta-700 dark:text-setta-400"}  hover:bg-setta-300 dark:bg-setta-800/50  dark:hover:bg-setta-900`}
-          onClick={setToEraserMode}
+          className={`flex w-8 cursor-pointer  items-center justify-center gap-1 rounded-l-lg bg-setta-200/30 py-1 text-xs ${mode === "eraser" ? "text-blue-500" : "text-setta-700 dark:text-setta-400"}  hover:bg-setta-300 dark:bg-setta-800/50  dark:hover:bg-setta-900`}
+          onClick={() => onToolChange("eraser")}
         >
           <i className="gg-erase" />
         </button>
@@ -79,12 +79,12 @@ export const DrawAreaControls = ({
           header={"Brush Settings"}
         >
           <EraserSettings
-            brushSize={eraserBrushSize}
-            setBrushSize={setEraserBrushSize}
+            brushSize={eraserSize}
+            setBrushSize={onEraserSizeChange}
           />
         </StandardPopover>
       </div>
-      <button
+      {/* <button
         className={`flex w-8 cursor-pointer items-center justify-center gap-1 self-stretch rounded-lg bg-setta-200/30 py-1 text-xs ${mode === "edit" ? "text-blue-500" : "text-setta-700 dark:text-setta-400"}  hover:bg-setta-300 dark:bg-setta-800/50  dark:hover:bg-setta-900`}
         onClick={setToEditMode}
       >
