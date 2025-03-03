@@ -9,7 +9,7 @@ export const DrawArea = () => {
   const [eraserSize, setEraserSize] = useState(20);
   const [brushColor, setBrushColor] = useState("#df4b26"); // Default red color
   const [layers, setLayers] = useState([
-    { id: 1, name: "Layer 1", visible: true },
+    { id: 1, name: "Layer 1", visible: true, opacity: 1 },
   ]);
   const [activeLayerId, setActiveLayerId] = useState(1);
 
@@ -17,13 +17,17 @@ export const DrawArea = () => {
   const konvaLayersRef = useRef({});
   const isPaintRef = useRef(false);
   const lastLineRef = useRef(null);
+  // Store all lines for each layer to manage opacity
+  const layerLinesRef = useRef({});
 
+  // Use refs to track current values during events
   const modeRef = useRef(mode);
   const opacityRef = useRef(opacity);
   const brushSizeRef = useRef(brushSize);
   const eraserSizeRef = useRef(eraserSize);
   const brushColorRef = useRef(brushColor);
   const activeLayerIdRef = useRef(activeLayerId);
+  const layersRef = useRef(layers);
 
   // Update the refs whenever values change
   useEffect(() => {
@@ -44,6 +48,39 @@ export const DrawArea = () => {
   useEffect(() => {
     activeLayerIdRef.current = activeLayerId;
   }, [activeLayerId]);
+  useEffect(() => {
+    layersRef.current = layers;
+  }, [layers]);
+
+  // Function to update layer's lines opacity
+  const updateLayerLinesOpacity = useCallback((layerId) => {
+    const layerData = layersRef.current.find((l) => l.id === layerId);
+    if (!layerData) return;
+
+    const layerOpacity = layerData.opacity;
+    const layerLines = layerLinesRef.current[layerId] || [];
+
+    layerLines.forEach((line) => {
+      // Only adjust non-eraser lines
+      if (line.attrs.globalCompositeOperation !== "destination-out") {
+        // Use the stored original opacity value
+        const originalOpacity = line.attrs._originalOpacity || 1;
+        line.opacity(originalOpacity * layerOpacity);
+      }
+    });
+
+    // Redraw the layer
+    if (konvaLayersRef.current[layerId]) {
+      konvaLayersRef.current[layerId].batchDraw();
+    }
+  }, []);
+
+  // Update all layer opacities when needed
+  useEffect(() => {
+    Object.keys(layerLinesRef.current).forEach((layerId) => {
+      updateLayerLinesOpacity(parseInt(layerId, 10));
+    });
+  }, [layers, updateLayerLinesOpacity]);
 
   // Define handlers with useCallback to maintain reference stability
   const handleMouseDown = useCallback((e) => {
@@ -60,15 +97,25 @@ export const DrawArea = () => {
     const currentEraserSize = eraserSizeRef.current;
     const currentBrushColor = brushColorRef.current;
     const currentLayerId = activeLayerIdRef.current;
+    const currentLayers = layersRef.current;
 
     // Choose size based on current mode
     const strokeWidth =
       currentMode === "brush" ? currentBrushSize : currentEraserSize;
 
+    // Get layer opacity
+    const layerData = currentLayers.find((l) => l.id === currentLayerId);
+    const layerOpacity = layerData ? layerData.opacity : 1;
+
+    // Create the new line
     lastLineRef.current = new Konva.Line({
       stroke: currentBrushColor,
       strokeWidth: strokeWidth,
-      opacity: currentMode === "brush" ? currentOpacity : 1,
+      // For erasers, always use full opacity; for brushes, apply both opacities
+      opacity: currentMode === "brush" ? currentOpacity * layerOpacity : 1,
+      // Store original opacity for future adjustments
+      _originalOpacity: currentOpacity,
+      _isEraser: currentMode === "eraser",
       globalCompositeOperation:
         currentMode === "brush" ? "source-over" : "destination-out",
       lineCap: "round",
@@ -76,7 +123,14 @@ export const DrawArea = () => {
       points: [pos.x, pos.y, pos.x, pos.y],
     });
 
+    // Add line to the layer
     konvaLayersRef.current[currentLayerId].add(lastLineRef.current);
+
+    // Store the line for opacity management
+    if (!layerLinesRef.current[currentLayerId]) {
+      layerLinesRef.current[currentLayerId] = [];
+    }
+    layerLinesRef.current[currentLayerId].push(lastLineRef.current);
   }, []);
 
   const handleMouseUp = useCallback(() => {
@@ -117,6 +171,7 @@ export const DrawArea = () => {
     const layer = new Konva.Layer();
     stage.add(layer);
     konvaLayersRef.current[1] = layer;
+    layerLinesRef.current[1] = [];
 
     // Handle window resize
     const resizeObserver = new ResizeObserver(() => {
@@ -147,6 +202,7 @@ export const DrawArea = () => {
         const newKonvaLayer = new Konva.Layer();
         stageRef.current.add(newKonvaLayer);
         konvaLayersRef.current[layer.id] = newKonvaLayer;
+        layerLinesRef.current[layer.id] = [];
       }
 
       // Update visibility
@@ -159,6 +215,7 @@ export const DrawArea = () => {
       if (!layers.some((l) => l.id === numLayerId)) {
         konvaLayersRef.current[layerId].destroy();
         delete konvaLayersRef.current[layerId];
+        delete layerLinesRef.current[layerId];
       }
     });
 
@@ -191,12 +248,21 @@ export const DrawArea = () => {
     setBrushColor(e.target.value);
   };
 
+  const handleLayerOpacityChange = (id, newOpacity) => {
+    setLayers(
+      layers.map((layer) =>
+        layer.id === id ? { ...layer, opacity: newOpacity } : layer,
+      ),
+    );
+  };
+
   const addLayer = () => {
     const maxId = Math.max(0, ...layers.map((l) => l.id));
     const newLayer = {
       id: maxId + 1,
       name: `Layer ${maxId + 1}`,
       visible: true,
+      opacity: 1,
     };
 
     setLayers([...layers, newLayer]);
@@ -315,34 +381,61 @@ export const DrawArea = () => {
             {layers.map((layer) => (
               <div
                 key={layer.id}
-                className={`mb-1 flex cursor-pointer items-center rounded p-2 ${
+                className={`mb-1 flex cursor-pointer flex-col rounded p-2 ${
                   activeLayerId === layer.id
                     ? "border border-blue-300 bg-blue-100"
                     : "bg-white"
                 }`}
                 onClick={() => selectLayer(layer.id)}
               >
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLayerVisibility(layer.id);
-                  }}
-                  className="mr-2 text-gray-600"
-                >
-                  {layer.visible ? "👁️" : "👁️‍🗨️"}
-                </button>
-                <span className="flex-grow truncate">{layer.name}</span>
-                {layers.length > 1 && (
+                <div className="flex items-center">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteLayer(layer.id);
+                      toggleLayerVisibility(layer.id);
                     }}
-                    className="ml-2 text-sm text-red-500"
+                    className="mr-2 text-gray-600"
                   >
-                    ×
+                    {layer.visible ? "👁️" : "👁️‍🗨️"}
                   </button>
-                )}
+                  <span className="flex-grow truncate">{layer.name}</span>
+                  {layers.length > 1 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteLayer(layer.id);
+                      }}
+                      className="ml-2 text-sm text-red-500"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+
+                {/* Layer opacity control */}
+                <div
+                  className="mt-2 flex items-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <label className="mr-2 text-xs text-gray-600">Opacity:</label>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="1"
+                    step="0.1"
+                    value={layer.opacity}
+                    onChange={(e) =>
+                      handleLayerOpacityChange(
+                        layer.id,
+                        parseFloat(e.target.value),
+                      )
+                    }
+                    className="w-24 flex-grow"
+                  />
+                  <span className="ml-1 w-8 text-xs">
+                    {(layer.opacity * 100).toFixed(0)}%
+                  </span>
+                </div>
               </div>
             ))}
           </div>
