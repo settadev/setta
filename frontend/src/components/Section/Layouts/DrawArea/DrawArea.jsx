@@ -1,5 +1,6 @@
 import Konva from "konva";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { DrawAreaControls } from "./DrawAreaControls";
 
 export const DrawArea = () => {
   const containerRef = useRef(null);
@@ -294,37 +295,7 @@ export const DrawArea = () => {
     });
   }, [layers, updateLayerCache]);
 
-  const handleToolChange = (e) => {
-    setMode(e.target.value);
-  };
-
-  const handleOpacityChange = (e) => {
-    const newOpacity = parseFloat(e.target.value);
-    setOpacity(newOpacity);
-  };
-
-  const handleBrushSizeChange = (e) => {
-    const newSize = parseInt(e.target.value, 10);
-    setBrushSize(newSize);
-  };
-
-  const handleEraserSizeChange = (e) => {
-    const newSize = parseInt(e.target.value, 10);
-    setEraserSize(newSize);
-  };
-
-  const handleColorChange = (e) => {
-    setBrushColor(e.target.value);
-  };
-
-  const handleLayerOpacityChange = (id, newOpacity) => {
-    setLayers(
-      layers.map((layer) =>
-        layer.id === id ? { ...layer, opacity: newOpacity } : layer,
-      ),
-    );
-  };
-
+  // Layer management functions
   const addLayer = () => {
     const maxId = Math.max(0, ...layers.map((l) => l.id));
     const newLayer = {
@@ -359,157 +330,59 @@ export const DrawArea = () => {
     );
   };
 
-  const selectLayer = (id) => {
-    setActiveLayerId(id);
+  // Control handlers
+  const handleToolChange = (value) => {
+    setMode(value);
+  };
+
+  const handleOpacityChange = (value) => {
+    setOpacity(value);
+  };
+
+  const handleBrushSizeChange = (value) => {
+    setBrushSize(value);
+  };
+
+  const handleEraserSizeChange = (value) => {
+    setEraserSize(value);
+  };
+
+  const handleColorChange = (value) => {
+    setBrushColor(value);
+  };
+
+  const handleLayerOpacityChange = (id, newOpacity) => {
+    setLayers(
+      layers.map((layer) =>
+        layer.id === id ? { ...layer, opacity: newOpacity } : layer,
+      ),
+    );
   };
 
   return (
     <div className="nodrag single-cell-container section-row-main section-key-value relative flex max-h-full min-w-0 flex-col">
-      <div className="flex flex-wrap gap-4 bg-gray-100 p-2">
-        <div>
-          <label className="mr-2">Tool:</label>
-          <select
-            value={mode}
-            onChange={handleToolChange}
-            className="rounded border border-gray-300 px-2 py-1"
-          >
-            <option value="brush">Brush</option>
-            <option value="eraser">Eraser</option>
-          </select>
-        </div>
-
-        <div className="flex items-center">
-          <label className="mr-2">Color:</label>
-          <input
-            type="color"
-            value={brushColor}
-            onChange={handleColorChange}
-            className={`h-8 w-10 cursor-pointer rounded ${mode !== "brush" ? "opacity-50" : ""}`}
-            disabled={mode !== "brush"}
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="mr-2">Opacity:</label>
-          <input
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.1"
-            value={opacity}
-            onChange={handleOpacityChange}
-            className={`w-32 ${mode !== "brush" ? "opacity-50" : ""}`}
-            disabled={mode !== "brush"}
-          />
-          <span className="ml-2 w-8">{(opacity * 100).toFixed(0)}%</span>
-        </div>
-
-        <div className="flex items-center">
-          <label className="mr-2">Brush Size:</label>
-          <input
-            type="range"
-            min="1"
-            max="50"
-            value={brushSize}
-            onChange={handleBrushSizeChange}
-            className={`w-32 ${mode !== "brush" ? "opacity-50" : ""}`}
-            disabled={mode !== "brush"}
-          />
-          <span className="ml-2 w-8">{brushSize}px</span>
-        </div>
-
-        <div className="flex items-center">
-          <label className="mr-2">Eraser Size:</label>
-          <input
-            type="range"
-            min="1"
-            max="100"
-            value={eraserSize}
-            onChange={handleEraserSizeChange}
-            className={`w-32 ${mode !== "eraser" ? "opacity-50" : ""}`}
-            disabled={mode !== "eraser"}
-          />
-          <span className="ml-2 w-8">{eraserSize}px</span>
-        </div>
-      </div>
+      {/* Pass all control-related props to the DrawControls component */}
+      <DrawAreaControls
+        mode={mode}
+        opacity={opacity}
+        brushSize={brushSize}
+        eraserSize={eraserSize}
+        brushColor={brushColor}
+        layers={layers}
+        activeLayerId={activeLayerId}
+        onToolChange={handleToolChange}
+        onOpacityChange={handleOpacityChange}
+        onBrushSizeChange={handleBrushSizeChange}
+        onEraserSizeChange={handleEraserSizeChange}
+        onColorChange={handleColorChange}
+        onLayerOpacityChange={handleLayerOpacityChange}
+        onAddLayer={addLayer}
+        onDeleteLayer={deleteLayer}
+        onToggleLayerVisibility={toggleLayerVisibility}
+        onSelectLayer={setActiveLayerId}
+      />
 
       <div className="flex h-full">
-        {/* Layers panel */}
-        <div className="flex w-48 flex-col bg-gray-200 p-2">
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-bold">Layers</h3>
-            <button
-              onClick={addLayer}
-              className="rounded bg-blue-500 px-2 py-1 text-sm text-white"
-            >
-              Add Layer
-            </button>
-          </div>
-
-          <div className="flex-grow overflow-y-auto">
-            {layers.map((layer) => (
-              <div
-                key={layer.id}
-                className={`mb-1 flex cursor-pointer flex-col rounded p-2 ${
-                  activeLayerId === layer.id
-                    ? "border border-blue-300 bg-blue-100"
-                    : "bg-white"
-                }`}
-                onClick={() => selectLayer(layer.id)}
-              >
-                <div className="flex items-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleLayerVisibility(layer.id);
-                    }}
-                    className="mr-2 text-gray-600"
-                  >
-                    {layer.visible ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                  <span className="flex-grow truncate">{layer.name}</span>
-                  {layers.length > 1 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteLayer(layer.id);
-                      }}
-                      className="ml-2 text-sm text-red-500"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-
-                {/* Layer opacity control */}
-                <div
-                  className="mt-2 flex items-center"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <label className="mr-2 text-xs text-gray-600">Opacity:</label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="1"
-                    step="0.1"
-                    value={layer.opacity}
-                    onChange={(e) =>
-                      handleLayerOpacityChange(
-                        layer.id,
-                        parseFloat(e.target.value),
-                      )
-                    }
-                    className="w-24 flex-grow"
-                  />
-                  <span className="ml-1 w-8 text-xs">
-                    {(layer.opacity * 100).toFixed(0)}%
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Canvas */}
         <div
           ref={containerRef}
