@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { BiHide, BiPaint, BiShow } from "react-icons/bi";
 import { BsLayers } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa";
+import { IoMove } from "react-icons/io5";
 import { useSectionInfos } from "state/definitions";
 
 export const DrawAreaControls = ({
@@ -85,12 +86,12 @@ export const DrawAreaControls = ({
           />
         </StandardPopover>
       </div>
-      {/* <button
+      <button
         className={`flex w-8 cursor-pointer items-center justify-center gap-1 self-stretch rounded-lg bg-setta-200/30 py-1 text-xs ${mode === "edit" ? "text-blue-500" : "text-setta-700 dark:text-setta-400"}  hover:bg-setta-300 dark:bg-setta-800/50  dark:hover:bg-setta-900`}
-        onClick={setToEditMode}
+        onClick={() => onToolChange("edit")}
       >
         <IoMove />
-      </button> */}
+      </button>
 
       <StandardPopover
         arrowClasses="fill-white dark:fill-setta-800"

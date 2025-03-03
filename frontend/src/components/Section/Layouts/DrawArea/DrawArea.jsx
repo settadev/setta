@@ -4,7 +4,7 @@ import { DrawAreaControls } from "./DrawAreaControls";
 
 export const DrawArea = () => {
   const containerRef = useRef(null);
-  const [mode, setMode] = useState("brush");
+  const [mode, setMode] = useState("brush"); // Now can be "brush", "eraser", or "edit"
   const [opacity, setOpacity] = useState(1);
   const [brushSize, setBrushSize] = useState(5);
   const [eraserSize, setEraserSize] = useState(20);
@@ -20,6 +20,15 @@ export const DrawArea = () => {
   const lastLineRef = useRef(null);
   // Store all lines for each layer to manage opacity
   const layerLinesRef = useRef({});
+  // Reference for transformer
+  const transformerRef = useRef(null);
+  // Selected nodes reference
+  const selectedNodesRef = useRef([]);
+
+  // Selection rectangle related refs
+  const selectionRectangleRef = useRef(null);
+  const selectionStartRef = useRef({ x: 0, y: 0 });
+  const isSelectingRef = useRef(false);
 
   // Use refs to track current values during events
   const modeRef = useRef(mode);
@@ -52,6 +61,114 @@ export const DrawArea = () => {
   useEffect(() => {
     layersRef.current = layers;
   }, [layers]);
+
+  // Create and manage transformer based on mode
+  useEffect(() => {
+    if (!stageRef.current) return;
+
+    // If we're entering edit mode, make sure transformer exists
+    if (mode === "edit") {
+      // Always recreate the transformer when entering edit mode
+      // This ensures it's properly attached and visible
+      if (transformerRef.current) {
+        transformerRef.current.destroy();
+      }
+
+      const transformer = new Konva.Transformer({
+        // Configure transformer appearance
+        borderStroke: "#2196F3",
+        borderStrokeWidth: 1,
+        anchorStroke: "#2196F3",
+        anchorFill: "#FFFFFF",
+        anchorSize: 8,
+        rotateAnchorOffset: 30,
+        enabledAnchors: [
+          "top-left",
+          "top-center",
+          "top-right",
+          "middle-right",
+          "middle-left",
+          "bottom-left",
+          "bottom-center",
+          "bottom-right",
+        ],
+        rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
+        padding: 5,
+        // Add these properties to improve visuals
+        keepRatio: false,
+        centeredScaling: false,
+        boundBoxFunc: (oldBox, newBox) => newBox,
+      });
+
+      // Add to active layer
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        currentLayer.add(transformer);
+        transformer.moveToTop(); // Important: make sure transformer is above drawings
+        transformerRef.current = transformer;
+
+        // Reattach nodes if any were previously selected
+        if (selectedNodesRef.current.length > 0) {
+          transformer.nodes(selectedNodesRef.current);
+          currentLayer.draw(); // Force immediate draw
+        }
+      }
+
+      // Create selection rectangle if it doesn't exist
+      if (!selectionRectangleRef.current) {
+        const selectionRect = new Konva.Rect({
+          fill: "rgba(0, 123, 255, 0.3)",
+          stroke: "#2196F3",
+          strokeWidth: 1,
+          visible: false,
+          listening: false, // Don't interfere with other events
+        });
+
+        // Add to active layer
+        const currentLayerId = activeLayerIdRef.current;
+        const currentLayer = konvaLayersRef.current[currentLayerId];
+        if (currentLayer) {
+          currentLayer.add(selectionRect);
+          selectionRectangleRef.current = selectionRect;
+        }
+      }
+    } else {
+      // If we're leaving edit mode, remove transformer and clear selections
+      if (transformerRef.current) {
+        transformerRef.current.nodes([]);
+        transformerRef.current.destroy();
+        transformerRef.current = null;
+        selectedNodesRef.current = [];
+      }
+
+      // Also remove selection rectangle
+      if (selectionRectangleRef.current) {
+        selectionRectangleRef.current.destroy();
+        selectionRectangleRef.current = null;
+      }
+    }
+
+    // Make all lines draggable in edit mode, non-draggable otherwise
+    Object.keys(konvaLayersRef.current).forEach((layerId) => {
+      const layer = konvaLayersRef.current[layerId];
+      const lines = layer.find(".drawingLine");
+
+      lines.forEach((line) => {
+        line.draggable(mode === "edit");
+      });
+
+      // Redraw the layer
+      layer.batchDraw();
+    });
+
+    // Redraw the active layer
+    const currentLayerId = activeLayerIdRef.current;
+    const currentLayer = konvaLayersRef.current[currentLayerId];
+    if (currentLayer) {
+      currentLayer.batchDraw();
+    }
+  }, [mode, activeLayerId]);
 
   // Function to update layer's cache and opacity
   const updateLayerCache = useCallback((layerId) => {
@@ -105,84 +222,154 @@ export const DrawArea = () => {
 
   // Define handlers with useCallback to maintain reference stability
   const handleMouseDown = useCallback((e) => {
-    if (!stageRef.current || !konvaLayersRef.current[activeLayerIdRef.current])
-      return;
+    if (!stageRef.current) return;
 
-    isPaintRef.current = true;
-    const pos = stageRef.current.getPointerPosition();
-
-    // Use refs to get the latest values
     const currentMode = modeRef.current;
-    const currentOpacity = opacityRef.current;
-    const currentBrushSize = brushSizeRef.current;
-    const currentEraserSize = eraserSizeRef.current;
-    const currentBrushColor = brushColorRef.current;
-    const currentLayerId = activeLayerIdRef.current;
-
-    // Choose size based on current mode
-    const strokeWidth =
-      currentMode === "brush" ? currentBrushSize : currentEraserSize;
-
-    // Create the new line
-    lastLineRef.current = new Konva.Line({
-      stroke: currentBrushColor,
-      strokeWidth: strokeWidth,
-      // For brushes, use the brush opacity; for erasers, always full opacity
-      opacity: currentMode === "brush" ? currentOpacity : 1,
-      // Store original opacity for future adjustments
-      _originalOpacity: currentOpacity,
-      _isEraser: currentMode === "eraser",
-      globalCompositeOperation:
-        currentMode === "brush" ? "source-over" : "destination-out",
-      lineCap: "round",
-      lineJoin: "round",
-      points: [pos.x, pos.y, pos.x, pos.y],
-    });
-
-    // Add line to the layer
-    konvaLayersRef.current[currentLayerId].add(lastLineRef.current);
-
-    // Store the line for opacity management
-    if (!layerLinesRef.current[currentLayerId]) {
-      layerLinesRef.current[currentLayerId] = [];
-    }
-    layerLinesRef.current[currentLayerId].push(lastLineRef.current);
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    isPaintRef.current = false;
-
-    // When line drawing is complete, update the layer's cache
-    if (lastLineRef.current) {
-      const currentLayerId = activeLayerIdRef.current;
-
-      // Clear the layer's cache before updating it
-      if (konvaLayersRef.current[currentLayerId]) {
-        konvaLayersRef.current[currentLayerId].clearCache();
-      }
-
-      // Update the cache with the new line included
-      updateLayerCache(currentLayerId);
-    }
-  }, [updateLayerCache]);
-
-  const handleMouseMove = useCallback((e) => {
-    if (!isPaintRef.current || !lastLineRef.current || !stageRef.current)
-      return;
-
-    // Prevent scrolling on touch devices
-    e.evt.preventDefault();
-
-    const pos = stageRef.current.getPointerPosition();
-    const newPoints = lastLineRef.current.points().concat([pos.x, pos.y]);
-    lastLineRef.current.points(newPoints);
-
-    // Update the layer with proper opacity handling
     const currentLayerId = activeLayerIdRef.current;
     const currentLayer = konvaLayersRef.current[currentLayerId];
 
-    if (currentLayer) {
-      // First, update the line points
+    if (!currentLayer) return;
+
+    // Get pointer position
+    const pos = stageRef.current.getPointerPosition();
+
+    // Handle based on mode
+    if (currentMode === "edit") {
+      // If clicking on stage (not on a shape)
+      if (e.target === stageRef.current) {
+        // Start selection rectangle
+        isSelectingRef.current = true;
+        selectionStartRef.current = { x: pos.x, y: pos.y };
+
+        if (selectionRectangleRef.current) {
+          selectionRectangleRef.current.setAttrs({
+            x: pos.x,
+            y: pos.y,
+            width: 0,
+            height: 0,
+            visible: true,
+          });
+
+          // Clear current selection if not holding shift
+          if (!e.evt.shiftKey && transformerRef.current) {
+            transformerRef.current.nodes([]);
+            selectedNodesRef.current = [];
+            currentLayer.batchDraw(); // Important: Redraw the layer to update view
+          }
+        }
+      } else if (
+        e.target.className === "Line" ||
+        e.target.name() === "drawingLine"
+      ) {
+        // If clicking on a line - now check both className and name
+        const clickedLine = e.target;
+        const isAlreadySelected =
+          selectedNodesRef.current.includes(clickedLine);
+
+        // Handle selection logic
+        if (e.evt.shiftKey) {
+          // Toggle selection with shift key
+          if (isAlreadySelected) {
+            // Remove from selection
+            selectedNodesRef.current = selectedNodesRef.current.filter(
+              (node) => node !== clickedLine,
+            );
+          } else {
+            // Add to selection
+            selectedNodesRef.current.push(clickedLine);
+          }
+        } else if (!isAlreadySelected) {
+          // Select only this line if not already selected and not holding shift
+          selectedNodesRef.current = [clickedLine];
+        } else {
+          // Clicking on already selected item - still need to attach transformer
+          // This ensures handles appear right away
+        }
+
+        // Update transformer - important: we need to do this regardless
+        if (transformerRef.current) {
+          transformerRef.current.nodes(selectedNodesRef.current);
+          transformerRef.current.moveToTop(); // Make sure transformer is on top
+          currentLayer.batchDraw(); // Ensure the layer is redrawn
+        }
+      }
+    } else {
+      // Original drawing behavior for brush/eraser modes
+      isPaintRef.current = true;
+
+      const currentOpacity = opacityRef.current;
+      const currentBrushSize = brushSizeRef.current;
+      const currentEraserSize = eraserSizeRef.current;
+      const currentBrushColor = brushColorRef.current;
+
+      // Choose size based on current mode
+      const strokeWidth =
+        currentMode === "brush" ? currentBrushSize : currentEraserSize;
+
+      // Create the new line
+      lastLineRef.current = new Konva.Line({
+        stroke: currentBrushColor,
+        strokeWidth: strokeWidth,
+        // For brushes, use the brush opacity; for erasers, always full opacity
+        opacity: currentMode === "brush" ? currentOpacity : 1,
+        // Store original opacity for future adjustments
+        _originalOpacity: currentOpacity,
+        _isEraser: currentMode === "eraser",
+        globalCompositeOperation:
+          currentMode === "brush" ? "source-over" : "destination-out",
+        lineCap: "round",
+        lineJoin: "round",
+        points: [pos.x, pos.y, pos.x, pos.y],
+        draggable: true, // Make lines draggable for edit mode
+        name: "drawingLine", // Add name for easier selection
+      });
+
+      // Add line to the layer
+      currentLayer.add(lastLineRef.current);
+
+      // Store the line for opacity management
+      if (!layerLinesRef.current[currentLayerId]) {
+        layerLinesRef.current[currentLayerId] = [];
+      }
+      layerLinesRef.current[currentLayerId].push(lastLineRef.current);
+    }
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!stageRef.current) return;
+
+    const currentMode = modeRef.current;
+    const currentLayerId = activeLayerIdRef.current;
+    const currentLayer = konvaLayersRef.current[currentLayerId];
+
+    if (!currentLayer) return;
+
+    // Get pointer position
+    const pos = stageRef.current.getPointerPosition();
+
+    // Handle based on mode
+    if (currentMode === "edit" && isSelectingRef.current) {
+      // Update selection rectangle
+      e.evt.preventDefault();
+
+      if (selectionRectangleRef.current) {
+        const width = pos.x - selectionStartRef.current.x;
+        const height = pos.y - selectionStartRef.current.y;
+
+        selectionRectangleRef.current.setAttrs({
+          x: width < 0 ? pos.x : selectionStartRef.current.x,
+          y: height < 0 ? pos.y : selectionStartRef.current.y,
+          width: Math.abs(width),
+          height: Math.abs(height),
+        });
+
+        currentLayer.batchDraw();
+      }
+    } else if (isPaintRef.current && lastLineRef.current) {
+      // Original drawing behavior
+      e.evt.preventDefault();
+
+      const newPoints = lastLineRef.current.points().concat([pos.x, pos.y]);
       lastLineRef.current.points(newPoints);
 
       // Temporarily set the layer's opacity to 1 to avoid double-applying opacity
@@ -212,6 +399,72 @@ export const DrawArea = () => {
     }
   }, []);
 
+  const handleMouseUp = useCallback(
+    (e) => {
+      const currentMode = modeRef.current;
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+
+      if (!currentLayer) return;
+
+      if (currentMode === "edit" && isSelectingRef.current) {
+        // Finish selection rectangle and select contained lines
+        isSelectingRef.current = false;
+
+        if (
+          selectionRectangleRef.current &&
+          selectionRectangleRef.current.visible()
+        ) {
+          const selectionBox = selectionRectangleRef.current.getClientRect();
+
+          // Find all lines in the current layer
+          const lines = currentLayer.find(".drawingLine");
+
+          // Filter to get lines that intersect with selection rectangle
+          const selectedLines = lines.filter((line) =>
+            Konva.Util.haveIntersection(selectionBox, line.getClientRect()),
+          );
+
+          // If shift is held, add to existing selection, otherwise replace
+          if (e.evt.shiftKey) {
+            // Add only lines that aren't already selected
+            selectedLines.forEach((line) => {
+              if (!selectedNodesRef.current.includes(line)) {
+                selectedNodesRef.current.push(line);
+              }
+            });
+          } else {
+            selectedNodesRef.current = selectedLines;
+          }
+
+          // Update transformer
+          if (transformerRef.current) {
+            transformerRef.current.nodes(selectedNodesRef.current);
+          }
+
+          // Hide selection rectangle
+          selectionRectangleRef.current.visible(false);
+
+          // Redraw the layer
+          currentLayer.batchDraw();
+        }
+      } else if (isPaintRef.current) {
+        // Original behavior for completing a brush stroke
+        isPaintRef.current = false;
+
+        // When line drawing is complete, update the layer's cache
+        if (lastLineRef.current) {
+          // Clear the layer's cache before updating it
+          currentLayer.clearCache();
+
+          // Update the cache with the new line included
+          updateLayerCache(currentLayerId);
+        }
+      }
+    },
+    [updateLayerCache],
+  );
+
   // Initialize the stage and layers
   useEffect(() => {
     if (!containerRef.current) return;
@@ -229,6 +482,82 @@ export const DrawArea = () => {
     stage.on("mousedown touchstart", handleMouseDown);
     stage.on("mouseup touchend", handleMouseUp);
     stage.on("mousemove touchmove", handleMouseMove);
+
+    // Add these new event handlers for drag operations
+    stage.on("dragstart", (e) => {
+      // Only handle lines in edit mode
+      if (modeRef.current !== "edit" || e.target.name() !== "drawingLine")
+        return;
+
+      // Important: When starting a drag, disable caching temporarily
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        // Store cache state to restore later
+        e.target._cacheEnabled = currentLayer.isCached();
+        if (e.target._cacheEnabled) {
+          currentLayer.clearCache();
+        }
+      }
+    });
+
+    stage.on("dragmove", (e) => {
+      // Only handle lines in edit mode
+      if (modeRef.current !== "edit" || e.target.name() !== "drawingLine")
+        return;
+
+      // Make sure the layer updates during drag - key change: disable caching temporarily
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        // Temporarily disable caching during drag for live updates
+        const wasCached = currentLayer.isCached();
+        if (wasCached) {
+          currentLayer.clearCache();
+        }
+
+        // Force immediate redraw to see live movement
+        currentLayer.draw();
+
+        // Update transformer position if the line is selected
+        if (
+          transformerRef.current &&
+          selectedNodesRef.current.includes(e.target)
+        ) {
+          transformerRef.current.forceUpdate();
+          transformerRef.current.moveToTop();
+        }
+      }
+    });
+
+    stage.on("dragend", (e) => {
+      // Only handle lines in edit mode
+      if (modeRef.current !== "edit" || e.target.name() !== "drawingLine")
+        return;
+
+      // Update the cache after drag completes
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        // Force immediate draw first
+        currentLayer.draw();
+
+        // Restore cache if it was enabled
+        if (e.target._cacheEnabled) {
+          updateLayerCache(currentLayerId);
+        }
+
+        // Update transformer position
+        if (
+          transformerRef.current &&
+          selectedNodesRef.current.includes(e.target)
+        ) {
+          transformerRef.current.forceUpdate();
+          transformerRef.current.moveToTop();
+          currentLayer.draw(); // Another draw to ensure transformer is visible
+        }
+      }
+    });
 
     // Initial layer
     const layer = new Konva.Layer();
@@ -295,6 +624,29 @@ export const DrawArea = () => {
     });
   }, [layers, updateLayerCache]);
 
+  // Effect to handle mode changes and control transformer visibility
+  useEffect(() => {
+    // When switching from edit mode, clear selections
+    if (mode !== "edit") {
+      if (transformerRef.current) {
+        transformerRef.current.nodes([]);
+        selectedNodesRef.current = [];
+      }
+    }
+
+    // Make all lines draggable in edit mode, non-draggable otherwise
+    Object.keys(konvaLayersRef.current).forEach((layerId) => {
+      const layer = konvaLayersRef.current[layerId];
+      const lines = layer.find(".drawingLine");
+
+      lines.forEach((line) => {
+        line.draggable(mode === "edit");
+      });
+
+      layer.batchDraw();
+    });
+  }, [mode]);
+
   // Layer management functions
   const addLayer = () => {
     const maxId = Math.max(0, ...layers.map((l) => l.id));
@@ -330,7 +682,7 @@ export const DrawArea = () => {
     );
   };
 
-  // New function to reorder layers
+  // Reorder layers function
   const reorderLayers = (fromIndex, toIndex) => {
     // Make sure indices are valid
     if (
@@ -383,6 +735,40 @@ export const DrawArea = () => {
     );
   };
 
+  // Function to delete selected objects
+  const deleteSelectedObjects = () => {
+    if (selectedNodesRef.current.length === 0) return;
+
+    const currentLayerId = activeLayerIdRef.current;
+
+    // Remove selected nodes from the layer
+    selectedNodesRef.current.forEach((node) => {
+      // Also remove them from layerLinesRef
+      if (layerLinesRef.current[currentLayerId]) {
+        const nodeIndex = layerLinesRef.current[currentLayerId].findIndex(
+          (line) => line === node,
+        );
+        if (nodeIndex >= 0) {
+          layerLinesRef.current[currentLayerId].splice(nodeIndex, 1);
+        }
+      }
+
+      node.destroy();
+    });
+
+    // Clear selection
+    selectedNodesRef.current = [];
+    if (transformerRef.current) {
+      transformerRef.current.nodes([]);
+    }
+
+    // Redraw the layer
+    if (konvaLayersRef.current[currentLayerId]) {
+      konvaLayersRef.current[currentLayerId].batchDraw();
+      updateLayerCache(currentLayerId);
+    }
+  };
+
   const clearStrokes = () => {
     const currentLayerId = activeLayerId;
     const konvaLayer = konvaLayersRef.current[currentLayerId];
@@ -398,6 +784,39 @@ export const DrawArea = () => {
     // Clear the layer's cache
     konvaLayer.clearCache();
 
+    // Recreate transformer if in edit mode
+    if (mode === "edit") {
+      const transformer = new Konva.Transformer({
+        borderStroke: "#2196F3",
+        borderStrokeWidth: 1,
+        anchorStroke: "#2196F3",
+        anchorFill: "#FFFFFF",
+        anchorSize: 8,
+        rotateAnchorOffset: 30,
+        enabledAnchors: [
+          "top-left",
+          "top-right",
+          "bottom-left",
+          "bottom-right",
+        ],
+      });
+
+      konvaLayer.add(transformer);
+      transformerRef.current = transformer;
+
+      // Create selection rectangle
+      const selectionRect = new Konva.Rect({
+        fill: "rgba(0, 123, 255, 0.3)",
+        stroke: "#2196F3",
+        strokeWidth: 1,
+        visible: false,
+        listening: false,
+      });
+
+      konvaLayer.add(selectionRect);
+      selectionRectangleRef.current = selectionRect;
+    }
+
     // Redraw the layer
     konvaLayer.batchDraw();
 
@@ -405,6 +824,9 @@ export const DrawArea = () => {
     if (lastLineRef.current && lastLineRef.current.parent === konvaLayer) {
       lastLineRef.current = null;
     }
+
+    // Clear selection
+    selectedNodesRef.current = [];
   };
 
   return (
@@ -430,13 +852,14 @@ export const DrawArea = () => {
         onSelectLayer={setActiveLayerId}
         onReorderLayers={reorderLayers}
         clearStrokes={clearStrokes}
+        onDeleteSelected={deleteSelectedObjects} // New prop for edit mode
       />
       <section className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
         <div className="single-cell-child single-cell-container">
           <div
             ref={containerRef}
             className="single-cell-child max-w-full place-self-center"
-            // style={{ touchAction: "none" }}
+            style={{ touchAction: mode === "edit" ? "auto" : "none" }}
           />
         </div>
       </section>
