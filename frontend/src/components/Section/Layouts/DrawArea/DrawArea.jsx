@@ -94,10 +94,43 @@ export const DrawArea = () => {
         ],
         rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
         padding: 5,
-        // Add these properties to improve visuals
+        // Better performance settings
         keepRatio: false,
         centeredScaling: false,
         boundBoxFunc: (oldBox, newBox) => newBox,
+        // Set higher performance mode
+        shouldOverdrawWholeArea: true,
+        // Ensure changes apply immediately
+        enabledTransformers: {
+          rotation: true,
+          resize: true,
+          translate: true,
+        },
+      });
+
+      // Add transform event listeners directly to transformer
+      transformer.on("transformstart", () => {
+        const currentLayerId = activeLayerIdRef.current;
+        const currentLayer = konvaLayersRef.current[currentLayerId];
+        if (currentLayer && currentLayer.isCached()) {
+          currentLayer.clearCache();
+        }
+      });
+
+      transformer.on("transform", () => {
+        const currentLayerId = activeLayerIdRef.current;
+        const currentLayer = konvaLayersRef.current[currentLayerId];
+        if (currentLayer) {
+          currentLayer.batchDraw();
+        }
+      });
+
+      transformer.on("transformend", () => {
+        const currentLayerId = activeLayerIdRef.current;
+        const currentLayer = konvaLayersRef.current[currentLayerId];
+        if (currentLayer) {
+          updateLayerCache(currentLayerId);
+        }
       });
 
       // Add to active layer
@@ -105,13 +138,13 @@ export const DrawArea = () => {
       const currentLayer = konvaLayersRef.current[currentLayerId];
       if (currentLayer) {
         currentLayer.add(transformer);
-        transformer.moveToTop(); // Important: make sure transformer is above drawings
+        transformer.moveToTop();
         transformerRef.current = transformer;
 
         // Reattach nodes if any were previously selected
         if (selectedNodesRef.current.length > 0) {
           transformer.nodes(selectedNodesRef.current);
-          currentLayer.draw(); // Force immediate draw
+          currentLayer.batchDraw(); // Force immediate draw
         }
       }
 
@@ -178,6 +211,9 @@ export const DrawArea = () => {
     const layerData = layersRef.current.find((l) => l.id === layerId);
     if (!layerData) return;
 
+    // Don't cache layers in edit mode to avoid transform problems
+    const isEditMode = modeRef.current === "edit";
+
     // Reset all non-eraser lines to their original opacity first
     const layerLines = layerLinesRef.current[layerId] || [];
     layerLines.forEach((line) => {
@@ -194,8 +230,8 @@ export const DrawArea = () => {
     konvaLayer.opacity(layerData.opacity);
 
     // Cache the layer to ensure proper opacity rendering
-    // Only cache if there's actual content in the layer
-    if (layerLines.length > 0) {
+    // Only cache if there's actual content in the layer and not in edit mode
+    if (layerLines.length > 0 && !isEditMode) {
       // We need to calculate the bounding box of all shapes
       // or just use the stage dimensions for simplicity
       const stage = stageRef.current;
@@ -205,6 +241,7 @@ export const DrawArea = () => {
           y: 0,
           width: stage.width(),
           height: stage.height(),
+          pixelRatio: 1, // Using lower value for better performance
         });
       }
     }
@@ -212,6 +249,14 @@ export const DrawArea = () => {
     // Redraw the layer
     konvaLayer.batchDraw();
   }, []);
+
+  useEffect(() => {
+    // When entering edit mode, disable caching on all layers
+    // When leaving edit mode, re-enable caching
+    Object.keys(konvaLayersRef.current).forEach((layerId) => {
+      updateLayerCache(parseInt(layerId, 10));
+    });
+  }, [mode, updateLayerCache]);
 
   // Update all layer caches when needed
   useEffect(() => {
@@ -286,6 +331,8 @@ export const DrawArea = () => {
           // This ensures handles appear right away
         }
 
+        selectedNodesRef.current.forEach(prepareLineForTransform);
+
         // Update transformer - important: we need to do this regardless
         if (transformerRef.current) {
           transformerRef.current.nodes(selectedNodesRef.current);
@@ -320,8 +367,11 @@ export const DrawArea = () => {
         lineCap: "round",
         lineJoin: "round",
         points: [pos.x, pos.y, pos.x, pos.y],
-        draggable: true, // Make lines draggable for edit mode
+        draggable: currentMode === "edit", // Make lines draggable only in edit mode
         name: "drawingLine", // Add name for easier selection
+        // Add these transform properties to make lines work better with transformer
+        transformsEnabled: "all",
+        listening: true,
       });
 
       // Add line to the layer
@@ -437,9 +487,13 @@ export const DrawArea = () => {
             selectedNodesRef.current = selectedLines;
           }
 
-          // Update transformer
+          // Prepare all selected lines for transformation
+          selectedNodesRef.current.forEach(prepareLineForTransform);
+
+          // Then update the transformer
           if (transformerRef.current) {
             transformerRef.current.nodes(selectedNodesRef.current);
+            transformerRef.current.moveToTop();
           }
 
           // Hide selection rectangle
@@ -555,6 +609,53 @@ export const DrawArea = () => {
           transformerRef.current.forceUpdate();
           transformerRef.current.moveToTop();
           currentLayer.draw(); // Another draw to ensure transformer is visible
+        }
+      }
+    });
+
+    stage.on("transformstart", (e) => {
+      // Only handle in edit mode
+      if (modeRef.current !== "edit") return;
+
+      // Disable caching during transform operations
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        // Store cache state to restore later
+        currentLayer._cacheEnabled = currentLayer.isCached();
+        if (currentLayer._cacheEnabled) {
+          currentLayer.clearCache();
+        }
+      }
+    });
+
+    stage.on("transform", (e) => {
+      // Only handle in edit mode
+      if (modeRef.current !== "edit") return;
+
+      // Make sure the layer updates during transform
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        // Force immediate redraw for live updates
+        currentLayer.batchDraw();
+      }
+    });
+
+    stage.on("transformend", (e) => {
+      // Only handle in edit mode
+      if (modeRef.current !== "edit") return;
+
+      // Update the cache after transform completes
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        // Force immediate draw first
+        currentLayer.batchDraw();
+
+        // Restore cache if it was enabled
+        if (currentLayer._cacheEnabled) {
+          updateLayerCache(currentLayerId);
         }
       }
     });
@@ -827,6 +928,37 @@ export const DrawArea = () => {
 
     // Clear selection
     selectedNodesRef.current = [];
+  };
+
+  // Add this function to your component to prepare lines for transformation
+  const prepareLineForTransform = (line) => {
+    // Ensure the line has all transform-related properties set
+    line.transformsEnabled("all");
+    line.draggable(true);
+
+    // Add event handlers directly to the line for better transform interaction
+    line.on("transformstart", () => {
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer && currentLayer.isCached()) {
+        currentLayer.clearCache();
+      }
+    });
+
+    line.on("transform", () => {
+      // Force update during transformation
+      if (transformerRef.current) {
+        transformerRef.current.forceUpdate();
+      }
+    });
+
+    line.on("transformend", () => {
+      const currentLayerId = activeLayerIdRef.current;
+      const currentLayer = konvaLayersRef.current[currentLayerId];
+      if (currentLayer) {
+        updateLayerCache(currentLayerId);
+      }
+    });
   };
 
   return (
