@@ -330,6 +330,30 @@ export const DrawArea = () => {
     );
   };
 
+  // New function to reorder layers
+  const reorderLayers = (fromIndex, toIndex) => {
+    // Make sure indices are valid
+    if (
+      fromIndex < 0 ||
+      fromIndex >= layers.length ||
+      toIndex < 0 ||
+      toIndex >= layers.length ||
+      fromIndex === toIndex
+    ) {
+      return;
+    }
+
+    // Create a copy of the layers array
+    const newLayers = [...layers];
+
+    // Remove the layer from the fromIndex and insert it at toIndex
+    const [movedLayer] = newLayers.splice(fromIndex, 1);
+    newLayers.splice(toIndex, 0, movedLayer);
+
+    // Update the layers state
+    setLayers(newLayers);
+  };
+
   // Control handlers
   const handleToolChange = (value) => {
     setMode(value);
@@ -380,6 +404,7 @@ export const DrawArea = () => {
         onDeleteLayer={deleteLayer}
         onToggleLayerVisibility={toggleLayerVisibility}
         onSelectLayer={setActiveLayerId}
+        onReorderLayers={reorderLayers}
       />
       <section className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
         <div className="single-cell-child single-cell-container">

@@ -25,6 +25,7 @@ export const DrawAreaControls = ({
   onDeleteLayer,
   onToggleLayerVisibility,
   onSelectLayer,
+  onReorderLayers,
 }) => {
   return (
     <div className="section-search section-w-full z-10 flex  flex-wrap items-center gap-2 rounded-xl border-b border-solid border-white px-3 py-3 shadow-sm @container dark:border-setta-700 [&_.colorpicker]:!max-h-6 [&_.colorpicker]:max-w-24 ">
@@ -125,7 +126,7 @@ export const DrawAreaControls = ({
           setActiveLayerId={onSelectLayer}
           setLayerVisibility={onToggleLayerVisibility}
           addLayer={onAddLayer}
-          // reorderLayers={reorderLayers}
+          reorderLayers={onReorderLayers}
           deleteLayer={onDeleteLayer}
         />
       </StandardPopover>
@@ -327,7 +328,7 @@ function LayerList({
   setActiveLayerId,
   setLayerVisibility,
   addLayer,
-  // reorderLayers,
+  reorderLayers,
   deleteLayer,
 }) {
   // const layers = useSectionInfos(
@@ -358,10 +359,10 @@ function LayerList({
 
     if (draggedIdx !== targetIdx) {
       // layers are reversed, so adjust indices
-      // reorderLayers(
-      //   layers.length - 1 - draggedIdx,
-      //   layers.length - 1 - targetIdx,
-      // );
+      reorderLayers(
+        layers.length - 1 - draggedIdx,
+        layers.length - 1 - targetIdx,
+      );
     }
   };
 
