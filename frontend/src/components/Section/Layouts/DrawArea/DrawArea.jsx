@@ -1,16 +1,17 @@
-import * as fabric from "fabric";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Layer, Line, Stage } from "react-konva";
 import { useSectionInfos } from "state/definitions";
 import { useDrawAreaActiveLayerAndLoadedArtifacts } from "state/hooks/artifacts";
-import { setCanvasSize } from "./canvasUtils";
+import { setDrawAreaSectionSize } from "state/hooks/sectionSizes";
 import { DrawAreaControls } from "./DrawAreaControls";
 
 export function DrawArea({ sectionId }) {
-  const canvasRef = useRef(null);
-  const fabricCanvas = useRef(null);
+  const stageRef = useRef(null);
+  const [lines, setLines] = useState([]);
+  const isDrawing = useRef(false);
+
   const {
     activeLayer,
-    // allLayersMetadata,
     size: { width, height },
     canvasSettings: {
       activeLayerId,
@@ -19,69 +20,86 @@ export function DrawArea({ sectionId }) {
       brushShape,
       isEraser,
       eraserBrushSize,
-      // drawThrottleDelay,
-      // canvasTransferQueueLength,
       mode,
-      // artifactIdUsedToSetCanvasSize,
     },
-    // loadedArtifacts,
-    // loadedArtifactIdsWithDuplicates,
   } = useDrawAreaActiveLayerAndLoadedArtifacts(sectionId);
 
   const layerOpacity = activeLayer?.layerOpacity ?? 1;
   const brushOpacity = activeLayer?.brushOpacity ?? 1;
 
+  // Handle drawing mode
   useEffect(() => {
-    if (!canvasRef.current) {
-      return;
+    if (!stageRef.current) return;
+
+    const stage = stageRef.current;
+    if (mode === "draw") {
+      stage.container().style.cursor = "crosshair";
+    } else {
+      stage.container().style.cursor = "default";
     }
-
-    fabricCanvas.current = new fabric.Canvas(canvasRef.current, {
-      isDrawingMode: mode === "draw",
-    });
-
-    // Initialize the brush
-    const pencilBrush = new fabric.PencilBrush(fabricCanvas.current);
-    pencilBrush.color = color;
-    pencilBrush.width = brushSize;
-    fabricCanvas.current.freeDrawingBrush = pencilBrush;
-
-    return () => {
-      // `dispose` is async
-      // however it runs a sync DOM cleanup
-      // its async part ensures rendering has completed
-      // and should not affect react
-      fabricCanvas.current.dispose();
-    };
-  }, [canvasRef]);
-
-  useEffect(() => {
-    if (!fabricCanvas.current) {
-      return;
-    }
-    useSectionInfos.setState((state) =>
-      setCanvasSize({
-        sectionId,
-        canvas: fabricCanvas.current,
-        height,
-        width,
-        state,
-      }),
-    );
-  }, [width, height, sectionId]);
-
-  // Update drawing mode when it changes
-  useEffect(() => {
-    if (!fabricCanvas.current) return;
-    fabricCanvas.current.isDrawingMode = mode === "draw";
   }, [mode]);
 
-  // Update brush properties when they change
+  // Set initial default sizes to avoid "auto" errors with Konva
+  const [stageSize, setStageSize] = useState({ width: 300, height: 200 });
+
   useEffect(() => {
-    if (!fabricCanvas.current) return;
-    fabricCanvas.current.freeDrawingBrush.color = color;
-    fabricCanvas.current.freeDrawingBrush.width = brushSize;
-  }, [color, brushSize]);
+    useSectionInfos.setState((state) => {
+      const canvasSize = setDrawAreaSectionSize({
+        sectionId,
+        sectionHeight: height,
+        sectionWidth: width,
+        state,
+      });
+
+      if (
+        typeof canvasSize.width === "number" &&
+        typeof canvasSize.height === "number"
+      ) {
+        setStageSize({
+          width: canvasSize.width,
+          height: canvasSize.height,
+        });
+      }
+
+      return state;
+    });
+  }, [width, height, sectionId]);
+
+  const handleMouseDown = (e) => {
+    if (mode !== "draw") return;
+
+    isDrawing.current = true;
+    const pos = e.target.getStage().getPointerPosition();
+    setLines([
+      ...lines,
+      {
+        points: [pos.x, pos.y],
+        color: isEraser ? "#FFFFFF" : color,
+        strokeWidth: isEraser ? eraserBrushSize : brushSize,
+        opacity: brushOpacity,
+        globalCompositeOperation: isEraser ? "destination-out" : "source-over",
+      },
+    ]);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDrawing.current || mode !== "draw") return;
+
+    const stage = e.target.getStage();
+    const point = stage.getPointerPosition();
+
+    // Update the last line
+    const lastLine = lines[lines.length - 1];
+    lastLine.points = lastLine.points.concat([point.x, point.y]);
+
+    // Replace the last line
+    lines.splice(lines.length - 1, 1, lastLine);
+    setLines([...lines]);
+  };
+
+  const handleMouseUp = () => {
+    isDrawing.current = false;
+  };
 
   return (
     <>
@@ -96,11 +114,34 @@ export function DrawArea({ sectionId }) {
         isEraser={isEraser}
         layerOpacity={layerOpacity}
         mode={mode}
-        // clearStrokes={clearStrokes}
       />
       <section className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
         <div className="single-cell-child single-cell-container">
-          <canvas ref={canvasRef} />
+          <Stage
+            width={stageSize.width}
+            height={stageSize.height}
+            ref={stageRef}
+            onMouseDown={handleMouseDown}
+            onMousemove={handleMouseMove}
+            onMouseup={handleMouseUp}
+            onMouseleave={handleMouseUp}
+          >
+            <Layer opacity={layerOpacity}>
+              {lines.map((line, i) => (
+                <Line
+                  key={i}
+                  points={line.points}
+                  stroke={line.color}
+                  strokeWidth={line.strokeWidth}
+                  tension={0.5}
+                  lineCap="round"
+                  lineJoin="round"
+                  opacity={line.opacity}
+                  globalCompositeOperation={line.globalCompositeOperation}
+                />
+              ))}
+            </Layer>
+          </Stage>
         </div>
       </section>
     </>
