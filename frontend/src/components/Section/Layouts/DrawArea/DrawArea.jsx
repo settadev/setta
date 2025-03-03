@@ -176,10 +176,38 @@ export const DrawArea = () => {
     const newPoints = lastLineRef.current.points().concat([pos.x, pos.y]);
     lastLineRef.current.points(newPoints);
 
-    // Update the layer temporarily without full cache rebuild for performance
+    // Update the layer with proper opacity handling
     const currentLayerId = activeLayerIdRef.current;
-    if (konvaLayersRef.current[currentLayerId]) {
-      konvaLayersRef.current[currentLayerId].batchDraw();
+    const currentLayer = konvaLayersRef.current[currentLayerId];
+
+    if (currentLayer) {
+      // First, update the line points
+      lastLineRef.current.points(newPoints);
+
+      // Temporarily set the layer's opacity to 1 to avoid double-applying opacity
+      const layerData = layersRef.current.find((l) => l.id === currentLayerId);
+      const originalLayerOpacity = layerData ? layerData.opacity : 1;
+
+      // Clear cache, set full opacity to avoid accumulation
+      currentLayer.clearCache();
+      currentLayer.opacity(1);
+
+      // Update drawing
+      currentLayer.batchDraw();
+
+      // Immediately apply cache with the correct opacity to avoid flicker
+      if (stageRef.current) {
+        currentLayer.cache({
+          x: 0,
+          y: 0,
+          width: stageRef.current.width(),
+          height: stageRef.current.height(),
+        });
+
+        // Restore the layer opacity
+        currentLayer.opacity(originalLayerOpacity);
+        currentLayer.batchDraw();
+      }
     }
   }, []);
 
