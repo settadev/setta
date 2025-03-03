@@ -7,6 +7,7 @@ export const DrawArea = () => {
   const [opacity, setOpacity] = useState(1);
   const [brushSize, setBrushSize] = useState(5);
   const [eraserSize, setEraserSize] = useState(20);
+  const [brushColor, setBrushColor] = useState("#df4b26"); // Default red color
   const stageRef = useRef(null);
   const layerRef = useRef(null);
   const isPaintRef = useRef(false);
@@ -16,6 +17,7 @@ export const DrawArea = () => {
   const opacityRef = useRef(opacity);
   const brushSizeRef = useRef(brushSize);
   const eraserSizeRef = useRef(eraserSize);
+  const brushColorRef = useRef(brushColor);
 
   // Update the refs whenever values change
   useEffect(() => {
@@ -30,6 +32,9 @@ export const DrawArea = () => {
   useEffect(() => {
     eraserSizeRef.current = eraserSize;
   }, [eraserSize]);
+  useEffect(() => {
+    brushColorRef.current = brushColor;
+  }, [brushColor]);
 
   // Define handlers with useCallback to maintain reference stability
   const handleMouseDown = useCallback((e) => {
@@ -43,13 +48,14 @@ export const DrawArea = () => {
     const currentOpacity = opacityRef.current;
     const currentBrushSize = brushSizeRef.current;
     const currentEraserSize = eraserSizeRef.current;
+    const currentBrushColor = brushColorRef.current;
 
     // Choose size based on current mode
     const strokeWidth =
       currentMode === "brush" ? currentBrushSize : currentEraserSize;
 
     lastLineRef.current = new Konva.Line({
-      stroke: "#df4b26",
+      stroke: currentBrushColor, // Use the selected color
       strokeWidth: strokeWidth,
       opacity: currentMode === "brush" ? currentOpacity : 1,
       globalCompositeOperation:
@@ -138,6 +144,10 @@ export const DrawArea = () => {
     setEraserSize(newSize);
   };
 
+  const handleColorChange = (e) => {
+    setBrushColor(e.target.value);
+  };
+
   return (
     <div className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
       <div className="flex flex-wrap gap-4 bg-gray-100 p-2">
@@ -154,6 +164,17 @@ export const DrawArea = () => {
         </div>
 
         <div className="flex items-center">
+          <label className="mr-2">Color:</label>
+          <input
+            type="color"
+            value={brushColor}
+            onChange={handleColorChange}
+            className={`h-8 w-10 cursor-pointer rounded ${mode !== "brush" ? "opacity-50" : ""}`}
+            disabled={mode !== "brush"}
+          />
+        </div>
+
+        <div className="flex items-center">
           <label className="mr-2">Opacity:</label>
           <input
             type="range"
@@ -162,8 +183,8 @@ export const DrawArea = () => {
             step="0.1"
             value={opacity}
             onChange={handleOpacityChange}
-            className={`w-32 ${mode === "eraser" ? "opacity-50" : ""}`}
-            disabled={mode === "eraser"}
+            className={`w-32 ${mode !== "brush" ? "opacity-50" : ""}`}
+            disabled={mode !== "brush"}
           />
           <span className="ml-2 w-8">{(opacity * 100).toFixed(0)}%</span>
         </div>
