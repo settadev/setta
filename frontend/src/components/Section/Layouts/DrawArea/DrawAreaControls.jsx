@@ -1,12 +1,11 @@
 import { ColorPickerInput } from "components/Params/ParamUIs/ColorPickerInput";
 import { SliderInput } from "components/Params/ParamUIs/SliderInput";
 import { StandardPopover } from "components/Utils/atoms/popover/standardpopover";
-import _ from "lodash";
 import { useEffect, useState } from "react";
 import { BiHide, BiPaint, BiShow } from "react-icons/bi";
+import { BsLayers } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa";
 import { useSectionInfos } from "state/definitions";
-import { getSectionArtifactGroupMetadata } from "state/hooks/artifacts";
 
 export const DrawAreaControls = ({
   mode,
@@ -108,7 +107,7 @@ export const DrawAreaControls = ({
         />
       </StandardPopover>
 
-      {/* <StandardPopover
+      <StandardPopover
         arrowClasses="fill-white dark:fill-setta-800"
         contentClasses="z-20 bg-white dark:bg-setta-800 flex relative px-2 py-1 rounded-lg min-w-48"
         trigger={
@@ -120,17 +119,18 @@ export const DrawAreaControls = ({
         header={"Layer Selection"}
       >
         <LayerList
-          sectionId={sectionId}
+          // sectionId={sectionId}
+          layers={layers}
           activeLayerId={activeLayerId}
-          setActiveLayerId={setActiveLayerId}
-          setLayerVisibility={setLayerVisibility}
-          addLayer={addLayer}
-          reorderLayers={reorderLayers}
-          deleteLayer={deleteLayer}
+          setActiveLayerId={onSelectLayer}
+          setLayerVisibility={onToggleLayerVisibility}
+          addLayer={onAddLayer}
+          // reorderLayers={reorderLayers}
+          deleteLayer={onDeleteLayer}
         />
       </StandardPopover>
 
-      <button
+      {/* <button
         className="flex w-8 cursor-pointer items-center justify-center gap-1 self-stretch rounded-lg bg-setta-200/30 py-1 text-xs text-setta-700 hover:bg-red-600 hover:text-white dark:bg-setta-800/50 dark:text-setta-400 dark:hover:bg-red-800 dark:hover:text-white"
         onClick={clearStrokes}
       >
@@ -321,18 +321,19 @@ function LayerSettings({ opacity, setOpacity }) {
 }
 
 function LayerList({
-  sectionId,
+  // sectionId,
+  layers,
   activeLayerId,
   setActiveLayerId,
   setLayerVisibility,
   addLayer,
-  reorderLayers,
+  // reorderLayers,
   deleteLayer,
 }) {
-  const layers = useSectionInfos(
-    (x) => getSectionArtifactGroupMetadata(sectionId, x),
-    _.isEqual,
-  );
+  // const layers = useSectionInfos(
+  //   (x) => getSectionArtifactGroupMetadata(sectionId, x),
+  //   _.isEqual,
+  // );
   const reversedLayers = layers.toReversed();
 
   const [draggedOverIdx, setDraggedOverIdx] = useState(null);
@@ -357,10 +358,10 @@ function LayerList({
 
     if (draggedIdx !== targetIdx) {
       // layers are reversed, so adjust indices
-      reorderLayers(
-        layers.length - 1 - draggedIdx,
-        layers.length - 1 - targetIdx,
-      );
+      // reorderLayers(
+      //   layers.length - 1 - draggedIdx,
+      //   layers.length - 1 - targetIdx,
+      // );
     }
   };
 
@@ -381,7 +382,7 @@ function LayerList({
             onClick={() => setActiveLayerId(layer.id)}
           >
             <button
-              onClick={() => setLayerVisibility(layer.id, !layer.visible)}
+              onClick={() => setLayerVisibility(layer.id)}
               className="cursor-pointer"
             >
               {layer.visible ? (
