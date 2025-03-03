@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSectionInfos } from "state/definitions";
 import { useDrawAreaActiveLayerAndLoadedArtifacts } from "state/hooks/artifacts";
 import { setCanvasSize } from "./canvasUtils";
@@ -17,6 +17,7 @@ export function DrawArea({ sectionId }) {
       color,
       brushSize,
       brushShape,
+      isEraser,
       eraserBrushSize,
       drawThrottleDelay,
       canvasTransferQueueLength,
@@ -27,7 +28,6 @@ export function DrawArea({ sectionId }) {
     loadedArtifactIdsWithDuplicates,
   } = useDrawAreaActiveLayerAndLoadedArtifacts(sectionId);
 
-  const [isEraser, setIsEraser] = useState(false);
   const layerOpacity = activeLayer?.layerOpacity ?? 1;
   const brushOpacity = activeLayer?.brushOpacity ?? 1;
 
@@ -73,7 +73,6 @@ export function DrawArea({ sectionId }) {
         brushShape={brushShape}
         eraserBrushSize={eraserBrushSize}
         isEraser={isEraser}
-        setIsEraser={setIsEraser}
         layerOpacity={layerOpacity}
         mode={mode}
         // clearStrokes={clearStrokes}

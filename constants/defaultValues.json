@@ -37,6 +37,7 @@
       "color": "#ff0000",
       "brushSize": 16,
       "brushShape": "butt",
+      "isEraser": false,
       "eraserBrushSize": 16,
       "drawThrottleDelay": 0,
       "canvasTransferQueueLength": 50,

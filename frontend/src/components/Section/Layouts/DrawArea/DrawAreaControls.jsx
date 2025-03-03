@@ -21,7 +21,6 @@ export function DrawAreaControls({
   brushShape,
   eraserBrushSize,
   isEraser,
-  setIsEraser,
   layerOpacity,
   mode,
   clearStrokes,
@@ -51,12 +50,16 @@ export function DrawAreaControls({
     setCanvasSettings(sectionId, "activeLayerId", v);
   }
   function setToBrushMode() {
-    setIsEraser(false);
-    setCanvasSettings(sectionId, "mode", "draw");
+    useSectionInfos.setState((x) => {
+      x.x[sectionId].canvasSettings.isEraser = false;
+      x.x[sectionId].canvasSettings.mode = "draw";
+    });
   }
   function setToEraserMode() {
-    setIsEraser(true);
-    setCanvasSettings(sectionId, "mode", "draw");
+    useSectionInfos.setState((x) => {
+      x.x[sectionId].canvasSettings.isEraser = true;
+      x.x[sectionId].canvasSettings.mode = "draw";
+    });
   }
   function setToEditMode() {
     setCanvasSettings(sectionId, "mode", "edit");
