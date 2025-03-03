@@ -3,8 +3,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DrawAreaControls } from "./DrawAreaControls";
 import { useMouseHandlers } from "./mouseHandlers";
 import { useKonvaStage } from "./useKonvaStage";
-import { useKonvaTransformer } from "./useKonvaTransformer";
-import { useUpdateKonvaLayers } from "./useUpdateKonvaLayers";
+import { useEditModeEffects, useKonvaTransformer } from "./useKonvaTransformer";
+import {
+  useLayerCacheEffects,
+  useUpdateKonvaLayers,
+} from "./useUpdateKonvaLayers";
 import { createPrepareLineForTransform } from "./utils";
 
 export const DrawArea = () => {
@@ -126,12 +129,14 @@ export const DrawArea = () => {
     updateLayerCache,
   });
 
-  useEffect(() => {
-    // Update all layer caches when mode changes or layers are updated
-    Object.keys(konvaLayersRef.current).forEach((layerId) => {
-      updateLayerCache(parseInt(layerId, 10));
-    });
-  }, [mode, layers, updateLayerCache]);
+  useLayerCacheEffects({ mode, layers, konvaLayersRef, updateLayerCache });
+
+  useEditModeEffects({
+    mode,
+    transformerRef,
+    selectedNodesRef,
+    konvaLayersRef,
+  });
 
   const prepareLineForTransform = createPrepareLineForTransform(
     activeLayerIdRef,
@@ -184,29 +189,6 @@ export const DrawArea = () => {
     layerLinesRef,
     updateLayerCache,
   });
-
-  // Effect to handle mode changes and control transformer visibility
-  useEffect(() => {
-    // When switching from edit mode, clear selections
-    if (mode !== "edit") {
-      if (transformerRef.current) {
-        transformerRef.current.nodes([]);
-        selectedNodesRef.current = [];
-      }
-    }
-
-    // Make all lines draggable in edit mode, non-draggable otherwise
-    Object.keys(konvaLayersRef.current).forEach((layerId) => {
-      const layer = konvaLayersRef.current[layerId];
-      const lines = layer.find(".drawingLine");
-
-      lines.forEach((line) => {
-        line.draggable(mode === "edit");
-      });
-
-      layer.batchDraw();
-    });
-  }, [mode]);
 
   // Layer management functions
   const addLayer = () => {

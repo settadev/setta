@@ -153,3 +153,33 @@ export function useKonvaTransformer({
     }
   }, [mode, activeLayerId]);
 }
+
+export function useEditModeEffects({
+  mode,
+  transformerRef,
+  selectedNodesRef,
+  konvaLayersRef,
+}) {
+  // Effect to handle mode changes and control transformer visibility
+  useEffect(() => {
+    // When switching from edit mode, clear selections
+    if (mode !== "edit") {
+      if (transformerRef.current) {
+        transformerRef.current.nodes([]);
+        selectedNodesRef.current = [];
+      }
+    }
+
+    // Make all lines draggable in edit mode, non-draggable otherwise
+    Object.keys(konvaLayersRef.current).forEach((layerId) => {
+      const layer = konvaLayersRef.current[layerId];
+      const lines = layer.find(".drawingLine");
+
+      lines.forEach((line) => {
+        line.draggable(mode === "edit");
+      });
+
+      layer.batchDraw();
+    });
+  }, [mode]);
+}

@@ -43,3 +43,17 @@ export function useUpdateKonvaLayers({
     });
   }, [layers, updateLayerCache]);
 }
+
+export function useLayerCacheEffects({
+  mode,
+  layers,
+  konvaLayersRef,
+  updateLayerCache,
+}) {
+  useEffect(() => {
+    // Update all layer caches when mode changes or layers are updated
+    Object.keys(konvaLayersRef.current).forEach((layerId) => {
+      updateLayerCache(parseInt(layerId, 10));
+    });
+  }, [mode, layers, updateLayerCache]);
+}
