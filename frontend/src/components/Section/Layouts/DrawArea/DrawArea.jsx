@@ -360,7 +360,7 @@ export const DrawArea = () => {
   };
 
   return (
-    <div className="nodrag single-cell-container section-row-main section-key-value relative flex max-h-full min-w-0 flex-col">
+    <>
       {/* Pass all control-related props to the DrawControls component */}
       <DrawAreaControls
         mode={mode}
@@ -381,15 +381,15 @@ export const DrawArea = () => {
         onToggleLayerVisibility={toggleLayerVisibility}
         onSelectLayer={setActiveLayerId}
       />
-
-      <div className="flex h-full">
-        {/* Canvas */}
-        <div
-          ref={containerRef}
-          className="flex-grow bg-gray-50"
-          style={{ touchAction: "none" }} // Prevents touch scrolling
-        />
-      </div>
-    </div>
+      <section className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
+        <div className="single-cell-child single-cell-container">
+          <div
+            ref={containerRef}
+            className="single-cell-child max-w-full place-self-center"
+            // style={{ touchAction: "none" }}
+          />
+        </div>
+      </section>
+    </>
   );
 };
