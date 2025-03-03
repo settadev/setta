@@ -10,7 +10,7 @@ export function DrawArea({ sectionId }) {
   const fabricCanvas = useRef(null);
   const {
     activeLayer,
-    allLayersMetadata,
+    // allLayersMetadata,
     size: { width, height },
     canvasSettings: {
       activeLayerId,
@@ -19,13 +19,13 @@ export function DrawArea({ sectionId }) {
       brushShape,
       isEraser,
       eraserBrushSize,
-      drawThrottleDelay,
-      canvasTransferQueueLength,
+      // drawThrottleDelay,
+      // canvasTransferQueueLength,
       mode,
-      artifactIdUsedToSetCanvasSize,
+      // artifactIdUsedToSetCanvasSize,
     },
-    loadedArtifacts,
-    loadedArtifactIdsWithDuplicates,
+    // loadedArtifacts,
+    // loadedArtifactIdsWithDuplicates,
   } = useDrawAreaActiveLayerAndLoadedArtifacts(sectionId);
 
   const layerOpacity = activeLayer?.layerOpacity ?? 1;
@@ -36,7 +36,15 @@ export function DrawArea({ sectionId }) {
       return;
     }
 
-    fabricCanvas.current = new fabric.Canvas(canvasRef.current, {});
+    fabricCanvas.current = new fabric.Canvas(canvasRef.current, {
+      isDrawingMode: mode === "draw",
+    });
+
+    // Initialize the brush
+    const pencilBrush = new fabric.PencilBrush(fabricCanvas.current);
+    pencilBrush.color = color;
+    pencilBrush.width = brushSize;
+    fabricCanvas.current.freeDrawingBrush = pencilBrush;
 
     return () => {
       // `dispose` is async
@@ -60,7 +68,20 @@ export function DrawArea({ sectionId }) {
         state,
       }),
     );
-  }, [width, height]);
+  }, [width, height, sectionId]);
+
+  // Update drawing mode when it changes
+  useEffect(() => {
+    if (!fabricCanvas.current) return;
+    fabricCanvas.current.isDrawingMode = mode === "draw";
+  }, [mode]);
+
+  // Update brush properties when they change
+  useEffect(() => {
+    if (!fabricCanvas.current) return;
+    fabricCanvas.current.freeDrawingBrush.color = color;
+    fabricCanvas.current.freeDrawingBrush.width = brushSize;
+  }, [color, brushSize]);
 
   return (
     <>
