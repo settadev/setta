@@ -26,6 +26,7 @@ export const DrawAreaControls = ({
   onToggleLayerVisibility,
   onSelectLayer,
   onReorderLayers,
+  clearStrokes,
 }) => {
   return (
     <div className="section-search section-w-full z-10 flex  flex-wrap items-center gap-2 rounded-xl border-b border-solid border-white px-3 py-3 shadow-sm @container dark:border-setta-700 [&_.colorpicker]:!max-h-6 [&_.colorpicker]:max-w-24 ">
@@ -131,12 +132,12 @@ export const DrawAreaControls = ({
         />
       </StandardPopover>
 
-      {/* <button
+      <button
         className="flex w-8 cursor-pointer items-center justify-center gap-1 self-stretch rounded-lg bg-setta-200/30 py-1 text-xs text-setta-700 hover:bg-red-600 hover:text-white dark:bg-setta-800/50 dark:text-setta-400 dark:hover:bg-red-800 dark:hover:text-white"
         onClick={clearStrokes}
       >
         <i className="gg-trash" />
-      </button> */}
+      </button>
     </div>
   );
 };

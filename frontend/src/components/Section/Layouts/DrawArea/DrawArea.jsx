@@ -383,6 +383,30 @@ export const DrawArea = () => {
     );
   };
 
+  const clearStrokes = () => {
+    const currentLayerId = activeLayerId;
+    const konvaLayer = konvaLayersRef.current[currentLayerId];
+
+    if (!konvaLayer) return;
+
+    // Remove all line shapes from the Konva layer
+    konvaLayer.destroyChildren();
+
+    // Clear the stored references to lines for this layer
+    layerLinesRef.current[currentLayerId] = [];
+
+    // Clear the layer's cache
+    konvaLayer.clearCache();
+
+    // Redraw the layer
+    konvaLayer.batchDraw();
+
+    // Make sure the current line reference is cleared if it was on this layer
+    if (lastLineRef.current && lastLineRef.current.parent === konvaLayer) {
+      lastLineRef.current = null;
+    }
+  };
+
   return (
     <>
       {/* Pass all control-related props to the DrawControls component */}
@@ -405,6 +429,7 @@ export const DrawArea = () => {
         onToggleLayerVisibility={toggleLayerVisibility}
         onSelectLayer={setActiveLayerId}
         onReorderLayers={reorderLayers}
+        clearStrokes={clearStrokes}
       />
       <section className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
         <div className="single-cell-child single-cell-container">
