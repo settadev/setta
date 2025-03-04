@@ -131,7 +131,7 @@ class Tasks:
             else:
                 results.append(result)
 
-    async def add_custom_fns(self, code_graph, to_cache):
+    async def add_custom_fns(self, code_graph, exporter_obj):
         for c in code_graph:
             subprocess_key = c["subprocess_key"]
             sp = self.in_memory_subprocesses.get(subprocess_key, {}).get("subprocess")
@@ -149,7 +149,7 @@ class Tasks:
                 {
                     "type": "import",
                     "imports": c["imports"],
-                    "to_cache": to_cache,
+                    "exporter_obj": exporter_obj,
                 }
             )
             result = await self.task_runner.run(sp.parent_conn.recv, [], RunType.THREAD)

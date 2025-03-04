@@ -109,7 +109,7 @@ class SettaInMemoryFnSubprocess:
                             fns_dict, module, module_name
                         )
                         for k in added_fn_names:
-                            cache[k] = msg["to_cache"]
+                            cache[k] = msg["exporter_obj"]
                             dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
 
                     self.child_conn.send(
@@ -120,12 +120,23 @@ class SettaInMemoryFnSubprocess:
                     )
 
                 elif msg_type == "call":
-                    fn_name = msg["fn_name"]
-                    message = self.process_message(fn_name, msg["message"], cache)
-                    fn = fns_dict[fn_name]
-                    result = fn.fn(message)
-                    return_message_type = fn.return_message_type
+                    result, return_message_type = self.call_imported_fn(
+                        msg, fns_dict, cache
+                    )
+                    self.child_conn.send(
+                        {
+                            "status": "success",
+                            "content": result,
+                            "messageType": return_message_type,
+                        }
+                    )
 
+                elif msg_type == "call_with_new_project_data":
+                    # replace old exporter_obj
+                    cache[msg["fn_name"]] = msg["exporter_obj"]
+                    result, return_message_type = self.call_imported_fn(
+                        msg, fns_dict, cache
+                    )
                     self.child_conn.send(
                         {
                             "status": "success",
@@ -143,6 +154,14 @@ class SettaInMemoryFnSubprocess:
                         "messageType": return_message_type,
                     }
                 )
+
+    def call_imported_fn(self, msg, fns_dict, cache):
+        fn_name = msg["fn_name"]
+        message = self.process_message(fn_name, msg["message"], cache)
+        fn = fns_dict[fn_name]
+        result = fn.fn(message)
+        return_message_type = fn.return_message_type
+        return result, return_message_type
 
     def close(self):
         try:

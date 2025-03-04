@@ -115,7 +115,7 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
 
     initialContent = await tasks.add_custom_fns(
         code_graph,
-        to_cache=exporter_obj_in_memory,
+        exporter_obj=exporter_obj_in_memory,
     )
 
     return initialContent
