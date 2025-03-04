@@ -1,3 +1,5 @@
+// useKonvaTransformer.js - Updated for dual-layer approach
+
 import Konva from "konva";
 import { useEffect } from "react";
 
@@ -61,40 +63,44 @@ export function useKonvaTransformer({
       // Add transform event listeners directly to transformer
       transformer.on("transformstart", () => {
         const currentLayerId = activeLayerIdRef.current;
-        const currentLayer = konvaLayersRef.current[currentLayerId];
-        if (currentLayer && currentLayer.isCached()) {
-          currentLayer.clearCache();
+        const resultLayer = konvaLayersRef.current[currentLayerId]?.result;
+
+        if (resultLayer && resultLayer.isCached()) {
+          resultLayer.clearCache();
         }
       });
 
       transformer.on("transform", () => {
         const currentLayerId = activeLayerIdRef.current;
-        const currentLayer = konvaLayersRef.current[currentLayerId];
-        if (currentLayer) {
-          currentLayer.batchDraw();
+        const resultLayer = konvaLayersRef.current[currentLayerId]?.result;
+
+        if (resultLayer) {
+          resultLayer.batchDraw();
         }
       });
 
       transformer.on("transformend", () => {
         const currentLayerId = activeLayerIdRef.current;
-        const currentLayer = konvaLayersRef.current[currentLayerId];
-        if (currentLayer) {
+        const resultLayer = konvaLayersRef.current[currentLayerId]?.result;
+
+        if (resultLayer) {
           updateLayerCache(currentLayerId);
         }
       });
 
-      // Add to active layer
+      // Add to active layer's result layer
       const currentLayerId = activeLayerIdRef.current;
-      const currentLayer = konvaLayersRef.current[currentLayerId];
-      if (currentLayer) {
-        currentLayer.add(transformer);
+      const resultLayer = konvaLayersRef.current[currentLayerId]?.result;
+
+      if (resultLayer) {
+        resultLayer.add(transformer);
         transformer.moveToTop();
         transformerRef.current = transformer;
 
         // Reattach nodes if any were previously selected
         if (selectedNodesRef.current.length > 0) {
           transformer.nodes(selectedNodesRef.current);
-          currentLayer.batchDraw(); // Force immediate draw
+          resultLayer.batchDraw(); // Force immediate draw
         }
       }
 
@@ -108,11 +114,9 @@ export function useKonvaTransformer({
           listening: false, // Don't interfere with other events
         });
 
-        // Add to active layer
-        const currentLayerId = activeLayerIdRef.current;
-        const currentLayer = konvaLayersRef.current[currentLayerId];
-        if (currentLayer) {
-          currentLayer.add(selectionRect);
+        // Add to active layer's result layer
+        if (resultLayer) {
+          resultLayer.add(selectionRect);
           selectionRectangleRef.current = selectionRect;
         }
       }
@@ -132,24 +136,28 @@ export function useKonvaTransformer({
       }
     }
 
-    // Make all lines draggable in edit mode, non-draggable otherwise
+    // Make all lines in result layers draggable in edit mode, non-draggable otherwise
     Object.keys(konvaLayersRef.current).forEach((layerId) => {
-      const layer = konvaLayersRef.current[layerId];
-      const lines = layer.find(".drawingLine");
+      const resultLayer = konvaLayersRef.current[layerId]?.result;
 
-      lines.forEach((line) => {
-        line.draggable(mode === "edit");
-      });
+      if (resultLayer) {
+        const lines = resultLayer.find(".drawingLine");
 
-      // Redraw the layer
-      layer.batchDraw();
+        lines.forEach((line) => {
+          line.draggable(mode === "edit");
+        });
+
+        // Redraw the layer
+        resultLayer.batchDraw();
+      }
     });
 
-    // Redraw the active layer
+    // Redraw the active layer's result layer
     const currentLayerId = activeLayerIdRef.current;
-    const currentLayer = konvaLayersRef.current[currentLayerId];
-    if (currentLayer) {
-      currentLayer.batchDraw();
+    const resultLayer = konvaLayersRef.current[currentLayerId]?.result;
+
+    if (resultLayer) {
+      resultLayer.batchDraw();
     }
   }, [mode, activeLayerId]);
 }
@@ -170,16 +178,19 @@ export function useEditModeEffects({
       }
     }
 
-    // Make all lines draggable in edit mode, non-draggable otherwise
+    // Make all lines in result layers draggable in edit mode, non-draggable otherwise
     Object.keys(konvaLayersRef.current).forEach((layerId) => {
-      const layer = konvaLayersRef.current[layerId];
-      const lines = layer.find(".drawingLine");
+      const resultLayer = konvaLayersRef.current[layerId]?.result;
 
-      lines.forEach((line) => {
-        line.draggable(mode === "edit");
-      });
+      if (resultLayer) {
+        const lines = resultLayer.find(".drawingLine");
 
-      layer.batchDraw();
+        lines.forEach((line) => {
+          line.draggable(mode === "edit");
+        });
+
+        resultLayer.batchDraw();
+      }
     });
   }, [mode]);
 }

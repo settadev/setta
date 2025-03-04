@@ -1,3 +1,5 @@
+// DrawArea.jsx - Updated for dual-layer approach
+
 import { useEffect, useRef, useState } from "react";
 import { DrawAreaControls } from "./DrawAreaControls";
 import { useMouseHandlers } from "./mouseHandlers";
@@ -7,6 +9,7 @@ import {
   getLayerManagementFns,
   useLayerCache,
   useLayerCacheEffects,
+  useMergeActiveToResult,
   useUpdateKonvaLayers,
 } from "./useUpdateKonvaLayers";
 import {
@@ -17,7 +20,7 @@ import {
 
 export const DrawArea = () => {
   const containerRef = useRef(null);
-  const [mode, setMode] = useState("brush"); // Now can be "brush", "eraser", or "edit"
+  const [mode, setMode] = useState("brush"); // Can be "brush", "eraser", or "edit"
   const [opacity, setOpacity] = useState(1);
   const [brushSize, setBrushSize] = useState(5);
   const [eraserSize, setEraserSize] = useState(20);
@@ -28,10 +31,11 @@ export const DrawArea = () => {
   const [activeLayerId, setActiveLayerId] = useState(1);
 
   const stageRef = useRef(null);
+  // Modified to store both active and result layers
   const konvaLayersRef = useRef({});
   const isPaintRef = useRef(false);
   const lastLineRef = useRef(null);
-  // Store all lines for each layer to manage opacity
+  // Modified to store active and result lines separately
   const layerLinesRef = useRef({});
   // Reference for transformer
   const transformerRef = useRef(null);
@@ -84,6 +88,14 @@ export const DrawArea = () => {
     stageRef,
   });
 
+  // New function to merge from active to result layer
+  const mergeActiveToResult = useMergeActiveToResult({
+    konvaLayersRef,
+    layerLinesRef,
+    layersRef, // Pass layersRef to access layer opacity
+    updateLayerCache,
+  });
+
   useKonvaTransformer({
     stageRef,
     mode,
@@ -132,6 +144,7 @@ export const DrawArea = () => {
     layersRef,
     updateLayerCache,
     prepareLineForTransform,
+    mergeActiveToResult, // Pass the new function
   });
 
   useKonvaStage({
@@ -147,6 +160,7 @@ export const DrawArea = () => {
     handleMouseUp,
     handleMouseMove,
     updateLayerCache,
+    mergeActiveToResult, // Pass the new function
   });
 
   useUpdateKonvaLayers({
@@ -189,6 +203,7 @@ export const DrawArea = () => {
     setLayers,
     activeLayerId,
     setActiveLayerId,
+    updateLayerCache,
   });
 
   const deleteSelectedObjects = createDeleteSelectedObjects({
@@ -234,7 +249,7 @@ export const DrawArea = () => {
         onSelectLayer={setActiveLayerId}
         onReorderLayers={reorderLayers}
         clearStrokes={clearStrokes}
-        onDeleteSelected={deleteSelectedObjects} // New prop for edit mode
+        onDeleteSelected={deleteSelectedObjects} // For edit mode
       />
       <section className="nodrag single-cell-container section-row-main section-key-value relative max-h-full min-w-0">
         <div className="single-cell-child single-cell-container">

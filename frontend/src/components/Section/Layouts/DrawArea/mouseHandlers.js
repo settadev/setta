@@ -1,3 +1,5 @@
+// mouseHandlers.js - Updated for dual-layer approach
+
 import Konva from "konva";
 import { useCallback } from "react";
 
@@ -21,15 +23,34 @@ export function useMouseHandlers({
   layersRef,
   updateLayerCache,
   prepareLineForTransform,
+  mergeActiveToResult,
 }) {
   const handleMouseDown = useCallback((e) => {
     if (!stageRef.current) return;
 
     const currentMode = modeRef.current;
     const currentLayerId = activeLayerIdRef.current;
-    const currentLayer = konvaLayersRef.current[currentLayerId];
+    const currentLayerPair = konvaLayersRef.current[currentLayerId];
 
-    if (!currentLayer) return;
+    if (!currentLayerPair) return;
+
+    // In edit mode, always work with the result layer
+    // In drawing mode with brush, use active layer
+    // In drawing mode with eraser, use result layer directly
+    let currentLayer;
+    if (currentMode === "edit") {
+      currentLayer = currentLayerPair.result;
+    } else if (currentMode === "eraser") {
+      // Erasers work directly on the result layer for immediate effect
+      currentLayer = currentLayerPair.result;
+      // Clear cache during erasing for immediate visual feedback
+      if (currentLayer.isCached()) {
+        currentLayer.clearCache();
+      }
+    } else {
+      // Normal brush drawing uses active layer
+      currentLayer = currentLayerPair.active;
+    }
 
     // Get pointer position
     const pos = stageRef.current.getPointerPosition();
@@ -97,9 +118,10 @@ export function useMouseHandlers({
         }
       }
     } else {
-      // Original drawing behavior for brush/eraser modes
+      // Drawing behavior for brush/eraser modes - always on active layer
       isPaintRef.current = true;
 
+      // Active layer is always uncached, so no need to clear cache
       const currentOpacity = opacityRef.current;
       const currentBrushSize = brushSizeRef.current;
       const currentEraserSize = eraserSizeRef.current;
@@ -109,12 +131,22 @@ export function useMouseHandlers({
       const strokeWidth =
         currentMode === "brush" ? currentBrushSize : currentEraserSize;
 
+      // Get current layer opacity to properly calculate brush opacity
+      const layerOpacity =
+        layersRef.current.find((l) => l.id === currentLayerId)?.opacity || 1;
+
       // Create the new line
       lastLineRef.current = new Konva.Line({
         stroke: currentBrushColor,
         strokeWidth: strokeWidth,
-        // For brushes, use the brush opacity; for erasers, always full opacity
-        opacity: currentMode === "brush" ? currentOpacity : 1,
+        // For brushes, apply opacity based on brush and layer settings
+        // For erasers, always use full opacity (1)
+        opacity:
+          currentMode === "brush"
+            ? currentLayer === currentLayerPair.result
+              ? currentOpacity * layerOpacity
+              : currentOpacity
+            : 1,
         // Store original opacity for future adjustments
         _originalOpacity: currentOpacity,
         _isEraser: currentMode === "eraser",
@@ -123,21 +155,24 @@ export function useMouseHandlers({
         lineCap: "round",
         lineJoin: "round",
         points: [pos.x, pos.y, pos.x, pos.y],
-        draggable: currentMode === "edit", // Make lines draggable only in edit mode
+        draggable: currentMode === "edit", // Only draggable in edit mode
         name: "drawingLine", // Add name for easier selection
-        // Add these transform properties to make lines work better with transformer
-        transformsEnabled: "all",
-        listening: true,
       });
 
-      // Add line to the layer
+      // Add line to the active layer
       currentLayer.add(lastLineRef.current);
 
-      // Store the line for opacity management
+      // Store the line in the appropriate array
       if (!layerLinesRef.current[currentLayerId]) {
-        layerLinesRef.current[currentLayerId] = [];
+        layerLinesRef.current[currentLayerId] = { active: [], result: [] };
       }
-      layerLinesRef.current[currentLayerId].push(lastLineRef.current);
+
+      if (currentMode === "eraser") {
+        // Store eraser strokes directly in result lines
+        layerLinesRef.current[currentLayerId].result.push(lastLineRef.current);
+      } else {
+        layerLinesRef.current[currentLayerId].active.push(lastLineRef.current);
+      }
     }
   }, []);
 
@@ -146,9 +181,21 @@ export function useMouseHandlers({
 
     const currentMode = modeRef.current;
     const currentLayerId = activeLayerIdRef.current;
-    const currentLayer = konvaLayersRef.current[currentLayerId];
+    const currentLayerPair = konvaLayersRef.current[currentLayerId];
 
-    if (!currentLayer) return;
+    if (!currentLayerPair) return;
+
+    // Choose the appropriate layer based on mode
+    let currentLayer;
+    if (currentMode === "edit") {
+      currentLayer = currentLayerPair.result;
+    } else if (currentMode === "eraser") {
+      // Erasers work directly on the result layer
+      currentLayer = currentLayerPair.result;
+    } else {
+      // Normal brush drawing uses active layer
+      currentLayer = currentLayerPair.active;
+    }
 
     // Get pointer position
     const pos = stageRef.current.getPointerPosition();
@@ -172,37 +219,14 @@ export function useMouseHandlers({
         currentLayer.batchDraw();
       }
     } else if (isPaintRef.current && lastLineRef.current) {
-      // Original drawing behavior
+      // Drawing behavior - active layer is always uncached for best performance
       e.evt.preventDefault();
 
       const newPoints = lastLineRef.current.points().concat([pos.x, pos.y]);
       lastLineRef.current.points(newPoints);
 
-      // Temporarily set the layer's opacity to 1 to avoid double-applying opacity
-      const layerData = layersRef.current.find((l) => l.id === currentLayerId);
-      const originalLayerOpacity = layerData ? layerData.opacity : 1;
-
-      // Clear cache, set full opacity to avoid accumulation
-      currentLayer.clearCache();
-      currentLayer.opacity(1);
-
-      // Update drawing
+      // Just draw - active layer is always uncached
       currentLayer.batchDraw();
-
-      // Immediately apply cache with the correct opacity to avoid flicker
-      if (stageRef.current) {
-        currentLayer.cache({
-          x: 0,
-          y: 0,
-          width: stageRef.current.width(),
-          height: stageRef.current.height(),
-          pixelRatio: window.devicePixelRatio || 2,
-        });
-
-        // Restore the layer opacity
-        currentLayer.opacity(originalLayerOpacity);
-        currentLayer.batchDraw();
-      }
     }
   }, []);
 
@@ -210,9 +234,18 @@ export function useMouseHandlers({
     (e) => {
       const currentMode = modeRef.current;
       const currentLayerId = activeLayerIdRef.current;
-      const currentLayer = konvaLayersRef.current[currentLayerId];
+      const currentLayerPair = konvaLayersRef.current[currentLayerId];
 
-      if (!currentLayer) return;
+      if (!currentLayerPair) return;
+
+      let currentLayer;
+      if (currentMode === "edit") {
+        currentLayer = currentLayerPair.result;
+      } else if (currentMode === "eraser") {
+        currentLayer = currentLayerPair.result;
+      } else {
+        currentLayer = currentLayerPair.active;
+      }
 
       if (currentMode === "edit" && isSelectingRef.current) {
         // Finish selection rectangle and select contained lines
@@ -224,8 +257,8 @@ export function useMouseHandlers({
         ) {
           const selectionBox = selectionRectangleRef.current.getClientRect();
 
-          // Find all lines in the current layer
-          const lines = currentLayer.find(".drawingLine");
+          // Find all lines in the result layer
+          const lines = currentLayerPair.result.find(".drawingLine");
 
           // Filter to get lines that intersect with selection rectangle
           const selectedLines = lines.filter((line) =>
@@ -260,20 +293,20 @@ export function useMouseHandlers({
           currentLayer.batchDraw();
         }
       } else if (isPaintRef.current) {
-        // Original behavior for completing a brush stroke
+        // Finish drawing a stroke
         isPaintRef.current = false;
 
-        // When line drawing is complete, update the layer's cache
-        if (lastLineRef.current) {
-          // Clear the layer's cache before updating it
-          currentLayer.clearCache();
-
-          // Update the cache with the new line included
+        if (currentMode === "brush") {
+          // Only merge brush strokes from active to result layer
+          mergeActiveToResult(currentLayerId);
+        } else if (currentMode === "eraser") {
+          // For eraser strokes, they're already on the result layer
+          // We just need to update the cache
           updateLayerCache(currentLayerId);
         }
       }
     },
-    [updateLayerCache],
+    [updateLayerCache, mergeActiveToResult],
   );
 
   return { handleMouseDown, handleMouseMove, handleMouseUp };
