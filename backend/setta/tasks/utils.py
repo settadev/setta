@@ -181,7 +181,9 @@ class SettaInMemoryFnSubprocess:
         if fn_name in cache:
             exporter_obj = cache[fn_name]
             for k, v in message.content.items():
-                nice_str = exporter_obj.var_name_mapping[tuple(json.loads(k))]
+                nice_str = exporter_obj.var_name_mapping.get(tuple(json.loads(k)))
+                if not nice_str:
+                    continue
                 p_dict, key = nested_access(exporter_obj.output, nice_str)
                 p_dict[key] = v
             message.content = exporter_obj.output
