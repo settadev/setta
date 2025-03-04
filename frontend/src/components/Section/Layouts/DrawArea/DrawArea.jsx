@@ -32,13 +32,12 @@ export function DrawArea({ sectionId }) {
       drawThrottleDelay,
       canvasTransferQueueLength,
       mode,
-      artifactIdUsedToSetCanvasSize,
     },
     loadedArtifacts,
     loadedArtifactIdsWithDuplicates,
   } = useDrawAreaActiveLayerAndLoadedArtifacts(sectionId);
 
-  const canvasRef = useRef(null);
+  const layerCanvasRefs = useRef({});
   const draftCanvasRef = useRef(null);
   const tempCanvasRefs = useRef({ layer: null, artifact: null });
   const strokesRef = useRef([]);
@@ -61,12 +60,13 @@ export function DrawArea({ sectionId }) {
   )?.artifactId;
 
   const updateDrawAreas = useMisc((x) => x.updateDrawAreas);
+  const layerIds = allLayersMetadata.map((x) => x.id);
 
   useEffect(() => {
     tempCanvasRefs.current.layer = document.createElement("canvas");
     tempCanvasRefs.current.artifact = document.createElement("canvas");
 
-    const unsub = listenForCanvasToBase64Requests(sectionId, canvasRef);
+    const unsub = listenForCanvasToBase64Requests(sectionId, layerCanvasRefs);
     return unsub;
   }, []);
 
@@ -74,23 +74,16 @@ export function DrawArea({ sectionId }) {
     useSectionInfos.setState((state) => {
       setCanvasSize({
         sectionId,
-        canvasRef,
+        layerCanvasRefs,
         tempCanvasRefs,
         draftCanvasRef,
         height,
         width,
-        artifactIdUsedToSetCanvasSize,
         state,
       });
     });
-    drawAllLayers(sectionId, canvasRef, tempCanvasRefs);
-  }, [
-    height,
-    width,
-    Boolean(loadedArtifacts[artifactIdUsedToSetCanvasSize]),
-    updateDrawAreas,
-  ]);
-  // the Boolean dependency is checking whether or not the artifactIdUsedToSetCanvasSize has been loaded or not
+    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
+  }, [height, width, updateDrawAreas]);
 
   useEffect(() => {
     setDraftCanvasProperties({
@@ -115,7 +108,7 @@ export function DrawArea({ sectionId }) {
       selectedIdx.current = null;
       resizeHandleCorners.current = null;
     }
-    drawAllLayers(sectionId, canvasRef, tempCanvasRefs);
+    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
   }, [
     mode,
     layerOpacity,
@@ -164,7 +157,7 @@ export function DrawArea({ sectionId }) {
       resizeHandle,
       resizeHandleCorners,
       drawThrottleDelay,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
       canvasTransferQueueLength,
@@ -180,7 +173,7 @@ export function DrawArea({ sectionId }) {
       sectionId,
       currBrushStrokeArtifactId,
       strokesRef,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
     );
@@ -203,6 +196,8 @@ export function DrawArea({ sectionId }) {
     cursorIcon = "cursor-[url(./src/assets/cursor/pen.svg)_0_24,_pointer]";
   }
 
+  console.log("layerCanvasRefs", layerCanvasRefs.current)
+
   return (
     <>
       <DrawAreaControls
@@ -224,14 +219,16 @@ export function DrawArea({ sectionId }) {
         {...getRootProps()}
       >
         <div className="single-cell-child single-cell-container">
-          <canvas
-            ref={canvasRef}
+          <LayerCanvases
+            layerIds={layerIds}
+            activeLayerId={activeLayerId}
+            layerCanvasRefs={layerCanvasRefs}
+            cursorIcon={cursorIcon}
+            canvasClassName={canvasClassName}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
             onMouseEnter={onMouseEnter}
-            className={`${cursorIcon} ${canvasClassName}`}
           />
           <canvas
             ref={draftCanvasRef}
@@ -241,4 +238,29 @@ export function DrawArea({ sectionId }) {
       </section>
     </>
   );
+}
+
+function LayerCanvases({
+  layerIds,
+  activeLayerId,
+  layerCanvasRefs,
+  cursorIcon,
+  canvasClassName,
+  onMouseDown,
+  onMouseMove,
+  onMouseUp,
+  onMouseEnter,
+}) {
+  return layerIds.map((id) => (
+    <canvas
+      key={id}
+      ref={layerCanvasRefs.current[id]}
+      className={`${cursorIcon} ${canvasClassName}`}
+      onMouseDown={id === activeLayerId ? onMouseDown : undefined}
+      onMouseMove={id === activeLayerId ? onMouseMove : undefined}
+      onMouseUp={id === activeLayerId ? onMouseUp : undefined}
+      onMouseLeave={id === activeLayerId ? onMouseUp : undefined}
+      onMouseEnter={id === activeLayerId ? onMouseEnter : undefined}
+    />
+  ));
 }
