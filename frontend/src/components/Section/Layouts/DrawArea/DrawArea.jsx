@@ -255,7 +255,7 @@ function LayerCanvases({
       ref={(el) => {
         layerCanvasRefs.current[id] = el;
       }}
-      className={`${cursorIcon} ${canvasClassName}`}
+      className={`${cursorIcon} ${canvasClassName} ${id !== activeLayerId ? "pointer-events-none" : ""}`}
       onMouseDown={id === activeLayerId ? onMouseDown : undefined}
       onMouseMove={id === activeLayerId ? onMouseMove : undefined}
       onMouseUp={id === activeLayerId ? onMouseUp : undefined}
