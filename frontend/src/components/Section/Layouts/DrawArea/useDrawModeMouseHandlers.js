@@ -48,7 +48,7 @@ export function useDrawModeMouseHandlers({
   resizeHandle,
   resizeHandleCorners,
   drawThrottleDelay,
-  canvasRef,
+  layerCanvasRefs,
   tempCanvasRefs,
   draftCanvasRef,
   canvasTransferQueueLength,
@@ -59,7 +59,7 @@ export function useDrawModeMouseHandlers({
 }) {
   let onMouseDown, onMouseMove, onMouseUp, onMouseEnter;
   let redrawLayers, didChange;
-  const fnCanvasToBase64 = () => canvasToBase64(canvasRef.current);
+  const fnCanvasToBase64 = () => canvasToBase64(layerCanvasRefs.current);
 
   if (mode === "draw") {
     const onMouseDownCore = drawingOnMouseDown({
@@ -71,7 +71,7 @@ export function useDrawModeMouseHandlers({
       brushShape,
       prevPointRef,
       setIsDrawing,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
       activeLayerId,
@@ -93,7 +93,7 @@ export function useDrawModeMouseHandlers({
       eraserStrokesRef,
       prevPointRef,
       isDrawing,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
       canvasTransferQueueLength,
@@ -118,7 +118,7 @@ export function useDrawModeMouseHandlers({
       activeLayerId,
       currBrushStrokeArtifactId,
       strokesRef,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
     });
@@ -133,7 +133,7 @@ export function useDrawModeMouseHandlers({
     onMouseEnter = drawingOnMouseEnter({ draftCanvasRef, onMouseDown });
   } else {
     const onMouseDownCore = editingOnMouseDown({
-      canvasRef,
+      layerCanvasRefs,
       selectedIdx,
       localArtifactTransformsRef,
       resizeHandle,
@@ -141,6 +141,7 @@ export function useDrawModeMouseHandlers({
       lastPos,
       draggedIdx,
       isDragging,
+      activeLayerId,
     });
 
     onMouseDown = (...props) => {
@@ -148,7 +149,7 @@ export function useDrawModeMouseHandlers({
       if (redrawLayers) {
         drawAllLayers(
           sectionId,
-          canvasRef,
+          layerCanvasRefs,
           tempCanvasRefs,
           {},
           { [activeLayerId]: localArtifactTransformsRef.current },
@@ -159,7 +160,7 @@ export function useDrawModeMouseHandlers({
     };
 
     const onMouseMoveCore = editingOnMouseMove({
-      canvasRef,
+      layerCanvasRefs,
       isDragging,
       lastPos,
       resizeHandle,
@@ -167,6 +168,7 @@ export function useDrawModeMouseHandlers({
       selectedIdx,
       draggedIdx,
       localArtifactTransformsRef,
+      activeLayerId,
     });
 
     onMouseMove = (...props) => {
@@ -174,7 +176,7 @@ export function useDrawModeMouseHandlers({
       if (redrawLayers) {
         drawAllLayers(
           sectionId,
-          canvasRef,
+          layerCanvasRefs,
           tempCanvasRefs,
           {},
           { [activeLayerId]: localArtifactTransformsRef.current },
@@ -192,7 +194,7 @@ export function useDrawModeMouseHandlers({
       resizeHandleCorners,
       activeLayerId,
       localArtifactTransformsRef,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
     });
 
@@ -229,7 +231,7 @@ function drawingOnMouseDown({
   brushShape,
   prevPointRef,
   setIsDrawing,
-  canvasRef,
+  layerCanvasRefs,
   tempCanvasRefs,
   draftCanvasRef,
   activeLayerId,
@@ -265,7 +267,7 @@ function drawingOnMouseDown({
       );
       drawAllLayers(
         sectionId,
-        canvasRef,
+        layerCanvasRefs,
         tempCanvasRefs,
         {},
         {},
@@ -302,7 +304,7 @@ function drawingOnMouseMove({
   eraserStrokesRef,
   prevPointRef,
   isDrawing,
-  canvasRef,
+  layerCanvasRefs,
   tempCanvasRefs,
   draftCanvasRef,
   canvasTransferQueueLength,
@@ -327,7 +329,7 @@ function drawingOnMouseMove({
       prevPointRef.current = point;
       drawAllLayers(
         sectionId,
-        canvasRef,
+        layerCanvasRefs,
         tempCanvasRefs,
         {},
         {},
@@ -339,7 +341,7 @@ function drawingOnMouseMove({
         sectionId,
         currBrushStrokeArtifactId,
         strokesRef,
-        canvasRef,
+        layerCanvasRefs,
         tempCanvasRefs,
         draftCanvasRef,
         false,
@@ -376,7 +378,7 @@ function drawingOnMouseUp({
   activeLayerId,
   currBrushStrokeArtifactId,
   strokesRef,
-  canvasRef,
+  layerCanvasRefs,
   tempCanvasRefs,
   draftCanvasRef,
 }) {
@@ -436,7 +438,7 @@ function drawingOnMouseUp({
       sectionId,
       currBrushStrokeArtifactId,
       strokesRef,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
     );
@@ -460,7 +462,7 @@ function drawingOnMouseEnter({ draftCanvasRef, onMouseDown }) {
 }
 
 function editingOnMouseDown({
-  canvasRef,
+  layerCanvasRefs,
   selectedIdx,
   localArtifactTransformsRef,
   resizeHandle,
@@ -468,11 +470,12 @@ function editingOnMouseDown({
   lastPos,
   draggedIdx,
   isDragging,
+  activeLayerId,
 }) {
   // returns true if layers should be redrawn
   return (e) => {
     const artifactState = useArtifacts.getState().x;
-    const canvas = canvasRef.current;
+    const canvas = layerCanvasRefs.current[activeLayerId];
     const rect = canvas.getBoundingClientRect();
     const zoom = getZoom();
     const x = (e.clientX - rect.left) / zoom;
@@ -538,7 +541,7 @@ function editingOnMouseDown({
 }
 
 function editingOnMouseMove({
-  canvasRef,
+  layerCanvasRefs,
   isDragging,
   lastPos,
   resizeHandle,
@@ -546,13 +549,14 @@ function editingOnMouseMove({
   selectedIdx,
   draggedIdx,
   localArtifactTransformsRef,
+  activeLayerId,
 }) {
   // returns true if layers should be redrawn
   return (e) => {
     if (!isDragging.current && resizeHandle.current === null) return false;
 
     const artifactState = useArtifacts.getState().x;
-    const canvas = canvasRef.current;
+    const canvas = layerCanvasRefs.current[activeLayerId];
     const rect = canvas.getBoundingClientRect();
     const zoom = getZoom();
     const x = (e.clientX - rect.left) / zoom;
@@ -687,7 +691,7 @@ function editingOnMouseUp({
   resizeHandleCorners,
   activeLayerId,
   localArtifactTransformsRef,
-  canvasRef,
+  layerCanvasRefs,
   tempCanvasRefs,
 }) {
   return () => {
@@ -704,7 +708,7 @@ function editingOnMouseUp({
       activeLayerId,
       localArtifactTransformsRef,
       resizeHandleCorners,
-      canvasRef,
+      layerCanvasRefs,
       tempCanvasRefs,
     );
     isDragging.current = false;
