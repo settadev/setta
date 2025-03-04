@@ -5,6 +5,7 @@ import { useMouseHandlers } from "./mouseHandlers";
 import { useKonvaStage } from "./useKonvaStage";
 import { useEditModeEffects, useKonvaTransformer } from "./useKonvaTransformer";
 import {
+  getLayerManagementFns,
   useLayerCache,
   useLayerCacheEffects,
   useUpdateKonvaLayers,
@@ -153,65 +154,6 @@ export const DrawArea = () => {
     updateLayerCache,
   });
 
-  // Layer management functions
-  const addLayer = () => {
-    const maxId = Math.max(0, ...layers.map((l) => l.id));
-    const newLayer = {
-      id: maxId + 1,
-      name: `Layer ${maxId + 1}`,
-      visible: true,
-      opacity: 1,
-    };
-
-    setLayers([...layers, newLayer]);
-    setActiveLayerId(newLayer.id);
-  };
-
-  const deleteLayer = (id) => {
-    // Don't delete if it's the only layer
-    if (layers.length <= 1) return;
-
-    const newLayers = layers.filter((layer) => layer.id !== id);
-    setLayers(newLayers);
-
-    // If active layer was deleted, set the first available layer as active
-    if (activeLayerId === id) {
-      setActiveLayerId(newLayers[0].id);
-    }
-  };
-
-  const toggleLayerVisibility = (id) => {
-    setLayers(
-      layers.map((layer) =>
-        layer.id === id ? { ...layer, visible: !layer.visible } : layer,
-      ),
-    );
-  };
-
-  // Reorder layers function
-  const reorderLayers = (fromIndex, toIndex) => {
-    // Make sure indices are valid
-    if (
-      fromIndex < 0 ||
-      fromIndex >= layers.length ||
-      toIndex < 0 ||
-      toIndex >= layers.length ||
-      fromIndex === toIndex
-    ) {
-      return;
-    }
-
-    // Create a copy of the layers array
-    const newLayers = [...layers];
-
-    // Remove the layer from the fromIndex and insert it at toIndex
-    const [movedLayer] = newLayers.splice(fromIndex, 1);
-    newLayers.splice(toIndex, 0, movedLayer);
-
-    // Update the layers state
-    setLayers(newLayers);
-  };
-
   // Control handlers
   const handleToolChange = (value) => {
     setMode(value);
@@ -233,13 +175,18 @@ export const DrawArea = () => {
     setBrushColor(value);
   };
 
-  const handleLayerOpacityChange = (id, newOpacity) => {
-    setLayers(
-      layers.map((layer) =>
-        layer.id === id ? { ...layer, opacity: newOpacity } : layer,
-      ),
-    );
-  };
+  const {
+    addLayer,
+    deleteLayer,
+    toggleLayerVisibility,
+    reorderLayers,
+    handleLayerOpacityChange,
+  } = getLayerManagementFns({
+    layers,
+    setLayers,
+    activeLayerId,
+    setActiveLayerId,
+  });
 
   // Function to delete selected objects
   const deleteSelectedObjects = () => {

@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 export function useUpdateKonvaLayers({
   stageRef,
@@ -110,4 +110,86 @@ export function useLayerCache({
     // Redraw the layer
     konvaLayer.batchDraw();
   }, []);
+}
+
+export function getLayerManagementFns({
+  layers,
+  setLayers,
+  activeLayerId,
+  setActiveLayerId,
+}) {
+  // Layer management functions
+  const addLayer = () => {
+    const maxId = Math.max(0, ...layers.map((l) => l.id));
+    const newLayer = {
+      id: maxId + 1,
+      name: `Layer ${maxId + 1}`,
+      visible: true,
+      opacity: 1,
+    };
+
+    setLayers([...layers, newLayer]);
+    setActiveLayerId(newLayer.id);
+  };
+
+  const deleteLayer = (id) => {
+    // Don't delete if it's the only layer
+    if (layers.length <= 1) return;
+
+    const newLayers = layers.filter((layer) => layer.id !== id);
+    setLayers(newLayers);
+
+    // If active layer was deleted, set the first available layer as active
+    if (activeLayerId === id) {
+      setActiveLayerId(newLayers[0].id);
+    }
+  };
+
+  const toggleLayerVisibility = (id) => {
+    setLayers(
+      layers.map((layer) =>
+        layer.id === id ? { ...layer, visible: !layer.visible } : layer,
+      ),
+    );
+  };
+
+  // Reorder layers function
+  const reorderLayers = (fromIndex, toIndex) => {
+    // Make sure indices are valid
+    if (
+      fromIndex < 0 ||
+      fromIndex >= layers.length ||
+      toIndex < 0 ||
+      toIndex >= layers.length ||
+      fromIndex === toIndex
+    ) {
+      return;
+    }
+
+    // Create a copy of the layers array
+    const newLayers = [...layers];
+
+    // Remove the layer from the fromIndex and insert it at toIndex
+    const [movedLayer] = newLayers.splice(fromIndex, 1);
+    newLayers.splice(toIndex, 0, movedLayer);
+
+    // Update the layers state
+    setLayers(newLayers);
+  };
+
+  const handleLayerOpacityChange = (id, newOpacity) => {
+    setLayers(
+      layers.map((layer) =>
+        layer.id === id ? { ...layer, opacity: newOpacity } : layer,
+      ),
+    );
+  };
+
+  return {
+    addLayer,
+    deleteLayer,
+    toggleLayerVisibility,
+    reorderLayers,
+    handleLayerOpacityChange,
+  };
 }
