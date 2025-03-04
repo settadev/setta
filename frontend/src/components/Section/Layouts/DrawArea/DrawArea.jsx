@@ -10,6 +10,10 @@ import useDeepCompareEffect, {
   useDeepCompareEffectNoCheck,
 } from "use-deep-compare-effect";
 import {
+  allLayersToBase64Array,
+  combinedLayersToBase64,
+} from "./base64Conversion";
+import {
   drawAllLayers,
   setCanvasSize,
   setDraftCanvasProperties,
@@ -65,10 +69,16 @@ export function DrawArea({ sectionId }) {
   useEffect(() => {
     tempCanvasRefs.current.layer = document.createElement("canvas");
     tempCanvasRefs.current.artifact = document.createElement("canvas");
-
-    const unsub = listenForCanvasToBase64Requests(sectionId, layerCanvasRefs);
-    return unsub;
   }, []);
+
+  useDeepCompareEffect(() => {
+    const unsub = listenForCanvasToBase64Requests(sectionId, () => {
+      const drawing = combinedLayersToBase64(layerCanvasRefs, layerIds);
+      const layers = allLayersToBase64Array(layerCanvasRefs, layerIds);
+      return { drawing, layers };
+    });
+    return unsub;
+  }, [layerIds]);
 
   useEffect(() => {
     useSectionInfos.setState((state) => {
