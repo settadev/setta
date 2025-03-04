@@ -196,8 +196,6 @@ export function DrawArea({ sectionId }) {
     cursorIcon = "cursor-[url(./src/assets/cursor/pen.svg)_0_24,_pointer]";
   }
 
-  console.log("layerCanvasRefs", layerCanvasRefs.current)
-
   return (
     <>
       <DrawAreaControls
@@ -254,7 +252,9 @@ function LayerCanvases({
   return layerIds.map((id) => (
     <canvas
       key={id}
-      ref={layerCanvasRefs.current[id]}
+      ref={(el) => {
+        layerCanvasRefs.current[id] = el;
+      }}
       className={`${cursorIcon} ${canvasClassName}`}
       onMouseDown={id === activeLayerId ? onMouseDown : undefined}
       onMouseMove={id === activeLayerId ? onMouseMove : undefined}
