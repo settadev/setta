@@ -131,9 +131,9 @@ class SettaInMemoryFnSubprocess:
                         }
                     )
 
-                elif msg_type == "call_with_new_project_data":
+                elif msg_type == "call_with_new_exporter_obj":
                     # replace old exporter_obj
-                    cache[msg["fn_name"]] = msg["exporter_obj"]
+                    cache[msg["fn_name"]] = msg["other_data"]["exporter_obj"]
                     result, return_message_type = self.call_imported_fn(
                         msg, fns_dict, cache
                     )
