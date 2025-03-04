@@ -102,7 +102,7 @@ export function useLayerCache({
           y: 0,
           width: stage.width(),
           height: stage.height(),
-          pixelRatio: 1, // Using lower value for better performance
+          pixelRatio: window.devicePixelRatio || 2, // Using lower value for better performance
         });
       }
     }

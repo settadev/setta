@@ -196,6 +196,7 @@ export function useMouseHandlers({
           y: 0,
           width: stageRef.current.width(),
           height: stageRef.current.height(),
+          pixelRatio: window.devicePixelRatio || 2,
         });
 
         // Restore the layer opacity
