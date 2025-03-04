@@ -83,7 +83,7 @@ export function DrawArea({ sectionId }) {
       });
     });
     drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
-  }, [height, width, updateDrawAreas]);
+  }, [height, width, JSON.stringify(layerIds), updateDrawAreas]);
 
   useEffect(() => {
     setDraftCanvasProperties({
