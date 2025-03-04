@@ -12,6 +12,10 @@
 
 ## News
 
+**March 4**: [v0.0.13](https://github.com/settadev/setta/releases/tag/v0.0.13)
+- Updated frontend javascript dependencies.
+
+
 **March 3**: [v0.0.12](https://github.com/settadev/setta/releases/tag/v0.0.12)
 - Moved the zoom/map/view controls into the left side pane:
 
@@ -41,9 +45,6 @@ Here's an example of what Developer View and User View look like:
     <td><img src="https://github.com/user-attachments/assets/1126649e-7559-4785-80b9-7eda6466c2e0" /></td>
   </tr>
 </table>
-
-**March 1**: [v0.0.10](https://github.com/settadev/setta/releases/tag/v0.0.10)
-- Made JSON source sections more user-friendly.
 
 ## What does Setta do?
 
