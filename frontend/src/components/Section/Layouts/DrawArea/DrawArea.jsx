@@ -9,7 +9,11 @@ import {
   useLayerCacheEffects,
   useUpdateKonvaLayers,
 } from "./useUpdateKonvaLayers";
-import { createClearStrokes, createPrepareLineForTransform } from "./utils";
+import {
+  createClearStrokes,
+  createDeleteSelectedObjects,
+  createPrepareLineForTransform,
+} from "./utils";
 
 export const DrawArea = () => {
   const containerRef = useRef(null);
@@ -187,39 +191,14 @@ export const DrawArea = () => {
     setActiveLayerId,
   });
 
-  // Function to delete selected objects
-  const deleteSelectedObjects = () => {
-    if (selectedNodesRef.current.length === 0) return;
-
-    const currentLayerId = activeLayerIdRef.current;
-
-    // Remove selected nodes from the layer
-    selectedNodesRef.current.forEach((node) => {
-      // Also remove them from layerLinesRef
-      if (layerLinesRef.current[currentLayerId]) {
-        const nodeIndex = layerLinesRef.current[currentLayerId].findIndex(
-          (line) => line === node,
-        );
-        if (nodeIndex >= 0) {
-          layerLinesRef.current[currentLayerId].splice(nodeIndex, 1);
-        }
-      }
-
-      node.destroy();
-    });
-
-    // Clear selection
-    selectedNodesRef.current = [];
-    if (transformerRef.current) {
-      transformerRef.current.nodes([]);
-    }
-
-    // Redraw the layer
-    if (konvaLayersRef.current[currentLayerId]) {
-      konvaLayersRef.current[currentLayerId].batchDraw();
-      updateLayerCache(currentLayerId);
-    }
-  };
+  const deleteSelectedObjects = createDeleteSelectedObjects({
+    selectedNodesRef,
+    activeLayerIdRef,
+    layerLinesRef,
+    transformerRef,
+    konvaLayersRef,
+    updateLayerCache,
+  });
 
   const clearStrokes = createClearStrokes({
     activeLayerIdRef,

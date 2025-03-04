@@ -105,3 +105,46 @@ export function createClearStrokes({
     selectedNodesRef.current = [];
   };
 }
+
+export function createDeleteSelectedObjects({
+  selectedNodesRef,
+  activeLayerIdRef,
+  layerLinesRef,
+  transformerRef,
+  konvaLayersRef,
+  updateLayerCache,
+}) {
+  // Function to delete selected objects
+  return () => {
+    if (selectedNodesRef.current.length === 0) return;
+
+    const currentLayerId = activeLayerIdRef.current;
+
+    // Remove selected nodes from the layer
+    selectedNodesRef.current.forEach((node) => {
+      // Also remove them from layerLinesRef
+      if (layerLinesRef.current[currentLayerId]) {
+        const nodeIndex = layerLinesRef.current[currentLayerId].findIndex(
+          (line) => line === node,
+        );
+        if (nodeIndex >= 0) {
+          layerLinesRef.current[currentLayerId].splice(nodeIndex, 1);
+        }
+      }
+
+      node.destroy();
+    });
+
+    // Clear selection
+    selectedNodesRef.current = [];
+    if (transformerRef.current) {
+      transformerRef.current.nodes([]);
+    }
+
+    // Redraw the layer
+    if (konvaLayersRef.current[currentLayerId]) {
+      konvaLayersRef.current[currentLayerId].batchDraw();
+      updateLayerCache(currentLayerId);
+    }
+  };
+}
