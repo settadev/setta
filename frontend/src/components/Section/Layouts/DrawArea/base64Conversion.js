@@ -14,6 +14,38 @@ export async function base64ToImageObj(input_value) {
   return value;
 }
 
+// Export all individual layers as an array of base64 strings
+export function allLayersToBase64Array(layerCanvasRefs, layerIds) {
+  return layerIds.map((layerId) => {
+    const canvas = layerCanvasRefs.current[layerId];
+    if (canvas) {
+      return canvasToBase64(canvas);
+    }
+    return null; // Or some default if the canvas doesn't exist
+  });
+}
+
+export function combinedLayersToBase64(layerCanvasRefs, layerIds) {
+  // Create a temporary canvas with the same dimensions as your layers
+  const tempCanvas = document.createElement("canvas");
+  const firstLayerCanvas = layerCanvasRefs.current[layerIds[0]];
+  tempCanvas.width = firstLayerCanvas.width;
+  tempCanvas.height = firstLayerCanvas.height;
+
+  const ctx = tempCanvas.getContext("2d");
+
+  // Draw all layers in order (bottom to top)
+  for (const layerId of layerIds) {
+    const layerCanvas = layerCanvasRefs.current[layerId];
+    if (layerCanvas) {
+      ctx.drawImage(layerCanvas, 0, 0);
+    }
+  }
+
+  // Convert to base64
+  return canvasToBase64(tempCanvas);
+}
+
 // function exportStrokesToBase64(strokes, width, height) {
 //   // Create a temporary canvas
 //   const tempCanvas = document.createElement("canvas");

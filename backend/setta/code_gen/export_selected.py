@@ -30,6 +30,10 @@ def get_drawing(p, id):
     return p["sections"][id]["drawing"]
 
 
+def get_layers(p, id):
+    return p["sections"][id]["layers"]
+
+
 def get_chat_message(p, id):
     return p["sections"][id]["latestChatMessage"]
 
@@ -594,8 +598,12 @@ class ExporterForInMemoryFn:
             value = {"image": img}
             self.create_var_mapping((id, "image"), f'{name}["image"]')
         elif type == C.DRAW:
-            value = {"drawing": get_drawing(self.p, id)}
+            value = {
+                "drawing": get_drawing(self.p, id),
+                "layers": get_layers(self.p, id),
+            }
             self.create_var_mapping((id, "drawing"), f'{name}["drawing"]')
+            self.create_var_mapping((id, "layers"), f'{name}["layers"]')
         elif type == C.CHAT:
             latestChatMessage = get_chat_message(self.p, id)
             artifacts = get_artifacts(self.p, id)

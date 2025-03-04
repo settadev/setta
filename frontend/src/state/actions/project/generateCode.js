@@ -64,7 +64,9 @@ export async function getProjectDataToGenerateCode({
     for (const x of Object.values(sectionInfosState)) {
       const currSection = _.cloneDeep(x);
       if (includeDrawings && getSectionType(x.id) === C.DRAW) {
-        currSection.drawing = await requestBase64FromCanvas(x.id);
+        const { drawing, layers } = await requestBase64FromCanvas(x.id);
+        currSection.drawing = drawing;
+        currSection.layers = layers;
       }
       if (includeLatestChatMessages && getSectionType(x.id) === C.CHAT) {
         // this property just needs to exist when the code is first imported

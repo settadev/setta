@@ -1,4 +1,3 @@
-import { canvasToBase64 } from "components/Section/Layouts/DrawArea/base64Conversion";
 import _ from "lodash";
 import { sendMessage } from "requests/websocket";
 import { useTemporaryMiscState } from "state/definitions";
@@ -56,13 +55,13 @@ function base64RequestId(sectionId) {
   return `${sectionId}-base64-request`;
 }
 
-export function listenForCanvasToBase64Requests(sectionId, canvasRef) {
+export function listenForCanvasToBase64Requests(sectionId, fnCanvasToBase64) {
   const id = base64RequestId(sectionId);
   const unsub = useTemporaryMiscState.subscribe(
     (x) => x[id],
     (x) => {
       if (x === true) {
-        setTemporaryMiscState(id, canvasToBase64(canvasRef.current));
+        setTemporaryMiscState(id, fnCanvasToBase64());
       }
     },
   );
