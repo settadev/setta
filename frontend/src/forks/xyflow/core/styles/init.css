@@ -10,15 +10,15 @@
 .react-flow__pane {
   z-index: 1;
   cursor: grab;
+}
 
-  &.selection {
+.react-flow__pane.selection {
     cursor: pointer;
   }
 
-  &.dragging {
+.react-flow__pane.dragging {
     cursor: grabbing;
   }
-}
 
 .react-flow__viewport {
   transform-origin: 0 0;
@@ -54,55 +54,55 @@
 .react-flow__edge {
   pointer-events: visibleStroke;
   cursor: pointer;
+}
 
-  &.animated path {
+.react-flow__edge.animated path {
     stroke-dasharray: 5;
     animation: dashdraw 0.5s linear infinite;
   }
 
-  &.animated path.react-flow__edge-interaction {
+.react-flow__edge.animated path.react-flow__edge-interaction {
     stroke-dasharray: none;
     animation: none;
   }
 
-  &.inactive {
+.react-flow__edge.inactive {
     pointer-events: none;
   }
 
-  &.selected,
-  &:focus,
-  &:focus-visible {
+.react-flow__edge.selected,
+  .react-flow__edge:focus,
+  .react-flow__edge:focus-visible {
     outline: none;
   }
 
-  &.selected .react-flow__edge-path,
-  &:focus .react-flow__edge-path,
-  &:focus-visible .react-flow__edge-path {
+.react-flow__edge.selected .react-flow__edge-path,
+  .react-flow__edge:focus .react-flow__edge-path,
+  .react-flow__edge:focus-visible .react-flow__edge-path {
     stroke: #555;
   }
 
-  &-textwrapper {
+.react-flow__edge-textwrapper {
     pointer-events: all;
   }
 
-  &-textbg {
+.react-flow__edge-textbg {
     fill: white;
   }
 
-  .react-flow__edge-text {
+.react-flow__edge .react-flow__edge-text {
     pointer-events: none;
     user-select: none;
   }
-}
 
 .react-flow__connection {
   pointer-events: none;
+}
 
-  .animated {
+.react-flow__connection .animated {
     stroke-dasharray: 5;
     animation: dashdraw 0.5s linear infinite;
   }
-}
 
 .react-flow__nodes {
   pointer-events: none;
@@ -116,11 +116,11 @@
   transform-origin: 0 0;
   box-sizing: border-box;
   cursor: move;
+}
 
-  &.dragging {
+.react-flow__node.dragging {
     cursor: grabbing;
   }
-}
 
 .react-flow__nodesselection {
   z-index: 3;
@@ -139,37 +139,37 @@
   pointer-events: none;
   min-width: 5px;
   min-height: 5px;
+}
 
-  &.connectionindicator {
+.react-flow__handle.connectionindicator {
     pointer-events: all;
     cursor: crosshair;
   }
 
-  &-bottom {
+.react-flow__handle-bottom {
     top: auto;
     left: 50%;
     bottom: -4px;
     transform: translate(-50%, 0);
   }
 
-  &-top {
+.react-flow__handle-top {
     left: 50%;
     top: -4px;
     transform: translate(-50%, 0);
   }
 
-  &-left {
+.react-flow__handle-left {
     top: 50%;
     left: -4px;
     transform: translate(0, -50%);
   }
 
-  &-right {
+.react-flow__handle-right {
     right: -4px;
     top: 50%;
     transform: translate(0, -50%);
   }
-}
 
 .react-flow__edgeupdater {
   cursor: move;
@@ -180,28 +180,28 @@
   position: absolute;
   z-index: 5;
   margin: 15px;
+}
 
-  &.top {
+.react-flow__panel.top {
     top: 0;
   }
 
-  &.bottom {
+.react-flow__panel.bottom {
     bottom: 0;
   }
 
-  &.left {
+.react-flow__panel.left {
     left: 0;
   }
 
-  &.right {
+.react-flow__panel.right {
     right: 0;
   }
 
-  &.center {
+.react-flow__panel.center {
     left: 50%;
     transform: translateX(-50%);
   }
-}
 
 @keyframes dashdraw {
   from {

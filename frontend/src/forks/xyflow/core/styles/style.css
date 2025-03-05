@@ -1,24 +1,18 @@
 /* this gets exported as style.css and can be used for the default theming */
 @import "./init.css";
 
-.react-flow__edge {
-  &.updating {
-    .react-flow__edge-path {
+.react-flow__edge.updating .react-flow__edge-path {
       stroke: #777;
     }
-  }
 
-  &-text {
+.react-flow__edge-text {
     font-size: 10px;
   }
-}
 
-.react-flow__node.selectable {
-  &:focus,
-  &:focus-visible {
+.react-flow__node.selectable:focus,
+  .react-flow__node.selectable:focus-visible {
     outline: none;
   }
-}
 
 .react-flow__node-default,
 .react-flow__node-input,
@@ -34,19 +28,26 @@
   border-style: solid;
   border-color: #1a192b;
   background-color: white;
+}
 
-  &.selectable {
-    &:hover {
+.react-flow__node-default.selectable:hover, .react-flow__node-input.selectable:hover, .react-flow__node-output.selectable:hover, .react-flow__node-group.selectable:hover {
       box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.08);
     }
 
-    &.selected,
-    &:focus,
-    &:focus-visible {
+.react-flow__node-default.selectable.selected,
+    .react-flow__node-default.selectable:focus,
+    .react-flow__node-default.selectable:focus-visible,
+    .react-flow__node-input.selectable.selected,
+    .react-flow__node-input.selectable:focus,
+    .react-flow__node-input.selectable:focus-visible,
+    .react-flow__node-output.selectable.selected,
+    .react-flow__node-output.selectable:focus,
+    .react-flow__node-output.selectable:focus-visible,
+    .react-flow__node-group.selectable.selected,
+    .react-flow__node-group.selectable:focus,
+    .react-flow__node-group.selectable:focus-visible {
       box-shadow: 0 0 0 0.5px #1a192b;
     }
-  }
-}
 
 .react-flow__node-group {
   background-color: rgba(240, 240, 240, 0.25);
@@ -56,12 +57,14 @@
 .react-flow__selection {
   background: rgba(0, 89, 220, 0.08);
   border: 1px dotted rgba(0, 89, 220, 0.8);
+}
 
-  &:focus,
-  &:focus-visible {
+.react-flow__nodesselection-rect:focus,
+  .react-flow__nodesselection-rect:focus-visible,
+  .react-flow__selection:focus,
+  .react-flow__selection:focus-visible {
     outline: none;
   }
-}
 
 .react-flow__handle {
   width: 6px;

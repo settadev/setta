@@ -12,14 +12,23 @@
   border-width: 1px;
   border-style: solid;
   border-color: #bbb;
+}
 
-  &.selected,
-  &:focus,
-  &:focus-visible {
+.react-flow__node-default.selected,
+  .react-flow__node-default:focus,
+  .react-flow__node-default:focus-visible,
+  .react-flow__node-input.selected,
+  .react-flow__node-input:focus,
+  .react-flow__node-input:focus-visible,
+  .react-flow__node-output.selected,
+  .react-flow__node-output:focus,
+  .react-flow__node-output:focus-visible,
+  .react-flow__node-group.selected,
+  .react-flow__node-group:focus,
+  .react-flow__node-group:focus-visible {
     outline: none;
     border: 1px solid #555;
   }
-}
 
 .react-flow__nodesselection-rect,
 .react-flow__selection {
