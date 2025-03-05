@@ -235,38 +235,65 @@ class SettaInMemoryFnSubprocess:
     def close(self):
         try:
             logger.debug("Initiating shutdown sequence")
-            self.parent_conn.send({"type": "shutdown"})
-            self.process.join(timeout=2)  # Add timeout to process join
 
-            if self.process.is_alive():
-                logger.debug("Process still alive after timeout, forcing termination")
-                self.process.terminate()
-                self.process.join(timeout=1)
-        except Exception as e:
-            logger.debug(f"Error during process shutdown: {e}")
+            # Set our stop event - this signals all tasks to stop
+            self.stop_event.set()
 
-        # Set stop event before closing pipes
-        self.stop_event.set()
-
-        # Close all connections
-        for conn in [
-            self.parent_conn,
-            self.child_conn,
-            self.stdout_parent_conn,
-            self.stdout_child_conn,
-        ]:
+            # Send shutdown message to the subprocess
             try:
-                conn.close()
-            except:
+                self.parent_conn.send({"type": "shutdown"})
+            except (BrokenPipeError, EOFError):
+                # Pipe might already be closed, that's okay
                 pass
 
-        self.stdout_thread.join(timeout=2)  # Add timeout to thread join
+            # Join the process with timeout
+            self.process.join(timeout=2)
 
-        if self.stdout_thread.is_alive():
-            logger.debug("Stdout thread failed to terminate within timeout")
+            # If still alive, escalate to terminate
+            if self.process.is_alive():
+                logger.debug(
+                    "Process still alive after graceful shutdown, forcing termination"
+                )
+                self.process.terminate()
+                self.process.join(timeout=1)
 
-        if self.stdout_processor_task:
-            self.stdout_processor_task.cancel()
+                # Last resort: kill
+                if self.process.is_alive():
+                    logger.debug(
+                        "Process still alive after terminate, killing forcefully"
+                    )
+                    self.process.kill()
+                    self.process.join(timeout=1)
+
+        except Exception as e:
+            logger.exception(f"Error during process shutdown: {e}")
+
+        # Now handle the async tasks and threads
+        try:
+            # Cancel the stdout processor task if it exists
+            if self.stdout_processor_task:
+                self.stdout_processor_task.cancel()
+
+            # Close all connections - this will cause pending operations to fail fast
+            for conn in [
+                self.parent_conn,
+                self.child_conn,
+                self.stdout_parent_conn,
+                self.stdout_child_conn,
+            ]:
+                try:
+                    conn.close()
+                except:
+                    pass
+
+            # Join the stdout thread with timeout
+            if self.stdout_thread and self.stdout_thread.is_alive():
+                self.stdout_thread.join(timeout=2)
+                if self.stdout_thread.is_alive():
+                    logger.debug("Stdout thread failed to terminate within timeout")
+
+        except Exception as e:
+            logger.exception(f"Error during resource cleanup: {e}")
 
     def start_stdout_processor_task(self):
         if self.stdout_processor_task is None or self.stdout_processor_task.done():

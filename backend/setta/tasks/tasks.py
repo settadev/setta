@@ -151,6 +151,8 @@ class Tasks:
             sp = self.in_memory_subprocesses.get(subprocess_key, {}).get("subprocess")
             if sp:
                 sp.close()
+                del self.in_memory_subprocesses[subprocess_key]
+
             sp = SettaInMemoryFnSubprocess(
                 self.stop_event, self.websockets, c["subprocessStartMethod"]
             )
