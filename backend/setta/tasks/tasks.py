@@ -71,46 +71,53 @@ class Tasks:
         call_type="call",
         other_data=None,
     ):
-        # Create a list of tasks to run concurrently
-        tasks = []
-        results = []
         message.content = {tuple(json.loads(k)): v for k, v in message.content.items()}
 
+        # Group tasks by subprocess to ensure sequential processing per subprocess
+        subprocess_tasks = {}
+        results = []
+
+        # First, identify all relevant subprocesses and their functions to call
         for sp_key, sp_info in self.in_memory_subprocesses.items():
             if (subprocess_key and sp_key != subprocess_key) or (
                 not match_subprocess_key(sp_key, project_config_id, section_id, idx)
             ):
                 continue
+
+            # For each matching subprocess, collect all functions that need to be called
+            fns_to_call = []
             for fn_name, fnInfo in sp_info["fnInfo"].items():
                 if (
                     call_all
                     or None in fnInfo["dependencies"]
                     or any(k in fnInfo["dependencies"] for k in message.content.keys())
                 ):
-                    # Send message to subprocess
-                    sp_info["subprocess"].parent_conn.send(
-                        {
-                            "type": call_type,
-                            "fn_name": fn_name,
-                            "message": message,
-                            "other_data": other_data,
-                        }
-                    )
+                    fns_to_call.append(fn_name)
 
-                    # Create task for receiving response
-                    task = asyncio.create_task(
-                        self._handle_subprocess_response(
-                            sp_key,
-                            fn_name,
-                            message.id,
-                            sp_info["subprocess"].parent_conn.recv,
-                            websocket_manager,
-                            results,
-                        )
-                    )
-                    tasks.append(task)
+            if fns_to_call:
+                subprocess_tasks[sp_key] = {
+                    "subprocess": sp_info["subprocess"],
+                    "functions": fns_to_call,
+                }
 
-        # Wait for all tasks to complete concurrently
+        # Create tasks to process each subprocess sequentially
+        tasks = []
+        for sp_key, sp_data in subprocess_tasks.items():
+            task = asyncio.create_task(
+                self._process_subprocess_sequentially(
+                    sp_key,
+                    sp_data["subprocess"],
+                    sp_data["functions"],
+                    message,
+                    call_type,
+                    other_data,
+                    websocket_manager,
+                    results,
+                )
+            )
+            tasks.append(task)
+
+        # Wait for all subprocess tasks to complete (each subprocess processed sequentially)
         if tasks:
             await asyncio.gather(*tasks)
 
@@ -123,27 +130,51 @@ class Tasks:
                 content.extend(r["content"])
         return {"content": content, "messageType": C.WS_IN_MEMORY_FN_RETURN}
 
-    async def _handle_subprocess_response(
-        self, subprocess_key, fn_name, msg_id, recv_fn, websocket_manager, results
+    async def _process_subprocess_sequentially(
+        self,
+        subprocess_key,
+        subprocess,
+        fn_names,
+        message,
+        call_type,
+        other_data,
+        websocket_manager,
+        results,
     ):
-        # Run the receive function in a thread
-        start_time = time.perf_counter()
-        result = await self.task_runner.run(recv_fn, [], RunType.THREAD)
-        elapsed_time = time.perf_counter() - start_time
-        if result["status"] == "success":
-            self.update_average_subprocess_fn_time(
-                subprocess_key, fn_name, elapsed_time
+        # Process each function sequentially for this subprocess
+        for fn_name in fn_names:
+            # Send message to subprocess
+            subprocess.parent_conn.send(
+                {
+                    "type": call_type,
+                    "fn_name": fn_name,
+                    "message": message,
+                    "other_data": other_data,
+                }
             )
-            if websocket_manager is not None:
-                if result["content"]:
-                    await websocket_manager.send_message_to_requester(
-                        msg_id, result["content"], result["messageType"]
-                    )
-                await self.maybe_send_latest_run_time_info(
-                    subprocess_key, fn_name, msg_id, websocket_manager
+
+            # Wait for and handle the response before sending the next message
+            start_time = time.perf_counter()
+            result = await self.task_runner.run(
+                subprocess.parent_conn.recv, [], RunType.THREAD
+            )
+            elapsed_time = time.perf_counter() - start_time
+
+            if result["status"] == "success":
+                self.update_average_subprocess_fn_time(
+                    subprocess_key, fn_name, elapsed_time
                 )
-            else:
-                results.append(result)
+
+                if websocket_manager is not None:
+                    if result["content"]:
+                        await websocket_manager.send_message_to_requester(
+                            message.id, result["content"], result["messageType"]
+                        )
+                    await self.maybe_send_latest_run_time_info(
+                        subprocess_key, fn_name, message.id, websocket_manager
+                    )
+                else:
+                    results.append(result)
 
     async def add_custom_fns(self, code_graph, exporter_obj):
         for c in code_graph:
