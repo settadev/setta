@@ -80,6 +80,7 @@ class Tasks:
             ):
                 continue
             for fn_name, fnInfo in sp_info["fnInfo"].items():
+                # TODO: there's a bug where fnInfo["dependencies"] contains tuples and message.content.keys() are strings 
                 if (
                     call_all
                     or None in fnInfo["dependencies"]
@@ -268,7 +269,7 @@ def match_subprocess_key(
         return False
     if section_id is not None and key_section_id != section_id:
         return False
-    if idx is not None and key_idx_str != idx:
+    if idx is not None and key_idx_str != str(idx):
         return False
 
     return True

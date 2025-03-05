@@ -3,7 +3,10 @@ import { StandardPopover } from "components/Utils/atoms/popover/standardpopover"
 import { getFloatingBoxHandlers } from "components/Utils/FloatingBox";
 import { useState } from "react";
 import { RiArrowDownSLine, RiPlayMiniFill } from "react-icons/ri";
-import { runOrImportAllCode } from "state/actions/runOrImportCode";
+import {
+  runOrImportAllCode,
+  sendProjectToAllInteractiveCode,
+} from "state/actions/runOrImportCode";
 
 export function RunButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +24,7 @@ export function RunButton() {
       label: "Run Interactive Fns",
       icon: <RiPlayMiniFill />,
       action: () => {
-        runOrImportAllCode();
+        sendProjectToAllInteractiveCode();
         setIsOpen(false);
       },
     },

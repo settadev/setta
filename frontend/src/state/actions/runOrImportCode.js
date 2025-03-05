@@ -1,5 +1,8 @@
 import C from "constants/constants.json";
-import { dbImportCodeBlocks } from "requests/interactive";
+import {
+  dbImportCodeBlocks,
+  dbSendProjectToInteractiveCode,
+} from "requests/interactive";
 import { useActiveSection, useSectionInfos } from "state/definitions";
 import {
   maybeGetNewArtifactIds,
@@ -14,8 +17,7 @@ import {
 } from "./project/generateCode";
 import { getSectionInfo, getSectionType } from "./sectionInfos";
 
-export async function importCodeBlocks(sectionIds, withSweep = false) {
-  setNotificationMessage("Importing your code...");
+async function maybeGetProjectDataWithSweep(sectionIds, withSweep) {
   const project = await getProjectDataToGenerateCode({
     withArtifacts: true,
     includeDrawings: true,
@@ -28,12 +30,27 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
     project.runCodeBlocks = sectionIds;
     projects.push(project);
   }
+  return projects;
+}
+
+export async function importCodeBlocks(sectionIds, withSweep = false) {
+  setNotificationMessage("Importing your code...");
+  const projects = await maybeGetProjectDataWithSweep(sectionIds, withSweep);
   const res = await dbImportCodeBlocks(projects);
   if (res.status === 200) {
     updateInMemorySubprocessInfo(res.data.inMemorySubprocessInfo);
     await maybeGetNewArtifactIds(res.data.content);
     await updateInteractiveArtifacts(res.data.content);
     setNotificationMessage("Done importing");
+  }
+}
+
+async function sendProjectToInteractiveCode(sectionIds, withSweep = false) {
+  const projects = await maybeGetProjectDataWithSweep(sectionIds, withSweep);
+  const res = await dbSendProjectToInteractiveCode(projects);
+  if (res.status === 200) {
+    updateInMemorySubprocessInfo(res.data.inMemorySubprocessInfo);
+    await updateInteractiveArtifacts(res.data.content);
   }
 }
 
@@ -77,6 +94,11 @@ export function runOrImportActiveCode() {
   if (asSubprocess.length > 0) {
     runCodeBlocks(asSubprocess);
   }
+}
+
+export function sendProjectToAllInteractiveCode() {
+  const { inMemory } = getInMemoryAndAsSubprocessCodeBlocks();
+  sendProjectToInteractiveCode(inMemory, true);
 }
 
 function getInMemoryAndAsSubprocessCodeBlocks(onlyActiveSections = false) {
