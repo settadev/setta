@@ -16,7 +16,7 @@ export function RunButton() {
 
   // Menu item styling with proper hover effect that's contained within the button
   const menuItemClasses =
-    "flex items-center gap-2 px-1.5 py-1.5 text-xs text-setta-700 dark:text-setta-100  mx-1 rounded-md text-left hover:bg-setta-600 hover:text-white dark:hover:bg-setta-900 active:bg-blue-100 active:dark:bg-blue-950 cursor-pointer";
+    "flex items-center gap-2 px-1.5 py-1.5 text-xs text-setta-700 dark:text-setta-200  mx-1 rounded-md text-left hover:bg-setta-600 hover:text-white dark:hover:bg-setta-900 dark:hover:text-white active:bg-blue-100 active:dark:bg-blue-950 cursor-pointer";
 
   // Different run actions
   const runActions = [
