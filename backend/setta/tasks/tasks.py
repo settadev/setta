@@ -1,5 +1,6 @@
 import asyncio
 import copy
+import json
 import logging
 import time
 from typing import Dict
@@ -73,6 +74,7 @@ class Tasks:
         # Create a list of tasks to run concurrently
         tasks = []
         results = []
+        message.content = {tuple(json.loads(k)): v for k, v in message.content.items()}
 
         for sp_key, sp_info in self.in_memory_subprocesses.items():
             if (subprocess_key and sp_key != subprocess_key) or (
@@ -80,7 +82,6 @@ class Tasks:
             ):
                 continue
             for fn_name, fnInfo in sp_info["fnInfo"].items():
-                # TODO: there's a bug where fnInfo["dependencies"] contains tuples and message.content.keys() are strings 
                 if (
                     call_all
                     or None in fnInfo["dependencies"]
