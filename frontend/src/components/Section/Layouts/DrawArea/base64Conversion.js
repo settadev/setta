@@ -49,7 +49,7 @@ function combinedLayersToBase64(layerCanvases, layerIds) {
 export function combinedAndSeparateLayersToBase64(layerCanvases, layerIds) {
   const drawing = combinedLayersToBase64(layerCanvases, layerIds);
   const layers = allLayersToBase64Array(layerCanvases, layerIds);
-  return { drawing, layers };
+  return [drawing, ...layers];
 }
 
 // function exportStrokesToBase64(strokes, width, height) {

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { listenForCanvasToBase64Requests } from "state/actions/temporaryMiscState";
 import { useArtifacts, useMisc, useSectionInfos } from "state/definitions";
 import {

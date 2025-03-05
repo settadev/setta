@@ -3,7 +3,6 @@ import _ from "lodash";
 import { useCallback } from "react";
 import { setActiveSectionIdAndUpdateZIndex } from "state/actions/activeSections";
 import { useArtifacts, useMisc, useSectionInfos } from "state/definitions";
-import { canvasToBase64 } from "./base64Conversion";
 import {
   drawAllLayers,
   drawStroke,
