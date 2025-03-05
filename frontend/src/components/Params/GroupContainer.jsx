@@ -160,7 +160,7 @@ function ResizablePinnedArea({
       </header>
 
       <div
-        className={`${isScrollable ? "nowheel" : ""} section-args-nested section-key-value section-min-rows grid w-full grid-cols-subgrid gap-y-1 overflow-y-scroll pr-1.5`}
+        className={`${isScrollable ? "nowheel" : ""} section-args-nested flex w-full grid-cols-subgrid flex-col gap-y-1 overflow-y-scroll pr-1.5`}
         ref={ref}
       >
         <GetParamSwitch
@@ -187,7 +187,7 @@ function GetUnpinnedParams({
 
   return (
     <div
-      className={`section-args-nested grid auto-rows-min grid-cols-subgrid gap-y-1 overflow-x-clip overflow-y-scroll py-2 pr-1.5 ${
+      className={`flex flex-col gap-y-1 overflow-x-clip overflow-y-scroll px-2 py-2 pr-1.5 ${
         isScrollable ? "nowheel" : ""
       } min-w-0 !max-w-full`}
       ref={ref}

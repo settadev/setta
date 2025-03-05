@@ -81,17 +81,17 @@ export function ParamUI({
                 onEscape();
               }
             }}
-            dummyCodeClassName={`${NO_PAN_CLASS_NAME} absolute inset-0 peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} nodrag ${!isDisabled ? "cursor-text select-text" : ""} break-words font-mono text-xs [tab-size:4] [word-break:break-word] py-[.125rem]`}
-            realCodeClassName={`${NO_PAN_CLASS_NAME} absolute inset-0 nodrag self-end peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} [&_*]:!outline-0 cursor-text select-text [&_.cm-activeLine]:!px-0 [&_.cm-activeLine]:!bg-setta-200/10 [&_.cm-content]:!py-0 [&_.cm-content]:!px-0 [&_.cm-line]:!px-0 [&_.cm-content]:text-xs absolute py-[.125rem]`}
+            dummyCodeClassName={`${NO_PAN_CLASS_NAME} relative inset-0 peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} nodrag ${!isDisabled ? "cursor-text select-text" : ""} break-words font-mono text-xs [tab-size:4] [word-break:break-word] py-[.125rem]`}
+            realCodeClassName={`${NO_PAN_CLASS_NAME} relative inset-0 nodrag self-end peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} [&_*]:!outline-0 cursor-text select-text [&_.cm-activeLine]:!px-0 [&_.cm-activeLine]:!bg-setta-200/10 [&_.cm-content]:!py-0 [&_.cm-content]:!px-0 [&_.cm-line]:!px-0 [&_.cm-content]:text-xs absolute py-[.125rem]`}
             language={configLanguage}
             evRefs={evRefs}
             isDisabled={isDisabled}
           />
           {waitingForResult && (
-            <i className="gg-spinner absolute self-center justify-self-end text-blue-500/70" />
+            <i className="gg-spinner relative self-center justify-self-end text-blue-500/70" />
           )}
           <span
-            className={`border-box absolute bottom-0 left-0 right-0 border-b border-setta-200/50 dark:border-setta-600/30 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""}`}
+            className={`border-box relative bottom-1 left-0 right-0 border-b border-setta-200/50 dark:border-setta-600/30 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""}`}
           />
         </>
       );
