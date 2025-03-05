@@ -18,6 +18,7 @@ from setta.code_gen.export_selected import (
 )
 from setta.code_gen.find_placeholders import parse_template_var
 from setta.tasks.fns.utils import replace_template_vars_with_random_names
+from setta.tasks.tasks import construct_subprocess_key
 from setta.utils.constants import C
 from setta.utils.utils import multireplace
 
@@ -35,6 +36,22 @@ class FormatCodeRequest(BaseModel):
     candidateTemplateVars: dict
 
 
+@router.post(C.ROUTE_SEND_PROJECT_TO_INTERACTIVE_CODE)
+async def route_send_project_to_interactive_code(
+    x: UpdateInteractiveCodeRequest,
+    tasks=Depends(get_tasks),
+):
+    to_run = []
+    for idx, p in enumerate(x.projects):
+        exporter_obj_in_memory = export_for_in_memory_fn(p)
+        to_run.append(
+            tasks.call_in_memory_subprocess_fn_with_new_exporter_obj(
+                p["projectConfig"]["id"], idx, exporter_obj_in_memory
+            )
+        )
+    return await process_returned_content_from_multiple_tasks(tasks, to_run)
+
+
 @router.post(C.ROUTE_UPDATE_INTERACTIVE_CODE)
 async def route_update_interactive_code(
     x: UpdateInteractiveCodeRequest,
@@ -46,13 +63,12 @@ async def route_update_interactive_code(
         update_interactive_code(p, tasks, lsp_writers, idx)
         for idx, p in enumerate(x.projects)
     ]
+    return await process_returned_content_from_multiple_tasks(tasks, update_tasks)
 
-    # Run all updates in parallel and gather results
-    all_content = await asyncio.gather(*update_tasks)
 
-    # Flatten the list of content
+async def process_returned_content_from_multiple_tasks(tasks, to_run):
+    all_content = await asyncio.gather(*to_run)
     content = [item for sublist in all_content for item in sublist]
-
     inMemorySubprocessInfo = tasks.getInMemorySubprocessInfo()
     return {"inMemorySubprocessInfo": inMemorySubprocessInfo, "content": content}
 
@@ -106,7 +122,9 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
         code_graph.append(
             {
                 "imports": imports,
-                "subprocess_key": f"{project_config_id}-{section_id}-{idx}",
+                "subprocess_key": construct_subprocess_key(
+                    project_config_id, section_id, idx
+                ),
                 "subprocessStartMethod": p["sections"][section_id][
                     "subprocessStartMethod"
                 ],
@@ -115,7 +133,7 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
 
     initialContent = await tasks.add_custom_fns(
         code_graph,
-        to_cache=exporter_obj_in_memory,
+        exporter_obj=exporter_obj_in_memory,
     )
 
     return initialContent
