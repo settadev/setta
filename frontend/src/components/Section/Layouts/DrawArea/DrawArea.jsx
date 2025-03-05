@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { listenForCanvasToBase64Requests } from "state/actions/temporaryMiscState";
 import { useArtifacts, useMisc, useSectionInfos } from "state/definitions";
 import {
@@ -9,10 +9,7 @@ import {
 import useDeepCompareEffect, {
   useDeepCompareEffectNoCheck,
 } from "use-deep-compare-effect";
-import {
-  allLayersToBase64Array,
-  combinedLayersToBase64,
-} from "./base64Conversion";
+import { combinedAndSeparateLayersToBase64 } from "./base64Conversion";
 import {
   drawAllLayers,
   setCanvasSize,
@@ -71,14 +68,15 @@ export function DrawArea({ sectionId }) {
     tempCanvasRefs.current.artifact = document.createElement("canvas");
   }, []);
 
+  const fnCanvasToBase64 = useCallback(
+    () => combinedAndSeparateLayersToBase64(layerCanvasRefs.current, layerIds),
+    [JSON.stringify(layerIds)],
+  );
+
   useDeepCompareEffect(() => {
-    const unsub = listenForCanvasToBase64Requests(sectionId, () => {
-      const drawing = combinedLayersToBase64(layerCanvasRefs, layerIds);
-      const layers = allLayersToBase64Array(layerCanvasRefs, layerIds);
-      return { drawing, layers };
-    });
+    const unsub = listenForCanvasToBase64Requests(sectionId, fnCanvasToBase64);
     return unsub;
-  }, [layerIds]);
+  }, [sectionId, fnCanvasToBase64]);
 
   useEffect(() => {
     useSectionInfos.setState((state) => {
@@ -175,6 +173,7 @@ export function DrawArea({ sectionId }) {
       activeLayerId,
       localArtifactTransformsRef,
       mode,
+      fnCanvasToBase64,
     });
 
   function clearStrokes() {

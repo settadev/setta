@@ -15,9 +15,9 @@ export async function base64ToImageObj(input_value) {
 }
 
 // Export all individual layers as an array of base64 strings
-export function allLayersToBase64Array(layerCanvasRefs, layerIds) {
+function allLayersToBase64Array(layerCanvases, layerIds) {
   return layerIds.map((layerId) => {
-    const canvas = layerCanvasRefs.current[layerId];
+    const canvas = layerCanvases[layerId];
     if (canvas) {
       return canvasToBase64(canvas);
     }
@@ -25,10 +25,10 @@ export function allLayersToBase64Array(layerCanvasRefs, layerIds) {
   });
 }
 
-export function combinedLayersToBase64(layerCanvasRefs, layerIds) {
+function combinedLayersToBase64(layerCanvases, layerIds) {
   // Create a temporary canvas with the same dimensions as your layers
   const tempCanvas = document.createElement("canvas");
-  const firstLayerCanvas = layerCanvasRefs.current[layerIds[0]];
+  const firstLayerCanvas = layerCanvases[layerIds[0]];
   tempCanvas.width = firstLayerCanvas.width;
   tempCanvas.height = firstLayerCanvas.height;
 
@@ -36,7 +36,7 @@ export function combinedLayersToBase64(layerCanvasRefs, layerIds) {
 
   // Draw all layers in order (bottom to top)
   for (const layerId of layerIds) {
-    const layerCanvas = layerCanvasRefs.current[layerId];
+    const layerCanvas = layerCanvases[layerId];
     if (layerCanvas) {
       ctx.drawImage(layerCanvas, 0, 0);
     }
@@ -44,6 +44,12 @@ export function combinedLayersToBase64(layerCanvasRefs, layerIds) {
 
   // Convert to base64
   return canvasToBase64(tempCanvas);
+}
+
+export function combinedAndSeparateLayersToBase64(layerCanvases, layerIds) {
+  const drawing = combinedLayersToBase64(layerCanvases, layerIds);
+  const layers = allLayersToBase64Array(layerCanvases, layerIds);
+  return { drawing, layers };
 }
 
 // function exportStrokesToBase64(strokes, width, height) {

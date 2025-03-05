@@ -56,10 +56,10 @@ export function useDrawModeMouseHandlers({
   activeLayerId,
   localArtifactTransformsRef,
   mode,
+  fnCanvasToBase64,
 }) {
   let onMouseDown, onMouseMove, onMouseUp, onMouseEnter;
   let redrawLayers, didChange;
-  const fnCanvasToBase64 = () => canvasToBase64(layerCanvasRefs.current);
 
   if (mode === "draw") {
     const onMouseDownCore = drawingOnMouseDown({
