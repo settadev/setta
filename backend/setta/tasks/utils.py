@@ -7,41 +7,13 @@ import sys
 import threading
 import traceback
 import uuid
+from collections import defaultdict
 
 from setta.tasks.fns.utils import TaskDefinition
 from setta.utils.constants import CWD
 from setta.utils.utils import nested_access
 
 logger = logging.getLogger(__name__)
-
-
-def import_code_from_string(code_string, module_name=None, add_to_sys_modules=True):
-    # Generate a unique module name if one isn't provided
-    if module_name is None:
-        module_name = f"setta_dynamic_module_{uuid.uuid4().hex}"
-
-    # Add current directory to sys.path if it's not already there
-    current_dir = str(CWD)
-    if current_dir not in sys.path:
-        sys.path.insert(0, current_dir)
-
-    spec = importlib.util.spec_from_loader(module_name, loader=None)
-
-    # Create a new module based on the spec
-    module = importlib.util.module_from_spec(spec)
-
-    # Optionally add the module to sys.modules
-    if add_to_sys_modules:
-        print(f"adding {module_name} to sys.modules", flush=True)
-        sys.modules[module_name] = module
-
-    # Compile the code string
-    code_object = compile(code_string, module_name, "exec")
-
-    # Execute the compiled code object in the module's namespace
-    exec(code_object, module.__dict__)
-
-    return module
 
 
 class SettaInMemoryFnSubprocess:
@@ -68,20 +40,19 @@ class SettaInMemoryFnSubprocess:
             self.start_stdout_processor_task()
 
     def _subprocess_main(self):
-        """Main loop in subprocess that handles all requests"""
+        """Main loop in subprocess that handles all requests with parallel function execution"""
         # Initialize store for imported modules
         fns_dict = {}
         cache = {}
 
-        class OutputCapture:
-            def __init__(self, stdout_pipe):
-                self.stdout_pipe = stdout_pipe
+        # Message queues per function
+        fn_message_queues = defaultdict(queue.Queue)
 
-            def write(self, text):
-                self.stdout_pipe.send(text)
+        # Create a lock for thread-safe operations
+        lock = threading.RLock()
 
-            def flush(self):
-                pass
+        # Function worker threads
+        fn_workers = {}
 
         # Redirect stdout as soon as subprocess starts
         output_capture = OutputCapture(self.stdout_child_conn)
@@ -91,9 +62,16 @@ class SettaInMemoryFnSubprocess:
         while True:
             msg = self.child_conn.recv()  # Wait for requests
             msg_type = msg["type"]
-            return_message_type = None
 
             if msg_type == "shutdown":
+                # Signal all worker threads to stop
+                for fn_name in fn_workers:
+                    fn_message_queues[fn_name].put(None)
+
+                # Wait for all worker threads to finish (with timeout)
+                for fn_name, worker in fn_workers.items():
+                    worker.join(timeout=1.0)
+
                 break
 
             try:
@@ -104,12 +82,25 @@ class SettaInMemoryFnSubprocess:
                         module_name = to_import["module_name"]
                         # Import and store module
                         module = import_code_from_string(code, module_name)
-                        added_fn_names = add_fns_from_module(
-                            fns_dict, module, module_name
-                        )
-                        for k in added_fn_names:
-                            cache[k] = msg["exporter_obj"]
-                            dependencies[k] = get_task_metadata(fns_dict[k], cache[k])
+                        with lock:
+                            added_fn_names = add_fns_from_module(
+                                fns_dict, module, module_name
+                            )
+                            for k in added_fn_names:
+                                cache[k] = msg["exporter_obj"]
+                                dependencies[k] = get_task_metadata(
+                                    fns_dict[k], cache[k]
+                                )
+                                # Start a worker thread for each function
+                                self._start_worker_for_fn(
+                                    k,
+                                    fn_workers,
+                                    fn_message_queues,
+                                    fns_dict,
+                                    cache,
+                                    lock,
+                                    self.child_conn,
+                                )
 
                     self.child_conn.send(
                         {
@@ -118,31 +109,22 @@ class SettaInMemoryFnSubprocess:
                         }
                     )
 
-                elif msg_type == "call":
-                    result, return_message_type = self.call_imported_fn(
-                        msg, fns_dict, cache
-                    )
-                    self.child_conn.send(
-                        {
-                            "status": "success",
-                            "content": result,
-                            "messageType": return_message_type,
-                        }
+                elif msg_type == "call" or msg_type == "call_with_new_exporter_obj":
+                    fn_name = msg["fn_name"]
+
+                    # Start a worker for this function if needed
+                    self._start_worker_for_fn(
+                        fn_name,
+                        fn_workers,
+                        fn_message_queues,
+                        fns_dict,
+                        cache,
+                        lock,
+                        self.child_conn,
                     )
 
-                elif msg_type == "call_with_new_exporter_obj":
-                    # replace old exporter_obj
-                    cache[msg["fn_name"]] = msg["other_data"]["exporter_obj"]
-                    result, return_message_type = self.call_imported_fn(
-                        msg, fns_dict, cache
-                    )
-                    self.child_conn.send(
-                        {
-                            "status": "success",
-                            "content": result,
-                            "messageType": return_message_type,
-                        }
-                    )
+                    # Add the message to the function's queue
+                    fn_message_queues[fn_name].put(msg)
 
             except Exception as e:
                 traceback.print_exc()
@@ -150,17 +132,85 @@ class SettaInMemoryFnSubprocess:
                     {
                         "status": "error",
                         "error": str(e),
-                        "messageType": return_message_type,
+                        "messageType": None,
+                        "original_msg": msg,
                     }
                 )
 
-    def call_imported_fn(self, msg, fns_dict, cache):
-        fn_name = msg["fn_name"]
-        message = self.process_message(fn_name, msg["message"], cache)
-        fn = fns_dict[fn_name]
-        result = fn.fn(message)
-        return_message_type = fn.return_message_type
-        return result, return_message_type
+    def _worker_thread(
+        self, fn_name, fn_message_queues, fns_dict, cache, lock, child_conn
+    ):
+        """Worker thread that processes messages for a specific function"""
+        while True:
+            try:
+                # Get a message from the queue
+                msg = fn_message_queues[fn_name].get()
+
+                if msg is None:  # Sentinel value to stop the thread
+                    break
+
+                msg_type = msg["type"]
+                return_message_type = None
+
+                if msg_type == "call" or msg_type == "call_with_new_exporter_obj":
+                    try:
+                        # Handle updating exporter_obj for call_with_new_exporter_obj
+                        if msg_type == "call_with_new_exporter_obj":
+                            with lock:
+                                cache[fn_name] = msg["other_data"]["exporter_obj"]
+
+                        # Get a thread-safe copy of what we need
+                        with lock:
+                            in_memory_fn_obj = fns_dict[fn_name]
+                            exporter_obj = cache.get(fn_name)
+
+                        # Process message
+                        message_content = process_message(msg["message"], exporter_obj)
+
+                        # Call function
+                        result = in_memory_fn_obj.fn(message_content)
+                        return_message_type = in_memory_fn_obj.return_message_type
+
+                        # Send result back
+                        child_conn.send(
+                            {
+                                "status": "success",
+                                "content": result,
+                                "messageType": return_message_type,
+                                "original_msg": msg,
+                            }
+                        )
+                    except Exception as e:
+                        traceback.print_exc()
+                        child_conn.send(
+                            {
+                                "status": "error",
+                                "error": str(e),
+                                "messageType": return_message_type,
+                                "original_msg": msg,
+                            }
+                        )
+
+                # Mark task as done
+                fn_message_queues[fn_name].task_done()
+
+            except Exception as e:
+                traceback.print_exc()
+                print(f"Error in worker thread for {fn_name}: {e}", flush=True)
+
+    def _start_worker_for_fn(
+        self, fn_name, fn_workers, fn_message_queues, fns_dict, cache, lock, child_conn
+    ):
+        """Start a worker thread for a function if not already running"""
+        if fn_name not in fn_workers or not fn_workers[fn_name].is_alive():
+            worker = threading.Thread(
+                target=self._worker_thread,
+                args=(fn_name, fn_message_queues, fns_dict, cache, lock, child_conn),
+                daemon=True,
+                name=f"worker-{fn_name}",
+            )
+            fn_workers[fn_name] = worker
+            worker.start()
 
     def close(self):
         try:
@@ -185,7 +235,10 @@ class SettaInMemoryFnSubprocess:
             self.stdout_parent_conn,
             self.stdout_child_conn,
         ]:
-            conn.close()
+            try:
+                conn.close()
+            except:
+                pass
 
         self.stdout_thread.join(timeout=2)  # Add timeout to thread join
 
@@ -194,18 +247,6 @@ class SettaInMemoryFnSubprocess:
 
         if self.stdout_processor_task:
             self.stdout_processor_task.cancel()
-
-    def process_message(self, fn_name, message, cache):
-        if fn_name in cache:
-            exporter_obj = cache[fn_name]
-            for k, v in message.content.items():
-                nice_str = exporter_obj.var_name_mapping.get(k)
-                if not nice_str:
-                    continue
-                p_dict, key = nested_access(exporter_obj.output, nice_str)
-                p_dict[key] = v
-            message.content = exporter_obj.output
-        return message.content
 
     def start_stdout_processor_task(self):
         if self.stdout_processor_task is None or self.stdout_processor_task.done():
@@ -290,3 +331,59 @@ def get_task_metadata(in_memory_fn, exporter_obj):
             exporter_obj.var_name_reverse_mapping[d] for d in in_memory_fn.dependencies
         )
     return dependencies
+
+
+# Class for capturing and redirecting stdout/stderr
+class OutputCapture:
+    def __init__(self, stdout_pipe):
+        self.stdout_pipe = stdout_pipe
+        self.lock = threading.Lock()
+
+    def write(self, text):
+        with self.lock:
+            self.stdout_pipe.send(text)
+
+    def flush(self):
+        pass
+
+
+def process_message(message, exporter_obj):
+    """Process a message before passing it to a function"""
+    if exporter_obj:
+        for k, v in message.content.items():
+            nice_str = exporter_obj.var_name_mapping.get(k)
+            if not nice_str:
+                continue
+            p_dict, key = nested_access(exporter_obj.output, nice_str)
+            p_dict[key] = v
+        return exporter_obj.output
+    return message.content
+
+
+def import_code_from_string(code_string, module_name=None, add_to_sys_modules=True):
+    # Generate a unique module name if one isn't provided
+    if module_name is None:
+        module_name = f"setta_dynamic_module_{uuid.uuid4().hex}"
+
+    # Add current directory to sys.path if it's not already there
+    current_dir = str(CWD)
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
+
+    spec = importlib.util.spec_from_loader(module_name, loader=None)
+
+    # Create a new module based on the spec
+    module = importlib.util.module_from_spec(spec)
+
+    # Optionally add the module to sys.modules
+    if add_to_sys_modules:
+        print(f"adding {module_name} to sys.modules", flush=True)
+        sys.modules[module_name] = module
+
+    # Compile the code string
+    code_object = compile(code_string, module_name, "exec")
+
+    # Execute the compiled code object in the module's namespace
+    exec(code_object, module.__dict__)
+
+    return module
