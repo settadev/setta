@@ -12,11 +12,11 @@ export function RunButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   const baseClasses =
-    "transition-colors text-xs font-semibold text-setta-700 dark:text-setta-100 h-full rounded-md gap-1 select-none flex items-center hover:bg-setta-100 dark:hover:bg-setta-800 bg-transparent active:!bg-blue-100 active:dark:!bg-blue-950";
+    "relative transition-colors text-xs font-semibold text-setta-700 dark:text-setta-100 h-full rounded-md gap-1 select-none flex items-center hover:bg-setta-100 dark:hover:bg-setta-800 bg-transparent active:!bg-blue-100 active:dark:!bg-blue-950";
 
   // Menu item styling with proper hover effect that's contained within the button
   const menuItemClasses =
-    "flex items-center gap-1.5 px-3 py-1.5 text-xs text-setta-700 dark:text-setta-100 w-full text-left hover:bg-setta-100 dark:hover:bg-setta-850 active:bg-blue-100 active:dark:bg-blue-950 cursor-pointer";
+    "flex items-center gap-2 px-1.5 py-1.5 text-xs text-setta-700 dark:text-setta-100  mx-1 rounded-md text-left hover:bg-setta-600 hover:text-white dark:hover:bg-setta-900 active:bg-blue-100 active:dark:bg-blue-950 cursor-pointer";
 
   // Different run actions
   const runActions = [
@@ -71,7 +71,7 @@ export function RunButton() {
             <RiArrowDownSLine />
           </Button>
         }
-        contentClasses="bg-white dark:bg-setta-900 py-1 rounded-md shadow-lg z-50 min-w-36 w-48 border border-setta-200 dark:border-setta-800 overflow-hidden"
+        contentClasses="flex flex-col bg-white dark:bg-setta-850 py-1 rounded-md shadow-lg z-50 min-w-36 w-48 border border-setta-100 dark:border-setta-700/50 overflow-hidden"
         open={isOpen}
         onOpenChange={setIsOpen}
         arrowClasses="hidden"
@@ -82,7 +82,7 @@ export function RunButton() {
             className={menuItemClasses}
             onClick={action.action}
           >
-            <i className="w-2">{action.icon}</i>
+            <i className="w-2 opacity-50">{action.icon}</i>
 
             <span className="ml-0.5">{action.label}</span>
           </button>
