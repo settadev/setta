@@ -554,6 +554,7 @@ class ExporterForInMemoryFn:
                 C.DRAW,
                 C.CHAT,
                 C.GLOBAL_VARIABLES,
+                C.TEXT_BLOCK,
             ],
         )
         for id in list(self.p["projectConfig"]["children"].keys()):
@@ -610,6 +611,10 @@ class ExporterForInMemoryFn:
         elif type == C.GLOBAL_VARIABLES:
             self.output.update(self.export_section_params(id, "", is_global=True))
             value_is_returned = False
+        elif type == C.TEXT_BLOCK:
+            variant = get_selected_section_variant(self.p, id)
+            value = {"text": variant["description"]}
+            self.create_var_mapping((id, "text"), f'{name}["text"]')
         else:
             raise ValueError
         return value, value_is_returned
