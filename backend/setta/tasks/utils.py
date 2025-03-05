@@ -50,6 +50,7 @@ class SettaInMemoryFnSubprocess:
 
         # Create a lock for thread-safe operations
         lock = threading.RLock()
+        send_lock = threading.Lock()
 
         # Function worker threads
         fn_workers = {}
@@ -99,15 +100,17 @@ class SettaInMemoryFnSubprocess:
                                     fns_dict,
                                     cache,
                                     lock,
+                                    send_lock,
                                     self.child_conn,
                                 )
 
-                    self.child_conn.send(
-                        {
-                            "status": "success",
-                            "content": dependencies,
-                        }
-                    )
+                    with send_lock:
+                        self.child_conn.send(
+                            {
+                                "status": "success",
+                                "content": dependencies,
+                            }
+                        )
 
                 elif msg_type == "call" or msg_type == "call_with_new_exporter_obj":
                     fn_name = msg["fn_name"]
@@ -120,6 +123,7 @@ class SettaInMemoryFnSubprocess:
                         fns_dict,
                         cache,
                         lock,
+                        send_lock,
                         self.child_conn,
                     )
 
@@ -128,17 +132,17 @@ class SettaInMemoryFnSubprocess:
 
             except Exception as e:
                 traceback.print_exc()
-                self.child_conn.send(
-                    {
-                        "status": "error",
-                        "error": str(e),
-                        "messageType": None,
-                        "original_msg": msg,
-                    }
-                )
+                with send_lock:
+                    self.child_conn.send(
+                        {
+                            "status": "error",
+                            "error": str(e),
+                            "messageType": None,
+                        }
+                    )
 
     def _worker_thread(
-        self, fn_name, fn_message_queues, fns_dict, cache, lock, child_conn
+        self, fn_name, fn_message_queues, fns_dict, cache, lock, send_lock, child_conn
     ):
         """Worker thread that processes messages for a specific function"""
         while True:
@@ -172,24 +176,24 @@ class SettaInMemoryFnSubprocess:
                         return_message_type = in_memory_fn_obj.return_message_type
 
                         # Send result back
-                        child_conn.send(
-                            {
-                                "status": "success",
-                                "content": result,
-                                "messageType": return_message_type,
-                                "original_msg": msg,
-                            }
-                        )
+                        with send_lock:
+                            child_conn.send(
+                                {
+                                    "status": "success",
+                                    "content": result,
+                                    "messageType": return_message_type,
+                                }
+                            )
                     except Exception as e:
                         traceback.print_exc()
-                        child_conn.send(
-                            {
-                                "status": "error",
-                                "error": str(e),
-                                "messageType": return_message_type,
-                                "original_msg": msg,
-                            }
-                        )
+                        with send_lock:
+                            child_conn.send(
+                                {
+                                    "status": "error",
+                                    "error": str(e),
+                                    "messageType": return_message_type,
+                                }
+                            )
 
                 # Mark task as done
                 fn_message_queues[fn_name].task_done()
@@ -199,13 +203,29 @@ class SettaInMemoryFnSubprocess:
                 print(f"Error in worker thread for {fn_name}: {e}", flush=True)
 
     def _start_worker_for_fn(
-        self, fn_name, fn_workers, fn_message_queues, fns_dict, cache, lock, child_conn
+        self,
+        fn_name,
+        fn_workers,
+        fn_message_queues,
+        fns_dict,
+        cache,
+        lock,
+        send_lock,
+        child_conn,
     ):
         """Start a worker thread for a function if not already running"""
         if fn_name not in fn_workers or not fn_workers[fn_name].is_alive():
             worker = threading.Thread(
                 target=self._worker_thread,
-                args=(fn_name, fn_message_queues, fns_dict, cache, lock, child_conn),
+                args=(
+                    fn_name,
+                    fn_message_queues,
+                    fns_dict,
+                    cache,
+                    lock,
+                    send_lock,
+                    child_conn,
+                ),
                 daemon=True,
                 name=f"worker-{fn_name}",
             )
