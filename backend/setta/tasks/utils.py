@@ -61,8 +61,17 @@ class SettaInMemoryFnSubprocess:
         sys.stderr = output_capture
 
         while True:
-            msg = self.child_conn.recv()  # Wait for requests
-            msg_type = msg["type"]
+            try:
+                msg = self.child_conn.recv()
+                msg_type = msg["type"]
+                logger.debug(f"Subprocess received message type: {msg_type}")
+            except EOFError:
+                logger.error("EOF error when receiving message in subprocess")
+                break
+            except Exception as e:
+                logger.error(f"Error receiving message in subprocess: {str(e)}")
+                traceback.print_exc()
+                break
 
             if msg_type == "shutdown":
                 # Signal all worker threads to stop
@@ -145,11 +154,14 @@ class SettaInMemoryFnSubprocess:
         self, fn_name, fn_message_queues, fns_dict, cache, lock, send_lock, child_conn
     ):
         """Worker thread that processes messages for a specific function"""
+        logger.debug(f"Started worker thread for {fn_name}")
         while True:
             try:
                 # Get a message from the queue
                 msg = fn_message_queues[fn_name].get()
-
+                logger.debug(
+                    f"Worker thread for {fn_name} got message of type: {msg.get('type') if msg else 'None'}"
+                )
                 if msg is None:  # Sentinel value to stop the thread
                     break
 
@@ -241,10 +253,11 @@ class SettaInMemoryFnSubprocess:
 
             # Send shutdown message to the subprocess
             try:
+                logger.debug("Sending shutdown message to subprocess")
                 self.parent_conn.send({"type": "shutdown"})
-            except (BrokenPipeError, EOFError):
-                # Pipe might already be closed, that's okay
-                pass
+                logger.debug("Shutdown message sent")
+            except (BrokenPipeError, EOFError) as e:
+                logger.error(f"Error sending shutdown message: {str(e)}")
 
             # Join the process with timeout
             self.process.join(timeout=2)
