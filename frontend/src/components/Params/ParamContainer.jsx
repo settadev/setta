@@ -60,36 +60,38 @@ function _ParamContainer({
     <>
       <article
         id={`ParamContainer-${sectionId}-${paramInfoId}`} // used for project-level search results
-        className={`section-args-nested-key-value section-key-value group/arg-group section-min-rows relative flex rounded-sm px-[2px] hover:bg-setta-100/50 hover:dark:bg-setta-800/70 ${bg} ${border} `}
+        className={`section-key-value group/arg-group relative flex rounded-sm px-[2px] hover:bg-setta-100/50 hover:dark:bg-setta-800/70 ${bg} ${border} `}
         {...getFloatingBoxHandlers(...tooltipContentArray)}
         onMouseDownCapture={onMouseDown} // has to be on capture, otherwise it doesn't get triggered when clicking above DummyCodeMirror when ParamNameInput is taller than DummyCodeMirror
         ref={childlessRef}
       >
         {!isKwarg ? (
-          <div className="section-key overflow-hidden" ref={childlessNameRef}>
+          <div className="overflow-hidden" ref={childlessNameRef}>
             {children}
           </div>
         ) : (
           <>{children}</>
         )}
-        <ParamInput
-          sectionId={sectionId}
-          paramInfoId={paramInfoId}
-          maybeErrorMessage={maybeErrorMessage}
-        />
         <ResizeHandle showResizeHandle={true} onMouseDown={onResizeStart} />
         {!!maybeErrorMessage && <ErrorSection paramInfoId={paramInfoId} />}
+        <div className="relative flex-1">
+          <ParamInput
+            sectionId={sectionId}
+            paramInfoId={paramInfoId}
+            maybeErrorMessage={maybeErrorMessage}
+          />
+        </div>
       </article>
     </>
   ) : (
     <article
       id={`ParamContainer-${sectionId}-${paramInfoId}`} // used for project-level search results
-      className={`section-args-nested section-lg-value group/arg-group section-min-rows [&>p]:section-key-value grid grid-cols-subgrid items-center justify-between gap-y-1 rounded-sm ${isTopLevelWithPad ? "[&>p]:!pb-0 [&>p]:!pt-2" : ""}`}
+      className={`section-lg-value group/arg-group grid grid-cols-subgrid items-center justify-between gap-y-1 rounded-sm ${isTopLevelWithPad ? "[&>p]:!pb-0 [&>p]:!pt-2" : ""}`}
       {...getFloatingBoxHandlers(...tooltipContentArray)}
       ref={parentRef}
     >
       {children}
-      <div className="section-args-nested section-key-value relative grid gap-y-1">
+      <div className="section-key-value relative gap-y-1">
         <div className="absolute bottom-0 h-[calc(100%_-_0.1rem)] w-[0.4rem] rounded-full bg-setta-200/20 dark:bg-setta-400/20" />
         <GetParamSwitch
           sectionId={sectionId}

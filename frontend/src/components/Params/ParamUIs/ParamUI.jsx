@@ -81,8 +81,8 @@ export function ParamUI({
                 onEscape();
               }
             }}
-            dummyCodeClassName={`${NO_PAN_CLASS_NAME} absolute  peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} nodrag ${!isDisabled ? "cursor-text select-text" : ""} break-words font-mono text-xs [tab-size:4] [word-break:break-word] py-[.125rem]`}
-            realCodeClassName={`${NO_PAN_CLASS_NAME} nodrag self-end peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} [&_*]:!outline-0 cursor-text select-text [&_.cm-activeLine]:!px-0 [&_.cm-activeLine]:!bg-setta-200/10 [&_.cm-content]:!py-0 [&_.cm-content]:!px-0 [&_.cm-line]:!px-0 [&_.cm-content]:text-xs absolute py-[.125rem]`}
+            dummyCodeClassName={`${NO_PAN_CLASS_NAME} absolute inset-0 peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} nodrag ${!isDisabled ? "cursor-text select-text" : ""} break-words font-mono text-xs [tab-size:4] [word-break:break-word] py-[.125rem]`}
+            realCodeClassName={`${NO_PAN_CLASS_NAME} absolute inset-0 nodrag self-end peer/textinput ${maybeErrorMessage ? "[&_*]:!text-red-500" : ""} [&_*]:!outline-0 cursor-text select-text [&_.cm-activeLine]:!px-0 [&_.cm-activeLine]:!bg-setta-200/10 [&_.cm-content]:!py-0 [&_.cm-content]:!px-0 [&_.cm-line]:!px-0 [&_.cm-content]:text-xs absolute py-[.125rem]`}
             language={configLanguage}
             evRefs={evRefs}
             isDisabled={isDisabled}
@@ -91,7 +91,7 @@ export function ParamUI({
             <i className="gg-spinner absolute self-center justify-self-end text-blue-500/70" />
           )}
           <span
-            className={`grid-row-start-1 border-box absolute self-end border-b border-setta-200/50 dark:border-setta-600/30 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""}`}
+            className={`border-box absolute bottom-0 left-0 right-0 border-b border-setta-200/50 dark:border-setta-600/30 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""}`}
           />
         </>
       );
@@ -107,7 +107,7 @@ export function ParamUI({
           max={max}
           step={step}
           isDisabled={isDisabled}
-          wrapperDivClass={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} cursor-pointer @container/slider section-value flex gap-1`}
+          wrapperDivClass={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} cursor-pointer @container/slider flex gap-1`}
           sliderRootClassName=" data[orientation='vertical']:flex-col data[orientation='vertical']:w-5 data[orientation='vertical']:h-24 SliderRoot relative flex w-full touch-none select-none items-center data-[orientation='horizontal']:h-5"
           sliderTrackClassName="relative flex-grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700"
           sliderRangeClassName="absolute h-full rounded-full bg-blue-500"
@@ -164,7 +164,7 @@ export function ParamUI({
             isDisabled={isDisabled}
           />
           <span
-            className={`section-value grid-row-start-1 border-box self-end border-b border-setta-200/50 dark:border-setta-600/30 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""}`}
+            className={`border-box absolute bottom-0 left-0 right-0 self-end border-b border-setta-200/50 dark:border-setta-600/30 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""}`}
           />
         </>
       );
@@ -214,7 +214,7 @@ export function ParamSweepUI({
             <i className="section-value gg-spinner self-center justify-self-end text-blue-500/70" />
           )}
           <span
-            className={`section-key-value grid-row-start-1 border-box mx-3 self-end border-b border-setta-200/50 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""} dark:border-setta-600/30`}
+            className={`border-box absolute bottom-0 left-0 right-0 mx-3 self-end border-b border-setta-200/50 ${!isSelectingParams ? "peer-focus-within/textinput:border-blue-400" : ""} dark:border-setta-600/30`}
           />
         </>
       );
