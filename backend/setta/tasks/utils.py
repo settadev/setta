@@ -123,21 +123,43 @@ class SettaInMemoryFnSubprocess:
 
                 elif msg_type == "call" or msg_type == "call_with_new_exporter_obj":
                     fn_name = msg["fn_name"]
+                    try:
+                        logger.debug(
+                            f"Subprocess about to process message for {fn_name}"
+                        )
+                        # Start a worker for this function if needed
+                        self._start_worker_for_fn(
+                            fn_name,
+                            fn_workers,
+                            fn_message_queues,
+                            fns_dict,
+                            cache,
+                            lock,
+                            send_lock,
+                            self.child_conn,
+                        )
 
-                    # Start a worker for this function if needed
-                    self._start_worker_for_fn(
-                        fn_name,
-                        fn_workers,
-                        fn_message_queues,
-                        fns_dict,
-                        cache,
-                        lock,
-                        send_lock,
-                        self.child_conn,
-                    )
-
-                    # Add the message to the function's queue
-                    fn_message_queues[fn_name].put(msg)
+                        # Add the message to the function's queue
+                        fn_message_queues[fn_name].put(msg)
+                    except Exception as e:
+                        logger.error(
+                            f"Error processing message for {fn_name}: {str(e)}"
+                        )
+                        traceback.print_exc()
+                        # Make sure to send an error response, so the parent doesn't hang
+                        with send_lock:
+                            try:
+                                self.child_conn.send(
+                                    {
+                                        "status": "error",
+                                        "error": str(e),
+                                        "messageType": None,
+                                    }
+                                )
+                            except:
+                                logger.error(
+                                    "Failed to send error response back to parent"
+                                )
 
             except Exception as e:
                 traceback.print_exc()
