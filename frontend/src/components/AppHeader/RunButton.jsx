@@ -28,30 +28,6 @@ export function RunButton() {
         setIsOpen(false);
       },
     },
-    {
-      label: "Run Interactive Functions",
-      icon: <RiPlayMiniFill />,
-      action: () => {
-        sendProjectToAllInteractiveCode();
-        setIsOpen(false);
-      },
-    },
-    {
-      label: "Run Interactive Functions Functions Functions Functions",
-      icon: <RiPlayMiniFill />,
-      action: () => {
-        sendProjectToAllInteractiveCode();
-        setIsOpen(false);
-      },
-    },
-    {
-      label: "Run",
-      icon: <RiPlayMiniFill />,
-      action: () => {
-        sendProjectToAllInteractiveCode();
-        setIsOpen(false);
-      },
-    },
   ];
 
   return (
