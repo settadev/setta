@@ -3,10 +3,11 @@ import { defineConfig } from "vite";
 import svgrPlugin from "vite-plugin-svgr";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import constants from "../constants/constants.json";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), viteTsconfigPaths(), svgrPlugin()],
+  plugins: [tailwindcss(), react(), viteTsconfigPaths(), svgrPlugin()],
   server: {
     host: constants.DEFAULT_HOST,
     port: constants.DEV_MODE_FRONTEND_PORT,

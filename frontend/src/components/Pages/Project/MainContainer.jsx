@@ -43,6 +43,8 @@ export function MainContainer() {
   );
 }
 
+// TODO: get rid of bg-opacity-50
+
 function LoadingSpinner() {
   return (
     <div className="single-cell-container absolute h-full w-full">

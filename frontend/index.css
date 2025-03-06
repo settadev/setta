@@ -1,31 +1,57 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @plugin '@tailwindcss/typography';
-@plugin '@tailwindcss/container-queries';
 
 @custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:where(.dark, .dark *)); */
+/* @custom-variant hover (&:hover); */
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
 @theme {
-  --color-setta-50: hsl(222, 28%, 95%);
-  --color-setta-100: hsl(219, 24%, 89%);
-  --color-setta-200: hsl(219, 25%, 77%);
-  --color-setta-300: hsl(220, 25%, 67%);
-  --color-setta-400: hsl(220, 26%, 57%);
-  --color-setta-500: hsl(220, 25%, 45%);
-  --color-setta-600: hsl(219, 25%, 34%);
-  --color-setta-700: hsl(219, 26%, 23%);
-  --color-setta-800: hsl(220, 26%, 14%);
-  --color-setta-850: hsl(220, 25%, 11%);
-  --color-setta-860: hsl(220, 25%, 8.5%);
-  --color-setta-875: hsl(220, 25%, 7.5%);
-  --color-setta-900: hsl(220, 27%, 6%);
-  --color-setta-925: hsl(220, 24%, 4.5%);
-  --color-setta-950: hsl(220, 25%, 3%);
-  --color-setta-975: hsl(220, 33%, 0.5%);
-  --color-setta-light: #94a3b8;
-  --color-setta-dark: hsl(220, 27%, 15%);
+  --color-test: #ff0000;
+  --color-setta-50: oklch(95.74% 0.0071 267.38);
+  --color-setta-100: oklch(90.85% 0.013 263.02);
+  --color-setta-200: oklch(80.57% 0.0292 262.95);
+  --color-setta-300: oklch(71.67% 0.0439 264.25);
+  --color-setta-400: oklch(62.55% 0.0618 263.97);
+  --color-setta-500: oklch(52.16% 0.0651 263.76);
+  --color-setta-600: oklch(43.11% 0.0508 262.49);
+  --color-setta-700: oklch(33.24% 0.0381 262.51);
+  --color-setta-800: oklch(24.58% 0.0254 263.94);
+  --color-setta-850: oklch(21.62% 0.0198 264.03);
+  --color-setta-860: oklch(19.03% 0.0158 264.09);
+  --color-setta-875: oklch(17.97% 0.0141 264.13);
+  --color-setta-900: oklch(16.31% 0.0125 264.14);
+  --color-setta-925: oklch(14.71% 0.0086 263.76);
+  --color-setta-950: oklch(12.81% 0.007 261.32);
+  --color-setta-975: oklch(6.97% 0.0051 260.18);
+  --color-setta-light: oklch(71.07% 0.0351 256.79);
+  --color-setta-dark: oklch(25.52% 0.028 263.88);
 
-  --font-heading: Work Sans, sans-serif;
+  --colors-setta-50: var(--color-setta-50);
+  --colors-setta-100: var(--color-setta-100);
+  --colors-setta-200: var(--color-setta-200);
+  --colors-setta-300: var(--color-setta-300);
+  --colors-setta-400: var(--color-setta-400);
+  --colors-setta-500: var(--color-setta-500);
+  --colors-setta-600: var(--color-setta-600);
+  --colors-setta-700: var(--color-setta-700);
+  --colors-setta-800: var(--color-setta-800);
+  --colors-setta-850: var(--color-setta-850);
+  --colors-setta-860: var(--color-setta-860);
+  --colors-setta-875: var(--color-setta-875);
+  --colors-setta-900: var(--color-setta-900);
+  --colors-setta-925: var(--color-setta-925);
+  --colors-setta-950: var(--color-setta-950);
+  --colors-setta-975: var(--color-setta-975);
+  --colors-setta-light: var(--color-setta-light);
+  --colors-setta-dark: var(--color-setta-dark);
 
   --animate-slow-dash: dash 40s linear infinite;
   --animate-slide-down: slideDown 200ms cubic-bezier(0.87, 0, 0.13, 1);
@@ -57,7 +83,6 @@
     }
   }
 }
-
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
