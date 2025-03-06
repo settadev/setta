@@ -8,6 +8,8 @@ import {
   runOrImportAllCode,
   sendProjectToAllInteractiveCode,
 } from "state/actions/runOrImportCode";
+import { useSettings } from "state/definitions";
+import { shortcutPrettified } from "utils/utils";
 
 export function RunButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +33,10 @@ export function RunButton() {
     },
   ];
 
+  const sendProjectToAllInteractiveCodeShortcut = useSettings((x) =>
+    shortcutPrettified(x.shortcuts.sendProjectToAllInteractiveCode),
+  );
+
   return (
     <div className="flex justify-stretch">
       <Button
@@ -50,7 +56,7 @@ export function RunButton() {
             key={index}
             className={menuItemClasses}
             onClick={action.action}
-            shortcut="ctrl alt del"
+            shortcut={sendProjectToAllInteractiveCodeShortcut}
           >
             <i className="w-2 opacity-50">{action.icon}</i>
 
@@ -58,29 +64,6 @@ export function RunButton() {
           </MenuItem>
         ))}
       </NavbarMenuDropdown>
-      {/* <StandardPopover
-        trigger={
-          <Button twClasses={`${baseClasses} px-1 rounded-l-none`}>
-            <RiArrowDownSLine />
-          </Button>
-        }
-        contentClasses="flex flex-col bg-white dark:bg-setta-850 py-1 rounded-md shadow-lg z-50 min-w-36 w-48 border border-setta-100 dark:border-setta-700/50 overflow-hidden"
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        arrowClasses="hidden"
-      >
-        {runActions.map((action, index) => (
-          <button
-            key={index}
-            className={menuItemClasses}
-            onClick={action.action}
-          >
-            <i className="w-2 opacity-50">{action.icon}</i>
-
-            <span className="ml-0.5">{action.label}</span>
-          </button>
-        ))}
-      </StandardPopover> */}
     </div>
   );
 }
