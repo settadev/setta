@@ -64,6 +64,7 @@ class Tasks:
         message: TaskMessage,
         websocket_manager=None,
         call_all=False,
+        call_fns_with_empty_dependency_array=False,
         subprocess_key=None,
         project_config_id=None,
         section_id=None,
@@ -87,11 +88,10 @@ class Tasks:
             # For each matching subprocess, collect all functions that need to be called
             fns_to_call = []
             for fn_name, fnInfo in sp_info["fnInfo"].items():
-                if (
-                    call_all
-                    or None in fnInfo["dependencies"]
-                    or any(k in fnInfo["dependencies"] for k in message.content.keys())
+                if call_fn_condition(
+                    call_all, call_fns_with_empty_dependency_array, fnInfo, message
                 ):
+                    print('fnInfo["dependencies"]', fnInfo["dependencies"], flush=True)
                     fns_to_call.append(fn_name)
 
             if fns_to_call:
@@ -231,7 +231,7 @@ class Tasks:
     ):
         initial_result = await self.call_in_memory_subprocess_fn(
             TaskMessage(id=create_new_id(), content={}),
-            call_all=True,
+            call_fns_with_empty_dependency_array=True,
             project_config_id=project_config_id,
             idx=idx,
             call_type="call_with_new_exporter_obj",
@@ -305,3 +305,17 @@ def match_subprocess_key(
         return False
 
     return True
+
+
+def call_fn_condition(call_all, call_fns_with_empty_dependency_array, fnInfo, message):
+    return (
+        call_all
+        or (call_fns_with_empty_dependency_array and not fnInfo["dependencies"])
+        or (
+            not call_fns_with_empty_dependency_array
+            and (
+                None in fnInfo["dependencies"]
+                or any(k in fnInfo["dependencies"] for k in message.content)
+            )
+        )
+    )
