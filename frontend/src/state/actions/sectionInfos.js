@@ -342,6 +342,16 @@ export function getSectionVisibilityKey(viewingEditingMode) {
   }
 }
 
+export function getSectionVisibilityKeyForDisplay(viewingEditingMode) {
+  switch (viewingEditingMode) {
+    case VIEWING_EDITING_MODE.USER:
+      return viewingEditingMode;
+    case VIEWING_EDITING_MODE.DEV:
+    case VIEWING_EDITING_MODE.USER_EDIT:
+      return VIEWING_EDITING_MODE.DEV;
+  }
+}
+
 export function getAncestorSameVisibility(sectionId, state) {
   const { viewingEditingMode } = state.projectConfig;
   let { parentId } = state.x[sectionId];
