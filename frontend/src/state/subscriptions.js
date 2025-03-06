@@ -12,6 +12,7 @@ import {
   useTemplateVarRegex,
 } from "state/definitions";
 import { getNamePathTypeKey } from "./actions/artifacts";
+import { maybeRequestDrawAreaUpdate } from "./actions/artifactsDrawArea";
 import { getEVRefRegexAndColorMap } from "./actions/evRefRegex";
 import {
   getNodeUpdateInformation,
@@ -30,7 +31,6 @@ import {
   getSectionViewingEditingModeVisibility,
 } from "./actions/sectionInfos";
 import { getTemplateVarsRegexAndColorMap } from "./actions/templateVarsRegex";
-import { getAllSectionArtifactIds } from "./hooks/artifacts";
 
 export function subscribe() {
   useSectionInfos.subscribe(
@@ -155,48 +155,7 @@ export function subscribe() {
 
   useArtifacts.subscribe(
     artifactWhoModifiedSubscriptionFn,
-    (newVal, oldVal) => {
-      const idToModifiedBy = {};
-      for (const [id, a] of Object.entries(newVal)) {
-        // modifiedByInfo contains keys: modifiedBy and timestamp
-        if (!_.isEqual(a, oldVal[id])) {
-          idToModifiedBy[id] = a.modifiedBy;
-        }
-      }
-
-      if (_.size(idToModifiedBy) === 0) {
-        return;
-      }
-
-      const sectionState = useSectionInfos.getState();
-      const drawAreasToUpdate = [];
-      for (const s of Object.values(sectionState.x)) {
-        if (getSectionType(s.id, sectionState) !== C.DRAW) {
-          continue;
-        }
-        const artifactIds = getAllSectionArtifactIds(s.id, sectionState);
-        for (const [artifactId, modifiedBy] of Object.entries(idToModifiedBy)) {
-          if (artifactIds.has(artifactId) && modifiedBy !== s.id) {
-            drawAreasToUpdate.push(s.id);
-            break;
-          }
-        }
-      }
-      if (drawAreasToUpdate.length === 0) {
-        return;
-      }
-
-      useMisc.setState((state) => {
-        const newUpdateDrawArea = { ...state.updateDrawArea };
-        for (const s of drawAreasToUpdate) {
-          if (!(s in newUpdateDrawArea)) {
-            newUpdateDrawArea[s] = 0;
-          }
-          newUpdateDrawArea[s] += 1;
-        }
-        return { updateDrawArea: newUpdateDrawArea };
-      });
-    },
+    maybeRequestDrawAreaUpdate,
     {
       equalityFn: _.isEqual,
     },
