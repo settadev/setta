@@ -11,6 +11,13 @@ export async function dbImportCodeBlocks(projects) {
   });
 }
 
+export async function dbSendProjectToInteractiveCode(projects) {
+  return await post({
+    body: { projects },
+    address: C.ROUTE_SEND_PROJECT_TO_INTERACTIVE_CODE,
+  });
+}
+
 export async function dbFormateCode() {
   const project = getProjectData({});
   const candidateTemplateVars = {};

@@ -12,6 +12,11 @@
 
 ## News
 
+**March 5**: [v0.0.14](https://github.com/settadev/setta/releases/tag/v0.0.14)
+- Allow access to individual layers of Drawing sections, as well as the combined output.
+- Added button + shortcut for sending current full project state to in-memory functions.
+
+
 **March 4**: [v0.0.13](https://github.com/settadev/setta/releases/tag/v0.0.13)
 - Updated frontend javascript dependencies.
 
@@ -30,21 +35,6 @@
   </tr>
 </table>
 
-
-**March 2**: [v0.0.11](https://github.com/settadev/setta/releases/tag/v0.0.11)
-- Added User View mode. This allows you to quickly create a simplified version of your UI.
-Here's an example of what Developer View and User View look like:
-
-<table>
-  <tr>
-    <th width="50%">Developer View</th>
-    <th width="50%">User View</th>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/4ecbb85a-1857-413c-b768-9ac17f226b6f" /></td>
-    <td><img src="https://github.com/user-attachments/assets/1126649e-7559-4785-80b9-7eda6466c2e0" /></td>
-  </tr>
-</table>
 
 ## What does Setta do?
 

@@ -232,11 +232,11 @@ def get_exporter_fn(config, section_id):
         return export_param_sweep_section
     elif stype == C.GLOBAL_PARAM_SWEEP:
         return export_global_param_sweep_section
-    elif stype == C.DRAW:
-        return export_canvas_rendered_value
-    elif stype == C.IMAGE:
-        return export_image_section
+    # elif stype == C.DRAW:
+    #     return export_canvas_rendered_value
+    # elif stype == C.IMAGE:
+    #     return export_image_section
     elif stype == C.SOCIAL:
         return export_social_section
-    elif stype == C.CHART:
-        return export_canvas_rendered_value
+    # elif stype == C.CHART:
+    #     return export_canvas_rendered_value
