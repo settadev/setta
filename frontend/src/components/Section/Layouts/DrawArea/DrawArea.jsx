@@ -92,7 +92,7 @@ export function DrawArea({ sectionId }) {
         state,
       });
     });
-    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
+    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs, fnCanvasToBase64);
   }, [height, width, JSON.stringify(layerIds), updateDrawArea]);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export function DrawArea({ sectionId }) {
       selectedIdx.current = null;
       resizeHandleCorners.current = null;
     }
-    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
+    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs, fnCanvasToBase64);
   }, [
     mode,
     layerOpacity,
@@ -187,6 +187,7 @@ export function DrawArea({ sectionId }) {
       layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
+      fnCanvasToBase64,
     );
   }
 
