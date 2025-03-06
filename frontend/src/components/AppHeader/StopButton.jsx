@@ -1,6 +1,6 @@
 import { Button } from "components/Utils/atoms/buttons/Button";
 import { RiStopFill } from "react-icons/ri";
-import { dbKillInMemorySubprocesses } from "requests/interactive";
+import { stopCode } from "state/actions/stopCode";
 
 export function StopButton() {
   const baseClasses =
@@ -8,10 +8,7 @@ export function StopButton() {
 
   return (
     <div className="flex justify-stretch">
-      <Button
-        onClick={dbKillInMemorySubprocesses}
-        twClasses={`${baseClasses} px-2`}
-      >
+      <Button onClick={stopCode} twClasses={`${baseClasses} px-2`}>
         <RiStopFill />
         Stop
       </Button>

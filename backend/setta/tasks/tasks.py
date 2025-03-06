@@ -159,8 +159,9 @@ class Tasks:
                     subprocess.parent_conn.recv, [], RunType.THREAD
                 )
                 elapsed_time = time.perf_counter() - start_time
-            except:
-                logger.debug("error while waiting for recv")
+            except Exception as e:
+                logger.debug("error while sending or receiving from subprocess")
+                results.append({"content":[e]})
                 continue
 
             if result["status"] == "success":
