@@ -103,6 +103,10 @@ export function setGlobalBrushStrokesAndDrawAllLayers(
       [currBrushStrokeArtifactId]: {
         ...state.x[currBrushStrokeArtifactId],
         value: _.cloneDeep(strokesRef.current),
+        modifiedByInfo: {
+          modifiedBy: sectionId,
+          timestamp: Date.now().toString(),
+        },
       },
     },
   }));

@@ -60,7 +60,9 @@ export function DrawArea({ sectionId }) {
     (a) => loadedArtifacts[a.artifactId]?.type === "brushStrokes",
   )?.artifactId;
 
-  const updateDrawAreas = useMisc((x) => x.updateDrawAreas);
+  const updateDrawArea = useMisc(
+    (x) => x.updateAllDrawAreas || x.updateDrawArea[sectionId],
+  );
   const layerIds = allLayersMetadata.map((x) => x.id);
 
   useEffect(() => {
@@ -91,7 +93,7 @@ export function DrawArea({ sectionId }) {
       });
     });
     drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
-  }, [height, width, JSON.stringify(layerIds), updateDrawAreas]);
+  }, [height, width, JSON.stringify(layerIds), updateDrawArea]);
 
   useEffect(() => {
     setDraftCanvasProperties({
@@ -108,7 +110,7 @@ export function DrawArea({ sectionId }) {
     brushShape,
     brushOpacity,
     layerOpacity,
-    updateDrawAreas,
+    updateDrawArea,
   ]);
 
   useDeepCompareEffect(() => {
@@ -122,7 +124,7 @@ export function DrawArea({ sectionId }) {
     layerOpacity,
     allLayersMetadata,
     loadedArtifactIdsWithDuplicates,
-    updateDrawAreas,
+    updateDrawArea,
   ]);
   // loadedArtifactIdsWithDuplicates contains all artifacts ids present in all layers
   // including duplicates (e.g. the same artifact present multiple times in a single layer, or across multiple layers)
@@ -135,7 +137,7 @@ export function DrawArea({ sectionId }) {
         useArtifacts.getState().x[currBrushStrokeArtifactId].value,
       );
     }
-  }, [currBrushStrokeArtifactId, updateDrawAreas]);
+  }, [currBrushStrokeArtifactId, updateDrawArea]);
 
   useDeepCompareEffectNoCheck(() => {
     if (!activeLayer?.artifactTransforms) {
@@ -145,7 +147,7 @@ export function DrawArea({ sectionId }) {
         activeLayer.artifactTransforms,
       );
     }
-  }, [activeLayer?.artifactTransforms, updateDrawAreas]);
+  }, [activeLayer?.artifactTransforms, updateDrawArea]);
 
   const { onMouseDown, onMouseMove, onMouseUp, onMouseEnter } =
     useDrawModeMouseHandlers({

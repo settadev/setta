@@ -75,6 +75,10 @@ export async function updateInteractiveArtifacts(artifacts) {
     if (!("path" in a)) a.path = "";
     if (a.type === "img") {
       a.value = await base64ToImageObj(a.value);
+      a.modifiedByInfo = {
+        modifiedBy: "interactive",
+        timestamp: Date.now().toString(),
+      };
     }
 
     newArtifacts[
