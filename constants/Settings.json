@@ -17,7 +17,7 @@
     "copyShortcut": "Mod + C",
     "pasteShortcut": "Mod + V",
     "pasteAsRefShortcut": "Mod + Shift + V",
-    "sortingShortcut": "Shift",
+    "sortingShortcut": "Mod + Alt",
     "movingFreeShortcut": "Alt",
     "showTooltipShortcut": "Q",
     "tooltipToPlaintextShortcut": "Q + S",
