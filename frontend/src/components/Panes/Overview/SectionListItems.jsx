@@ -32,7 +32,7 @@ function _SectionItem({ sectionId, sectionHeading, checkbox, depth }) {
   if (checkbox) {
     return (
       <label
-        className="dark:text-rx-300 flex cursor-pointer items-center gap-2 truncate rounded px-1 py-0.5 text-sm text-setta-700 hover:bg-white hover:shadow-md dark:text-setta-200  dark:hover:bg-setta-700"
+        className="dark:text-rx-300 flex cursor-pointer items-center gap-2 truncate rounded-sm px-1 py-0.5 text-sm text-setta-700 hover:bg-white hover:shadow-md dark:text-setta-200  dark:hover:bg-setta-700"
         // onClick={onClick}
       >
         <input
@@ -48,7 +48,7 @@ function _SectionItem({ sectionId, sectionHeading, checkbox, depth }) {
   return (
     <li
       id={`${sectionId}-OverviewListItem`}
-      className="cursor-pointer truncate rounded px-2 py-0.5 text-xs text-setta-700 hover:bg-white hover:shadow-md focus-visible:border-transparent focus-visible:bg-blue-500 focus-visible:text-white  focus-visible:outline-none focus-visible:ring-0 dark:text-setta-200 dark:hover:bg-setta-700 dark:focus-visible:!text-white"
+      className="cursor-pointer truncate rounded-sm px-2 py-0.5 text-xs text-setta-700 hover:bg-white hover:shadow-md focus-visible:border-transparent focus-visible:bg-blue-500 focus-visible:text-white  focus-visible:outline-hidden focus-visible:ring-0 dark:text-setta-200 dark:hover:bg-setta-700 dark:focus-visible:text-white!"
       onClick={onClick}
       onKeyDown={onKeyDown}
       style={{ marginLeft: `${0.75 * depth}rem` }}

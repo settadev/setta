@@ -55,7 +55,7 @@ export const ProjectConfigs = React.forwardRef(() => {
                 state={{ pageLoadType: PAGE_LOAD_TYPES.LOAD_PROJECT_CONFIG }}
               >
                 <p
-                  className={`${(previewEnabled && mousedOverName === name) || (!previewEnabled && currProjectConfigName === name) ? "font-black !text-setta-900 dark:!text-setta-100" : ""} flex-shrink truncate text-xs text-setta-600 [transition:font-weight_100ms_ease-in-out]  group-hover:!text-setta-900 dark:text-setta-400 dark:group-hover:!text-setta-100`}
+                  className={`${(previewEnabled && mousedOverName === name) || (!previewEnabled && currProjectConfigName === name) ? "font-black text-setta-900! dark:text-setta-100!" : ""} shrink truncate text-xs text-setta-600 [transition:font-weight_100ms_ease-in-out]  group-hover:text-setta-900! dark:text-setta-400 dark:group-hover:text-setta-100!`}
                 >
                   {name}
                 </p>

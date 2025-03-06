@@ -64,7 +64,7 @@ export function YamlView({ sectionId, isDisabled, onChange }) {
   return (
     <article
       ref={wrapperRef}
-      className={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title min-h-0 cursor-auto [&_*]:!outline-0 [&_.cm-theme]:h-full ${cmEditorClass} ${overflow} ${nowheel}`}
+      className={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title min-h-0 cursor-auto **:outline-0! [&_.cm-theme]:h-full ${cmEditorClass} ${overflow} ${nowheel}`}
       onKeyDown={onArticleDivEnterKeyFocusOnCodeMirror}
       tabIndex="0"
     >

@@ -94,7 +94,7 @@ function RightColumn({ projects, defaultProjectName, setDoRefresh }) {
             New Config
           </StandardButton>
           <StandardButton
-            twClasses="py-2 px-4 rounded-full font-medium text-white dark:text-white/75 bg-setta-400 dark:bg-setta-500/25 hover:!bg-green-500 dark:hover:!bg-green-700 hover:text-white gap-2"
+            twClasses="py-2 px-4 rounded-full font-medium text-white dark:text-white/75 bg-setta-400 dark:bg-setta-500/25 hover:bg-green-500! dark:hover:bg-green-700! hover:text-white gap-2"
             onClick={onClickMakeDefault}
             disabled={selectedProjects.length !== 1}
           >
@@ -102,7 +102,7 @@ function RightColumn({ projects, defaultProjectName, setDoRefresh }) {
             Make Default
           </StandardButton>
           <StandardButton
-            twClasses="py-2 px-4 rounded-full font-medium text-white dark:text-white/75 bg-setta-400 dark:bg-setta-500/25 hover:!bg-red-500 hover:text-white gap-2"
+            twClasses="py-2 px-4 rounded-full font-medium text-white dark:text-white/75 bg-setta-400 dark:bg-setta-500/25 hover:bg-red-500! hover:text-white gap-2"
             onClick={onClickDelete}
             disabled={selectedProjects.length === 0}
           >
@@ -140,7 +140,7 @@ function ProjectItems({
   });
 
   const gridStyles =
-    "grid grid-cols-[repeat(minmax(0, 1fr))] md:grid-cols-[repeat(auto-fit,_minmax(15rem,_1fr))] xl:grid-cols-[repeat(auto-fill,_minmax(20rem,_1fr))] gap-8 pt-7 justify-items-start";
+    "grid grid-cols-[repeat(minmax(0, 1fr))] md:grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-8 pt-7 justify-items-start";
 
   return (
     <div className={gridStyles}>
@@ -219,7 +219,7 @@ function ThumbnailArea({ project, isSelected, onSelectProject }) {
     <div
       className={`absolute bottom-0 left-0 top-0 col-start-1 col-end-2 row-start-1 row-end-2 grid w-full bg-center p-4 ${project.previewImgColor}`}
     >
-      <aside className="z-[10] col-start-1 col-end-2 row-start-1 row-end-2 flex w-full items-center justify-between gap-1 [place-self:flex-start_flex-end]">
+      <aside className="z-10 col-start-1 col-end-2 row-start-1 row-end-2 flex w-full items-center justify-between gap-1 [place-self:flex-start_flex-end]">
         <IconButton
           icon={<IoMdCheckmark />}
           color="text-white/50 hover:text-white"
@@ -230,7 +230,7 @@ function ThumbnailArea({ project, isSelected, onSelectProject }) {
       </aside>
 
       <div
-        className="col-start-1 col-end-2 row-start-1 row-end-2 -m-4 grid place-items-center overflow-hidden opacity-50 mix-blend-multiply [&>*]:scale-150"
+        className="col-start-1 col-end-2 row-start-1 row-end-2 -m-4 grid place-items-center overflow-hidden opacity-50 mix-blend-multiply *:scale-150"
         tabIndex="0"
         onKeyDown={(e) =>
           homePageProjectItemOnKeyDown(e, navigate, project.name)

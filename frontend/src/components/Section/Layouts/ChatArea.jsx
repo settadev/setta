@@ -75,11 +75,11 @@ function ChatAreaCore({ sectionId, messages }) {
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-                className={`prose prose-sm w-fit max-w-[min(85%,800px)] flex-shrink cursor-text px-4 py-2.5 ${
+                className={`prose prose-sm w-fit max-w-[min(85%,800px)] shrink cursor-text px-4 py-2.5 ${
                   message.role === "user"
                     ? "rounded-t-lg rounded-bl-lg bg-blue-500 text-white prose-headings:text-blue-200 dark:bg-blue-700"
                     : "rounded-b-lg rounded-tr-lg bg-setta-100 text-setta-800 prose-headings:text-setta-600 dark:bg-setta-700/50 dark:text-setta-50 dark:prose-headings:text-setta-300"
-                } dark:prose-invert   prose-headings:tracking-tighter   prose-h1:text-2xl prose-h1:leading-none prose-p:text-sm prose-code:before:hidden prose-code:after:hidden [&>p]:inline-block [&_*]:break-words`}
+                } dark:prose-invert   prose-headings:tracking-tighter   prose-h1:text-2xl prose-h1:leading-none prose-p:text-sm prose-code:before:hidden prose-code:after:hidden [&>p]:inline-block **:break-words`}
                 components={{
                   code: CodeBlock,
                 }}
@@ -100,11 +100,11 @@ function ChatAreaCore({ sectionId, messages }) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} nodrag max-h-48 flex-1 resize-none overflow-y-auto rounded-lg border border-setta-100 bg-transparent px-4 py-2 text-setta-800 outline-none [field-sizing:content]  hover:bg-setta-100/50 focus:outline-none focus:outline focus:outline-blue-500  dark:border-setta-700 dark:text-white dark:hover:bg-setta-800 dark:focus:bg-setta-800/50 dark:focus:outline-blue-700`}
+            className={`${isScrollable ? NO_WHEEL_CLASS_NAME : ""} nodrag max-h-48 flex-1 resize-none overflow-y-auto rounded-lg border border-setta-100 bg-transparent px-4 py-2 text-setta-800 outline-hidden [field-sizing:content]  hover:bg-setta-100/50 focus:outline-hidden focus:outline focus:outline-blue-500  dark:border-setta-700 dark:text-white dark:hover:bg-setta-800 dark:focus:bg-setta-800/50 dark:focus:outline-blue-700`}
           />
           <button
             type="submit"
-            className="mb-3 cursor-pointer self-end px-2 py-0.5 text-setta-500  hover:text-blue-500 focus:text-blue-500 focus:outline-none focus:ring-0 dark:hover:text-blue-700 "
+            className="mb-3 cursor-pointer self-end px-2 py-0.5 text-setta-500  hover:text-blue-500 focus:text-blue-500 focus:outline-hidden focus:ring-0 dark:hover:text-blue-700 "
           >
             <IoSend />
           </button>

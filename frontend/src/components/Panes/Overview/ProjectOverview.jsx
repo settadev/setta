@@ -20,12 +20,12 @@ function ProjectOverviewCore({ sectionList }) {
     <>
       <ProjectName />
       <StandardSearch
-        inputStyles="flex-grow outline-0 min-w-0 cursor-auto bg-transparent [border-width:0_0_1px_0] border-solid border-setta-200 dark:border-setta-800  focus-visible:!border-blue-300 pl-5 py-1 truncate placeholder-setta-400 dark:placeholder-setta-700 text-sm"
+        inputStyles="grow outline-0 min-w-0 cursor-auto bg-transparent [border-width:0_0_1px_0] border-solid border-setta-200 dark:border-setta-800  focus-visible:border-blue-300! pl-5 py-1 truncate placeholder-setta-400 dark:placeholder-setta-700 text-sm"
         outerClasses="pb-4"
         leftElementStyles="pl-1"
         placeholder="Filter"
         leftElement={
-          <i className="gg-sort-az !scale-75 text-setta-600 dark:text-setta-400" />
+          <i className="gg-sort-az scale-75! text-setta-600 dark:text-setta-400" />
         }
         onChange={(e) => setFilter(e.target.value)}
         {...getFloatingBoxHandlers({
@@ -33,9 +33,9 @@ function ProjectOverviewCore({ sectionList }) {
         })}
       />
 
-      <div className="min-h-0 flex-grow overflow-y-scroll">
+      <div className="min-h-0 grow overflow-y-scroll">
         <ul
-          className="min-h-0 flex-grow"
+          className="min-h-0 grow"
           {...getFloatingBoxHandlers({
             content: "Click on a section name to pan to it.",
           })}

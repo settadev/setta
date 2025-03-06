@@ -47,7 +47,7 @@ export function SaveLoadModal({
   }
 
   return (
-    <div className="grid flex-grow grid-rows-[min-content_min-content_1fr_min-content] overflow-hidden">
+    <div className="grid grow grid-rows-[min-content_min-content_1fr_min-content] overflow-hidden">
       <Body
         modalPurpose={modalPurpose}
         files={files}

@@ -55,7 +55,7 @@ export function HeaderIcon({
     case C.IMAGE:
       return (
         <div className="relative">
-          <i className="gg-image absolute inset-0 !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]" />
+          <i className="gg-image absolute inset-0 scale-50! text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]" />
         </div>
       );
     case C.DRAW:
@@ -65,7 +65,7 @@ export function HeaderIcon({
     case C.IFRAME:
       return (
         <div className="relative flex w-2 justify-center">
-          <i className="gg-code-slash !rotate-[14deg] !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]" />
+          <i className="gg-code-slash rotate-[14deg]! scale-50! text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff]" />
         </div>
       );
     case C.SOCIAL:
@@ -73,7 +73,7 @@ export function HeaderIcon({
     case C.GROUP:
       return (
         <FaLayerGroup
-          className="[&_*]:!scale-120 text-setta-400 transition-colors group-hover/group-section:text-blue-600  dark:text-setta-500 dark:group-hover/group-section:text-[#0084ff]
+          className="**:scale-120! text-setta-400 transition-colors group-hover/group-section:text-blue-600  dark:text-setta-500 dark:group-hover/group-section:text-[#0084ff]
           "
         />
       );
@@ -93,7 +93,7 @@ export function HeaderIcon({
       );
     default:
       return (
-        <i className="gg-menu group/card-section:hover:bg !scale-110 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff] " />
+        <i className="gg-menu group/card-section:hover:bg scale-110! text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:group-hover/card-section:text-[#0084ff] " />
       );
   }
 }
@@ -105,7 +105,7 @@ function IsInOtherProjectConfigsIcon({ sectionId }) {
 
   return (
     <i
-      className={`gg-link group/card-section:hover:bg  transition-colors group-hover/card-section:text-pink-500  dark:group-hover/card-section:text-[#ff00ff] ${isGroup ? "-rotate-45 !scale-75 text-purple-600 dark:text-purple-700" : "text-purple-500 dark:text-purple-500"}`}
+      className={`gg-link group/card-section:hover:bg  transition-colors group-hover/card-section:text-pink-500  dark:group-hover/card-section:text-[#ff00ff] ${isGroup ? "-rotate-45 scale-75! text-purple-600 dark:text-purple-700" : "text-purple-500 dark:text-purple-500"}`}
     />
   );
 }
@@ -164,7 +164,7 @@ function TextBlockIcon({ sectionId }) {
   ) : (
     <PiTextTFill className="text-transparent transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:text-transparent dark:group-hover/card-section:text-[#0084ff]" />
   );
-  // <i className="gg-pen -rotate-45 !scale-50 text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:text-transparent dark:group-hover/card-section:text-[#0084ff] " />
+  // <i className="gg-pen -rotate-45 scale-50! text-setta-300 transition-colors group-hover/card-section:text-blue-500 dark:text-setta-500 dark:text-transparent dark:group-hover/card-section:text-[#0084ff] " />
 }
 
 function TerminalIcon({ sectionId }) {

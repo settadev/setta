@@ -51,7 +51,7 @@ const LayersList = ({
       return "border-setta-300 dark:border-setta-600";
     }
 
-    return "border-blue-500 dark:border-blue-600 bg-blue-50 dark:bg-blue-800 dark:[&_*]:text-white/50";
+    return "border-blue-500 dark:border-blue-600 bg-blue-50 dark:bg-blue-800 dark:**:text-white/50";
   };
 
   function getArtifactTypeIcon(type) {
@@ -75,7 +75,7 @@ const LayersList = ({
             className={`-mx-2 mb-2 rounded-lg  px-2 py-1 transition-colors hover:bg-setta-100/30 dark:hover:bg-setta-900/50 ${getLayerStyle(layer)} ${
               draggedId
                 ? "cursor-copy border border-dashed border-blue-500"
-                : "border !border-transparent"
+                : "border border-transparent!"
             }`}
             onDragOver={(e) => handleDragOver(e, layer.id)}
             onDragLeave={handleDragLeave}
@@ -180,7 +180,7 @@ function ImageArtifactObjects({
           <Accordion.Item
             key={id}
             value={item.name}
-            className={`flex flex-col rounded-lg bg-white shadow-md transition-shadow hover:shadow-xl dark:bg-setta-800 dark:!shadow-setta-900 ${draggable ? "cursor-move" : "cursor-pointer"} mx-1 justify-center border px-2 py-1 ${getItemStyle?.(id) ?? "border-transparent  hover:border-white dark:border-setta-700 dark:hover:bg-setta-700"}`}
+            className={`flex flex-col rounded-lg bg-white shadow-md transition-shadow hover:shadow-xl dark:bg-setta-800 dark:shadow-setta-900! ${draggable ? "cursor-move" : "cursor-pointer"} mx-1 justify-center border px-2 py-1 ${getItemStyle?.(id) ?? "border-transparent  hover:border-white dark:border-setta-700 dark:hover:bg-setta-700"}`}
             draggable={draggable}
             onDragStart={(e) => onDragStart?.(e, id)}
             onDragEnd={onDragEnd}
@@ -214,7 +214,7 @@ function ImageArtifactObjects({
                     {JSON.stringify(loadedDetails[item.id], null, 2)}
                   </pre>
                 ) : (
-                  <div className="text-xs !text-setta-500 dark:!text-setta-400">
+                  <div className="text-xs text-setta-500! dark:text-setta-400!">
                     No additional details available
                   </div>
                 )}
@@ -247,7 +247,7 @@ function ChartArtifactObjects({
           <Accordion.Item
             key={id}
             value={item.name}
-            className={`flex flex-col rounded-lg bg-white shadow-md transition-shadow hover:shadow-xl dark:bg-setta-800 dark:!shadow-setta-900 ${draggable ? "cursor-move" : "cursor-pointer"} mx-1 justify-center border px-2 py-1 ${getItemStyle?.(id) ?? "border-transparent  hover:border-white dark:border-setta-700 dark:hover:bg-setta-700"}`}
+            className={`flex flex-col rounded-lg bg-white shadow-md transition-shadow hover:shadow-xl dark:bg-setta-800 dark:shadow-setta-900! ${draggable ? "cursor-move" : "cursor-pointer"} mx-1 justify-center border px-2 py-1 ${getItemStyle?.(id) ?? "border-transparent  hover:border-white dark:border-setta-700 dark:hover:bg-setta-700"}`}
             draggable={draggable}
             onDragStart={(e) => onDragStart?.(e, id)}
             onDragEnd={onDragEnd}
@@ -357,7 +357,7 @@ export function LayerListAndListOfArtifacts({ sectionId, sectionTypeName }) {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-1 overflow-x-clip overflow-y-scroll [&>*]:mx-[2px]">
+    <div className="flex flex-1 flex-col gap-1 overflow-x-clip overflow-y-scroll *:mx-[2px]">
       <LayersList
         sectionId={sectionId}
         availableArtifacts={availableArtifacts}
@@ -383,7 +383,7 @@ export function JustListOfArtifacts({ sectionId, sectionTypeName }) {
 
   function getItemStyle(id) {
     return selectedArtifactIds.has(id)
-      ? "!bg-blue-500 [&_*]:text-white dark:!bg-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900 border-transparent"
+      ? "bg-blue-500! **:text-white dark:bg-blue-800! hover:bg-blue-50 dark:hover:bg-blue-900 border-transparent"
       : null;
   }
 

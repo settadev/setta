@@ -17,7 +17,7 @@ export function RunButton({ sectionId }) {
   return (
     <IconButton
       icon={<RiPlayMiniFill />}
-      color="text-setta-600 hover:text-green-500  active:!text-blue-700"
+      color="text-setta-600 hover:text-green-500  active:text-blue-700!"
       bg="bg-transparent"
       size="w-4 h-4"
       padding="p-0 mr-1"

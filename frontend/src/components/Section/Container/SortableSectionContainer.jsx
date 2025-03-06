@@ -99,7 +99,7 @@ function _SortableCore({
 
   return (
     <div
-      className="relative flex w-full outline-none"
+      className="relative flex w-full outline-hidden"
       {...stackProps}
       tabIndex="-1"
     >

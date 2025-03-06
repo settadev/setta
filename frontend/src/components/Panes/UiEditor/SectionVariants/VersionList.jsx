@@ -106,12 +106,12 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
     <li
       onMouseEnter={() => onMouseEnterSetPreviewVariantId(sectionId, id)}
       onClick={() => onClickSetVariantId(sectionId, id)}
-      className={`section-key-value group/versionitem -my-[0.125rem] flex h-min cursor-pointer items-center justify-between rounded-sm border-b border-transparent px-1 py-[0.125rem] text-xs hover:bg-setta-200/30 dark:hover:bg-setta-700/50 ${isCurr ? "bg-blue-500 dark:bg-blue-700" : ""}`}
+      className={`section-key-value group/versionitem -my-[0.125rem] flex h-min cursor-pointer items-center justify-between rounded-xs border-b border-transparent px-1 py-[0.125rem] text-xs hover:bg-setta-200/30 dark:hover:bg-setta-700/50 ${isCurr ? "bg-blue-500 dark:bg-blue-700" : ""}`}
     >
       <p
         className={`section-key truncate ${
           isCurr
-            ? "font-medium text-white group-hover/versionitem:text-setta-800 group-hover/versionitem:dark:text-setta-100"
+            ? "font-medium text-white group-hover/versionitem:text-setta-800 dark:group-hover/versionitem:text-setta-100"
             : "text-setta-400 dark:text-setta-400"
         } `}
       >
@@ -122,7 +122,7 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
           className={`cursor-pointer bg-transparent ${
             isDefault
               ? "text-green-500"
-              : "text-transparent hover:!text-setta-400 group-hover/versionitem:text-setta-400/50"
+              : "text-transparent hover:text-setta-400! group-hover/versionitem:text-setta-400/50"
           }`}
           onClick={(e) => {
             e.stopPropagation();
@@ -135,7 +135,7 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
           className={`cursor-pointer bg-transparent ${
             isFrozen
               ? "text-blue-500"
-              : "text-transparent hover:!text-blue-400 group-hover/versionitem:text-setta-400/50"
+              : "text-transparent hover:text-blue-400! group-hover/versionitem:text-setta-400/50"
           }`}
           onClick={(e) => {
             e.stopPropagation();
@@ -150,7 +150,7 @@ function OneItem({ sectionId, id, isCurr, isDefault }) {
           className={`cursor-pointer bg-transparent ${
             isJsonSource
               ? "text-orange-500"
-              : "text-transparent hover:!text-orange-400 group-hover/versionitem:text-setta-400/50"
+              : "text-transparent hover:text-orange-400! group-hover/versionitem:text-setta-400/50"
           }`}
           onClick={(e) => {
             e.stopPropagation();
@@ -202,19 +202,19 @@ function OneItemEditing({ sectionId, id, isCurr, deletable }) {
   }
 
   return (
-    <li className="section-key-value group/versionitem -my-[0.125rem] flex h-min cursor-pointer items-center justify-between border-b border-setta-200 px-1 py-[0.125rem] text-xs focus-within:!border-blue-500  hover:border-setta-500 dark:border-setta-700 dark:hover:border-setta-500 ">
+    <li className="section-key-value group/versionitem -my-[0.125rem] flex h-min cursor-pointer items-center justify-between border-b border-setta-200 px-1 py-[0.125rem] text-xs focus-within:border-blue-500!  hover:border-setta-500 dark:border-setta-700 dark:hover:border-setta-500 ">
       <input
         value={inputValue}
         onChange={onChange}
         onBlur={onBlur}
         onKeyDown={onKeyDown}
-        className="flex-1 truncate text-setta-500 focus:text-setta-900 focus:outline-none focus:ring-0 dark:text-setta-400 dark:focus:text-setta-200"
+        className="flex-1 truncate text-setta-500 focus:text-setta-900 focus:outline-hidden focus:ring-0 dark:text-setta-400 dark:focus:text-setta-200"
       />
 
       {deletable && (
         <button
           className={
-            "cursor-pointer bg-transparent text-transparent hover:!text-red-500 active:!text-red-700 group-hover/versionitem:text-setta-400/50"
+            "cursor-pointer bg-transparent text-transparent hover:text-red-500! active:text-red-700! group-hover/versionitem:text-setta-400/50"
           }
           onClick={onClickDelete}
         >

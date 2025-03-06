@@ -47,7 +47,7 @@ function _SectionHeader({
             contentClasses="z-20"
             trigger={
               <IconButton
-                twClasses="[&_*]:hover:text-setta-500 [&_*]:dark:hover:text-setta-400"
+                twClasses="hover:**:text-setta-500 dark:hover:**:text-setta-400"
                 bg="bg-transparent"
               >
                 <TbSortDescending2 className="text-setta-300 dark:text-setta-700" />
@@ -133,7 +133,7 @@ function getTitleStyles({
   sectionTypeName,
 }) {
   const editing =
-    "cursor-text nodrag px-1 py-0 leading-5 -ml-1 bg-setta-100 focus-visible:ring-0 focus-visible:outline-none rounded-md box-border border border-solid border-transparent focus-visible:border-blue-500 dark:bg-setta-800 w-3/5 dark:text-white font-bold text-[.7rem] tracking-tight";
+    "cursor-text nodrag px-1 py-0 leading-5 -ml-1 bg-setta-100 focus-visible:ring-0 focus-visible:outline-hidden rounded-md box-border border border-solid border-transparent focus-visible:border-blue-500 dark:bg-setta-800 w-3/5 dark:text-white font-bold text-[.7rem] tracking-tight";
 
   const isGlobalVariables = sectionTypeName === C.GLOBAL_VARIABLES;
 
@@ -149,7 +149,7 @@ function getTitleStyles({
   }
 
   const fixed =
-    "select-none italic focus-visible:ring-0 focus-visible:outline-none box-border border border-solid border-transparent focus-visible:border-blue-500 tracking-tighter text-xs text-setta-400 max-w-full truncate pr-0.5";
+    "select-none italic focus-visible:ring-0 focus-visible:outline-hidden box-border border border-solid border-transparent focus-visible:border-blue-500 tracking-tighter text-xs text-setta-400 max-w-full truncate pr-0.5";
 
   return { editing, notEditing, fixed };
 }
@@ -189,7 +189,7 @@ function getNotEditingStyle({
 
   // Combine all the classes
   const baseClasses =
-    "px-1 py-0 -ml-1 w-3/5 focus-visible:ring-0 focus-visible:outline-none box-border rounded-md border border-solid border-transparent focus-visible:border-blue-500 leading-5 font-bold tracking-tight cursor-pointer max-w-full text-[.7rem] truncate";
+    "px-1 py-0 -ml-1 w-3/5 focus-visible:ring-0 focus-visible:outline-hidden box-border rounded-md border border-solid border-transparent focus-visible:border-blue-500 leading-5 font-bold tracking-tight cursor-pointer max-w-full text-[.7rem] truncate";
 
   return `${baseClasses} ${textColorClass} ${fontClass}`;
 }

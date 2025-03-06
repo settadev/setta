@@ -20,7 +20,7 @@ function QuickInfoConfigCore({ sectionId, paramInfos }) {
   );
 
   const inputStyles =
-    "flex-grow outline-0 min-w-0 w-full cursor-auto bg-transparent [border-width:0_0_1px_0] border-solid border-setta-200 dark:border-setta-800 focus-visible:!border-blue-300 pl-5 py-1 truncate placeholder-setta-400 dark:placeholder-setta-700 text-sm";
+    "grow outline-0 min-w-0 w-full cursor-auto bg-transparent [border-width:0_0_1px_0] border-solid border-setta-200 dark:border-setta-800 focus-visible:border-blue-300! pl-5 py-1 truncate placeholder-setta-400 dark:placeholder-setta-700 text-sm";
 
   return (
     <div className="flex flex-1 flex-col gap-1 overflow-y-hidden">
@@ -29,11 +29,11 @@ function QuickInfoConfigCore({ sectionId, paramInfos }) {
         // leftElementStyles="pl-1"
         placeholder="Filter"
         leftElement={
-          <i className="gg-sort-az !scale-75 text-setta-600 dark:text-setta-400" />
+          <i className="gg-sort-az scale-75! text-setta-600 dark:text-setta-400" />
         }
         onChange={(e) => setFilter(e.target.value)}
       />
-      <div className="mt-4 flex flex-col gap-2 overflow-y-scroll [&>*]:mx-[2px]">
+      <div className="mt-4 flex flex-col gap-2 overflow-y-scroll *:mx-[2px]">
         {sectionId &&
           filteredList.map((e, idx) => (
             <UIElement
@@ -59,7 +59,7 @@ function _UIElement({ paramInfo }) {
         {name}
       </p>
       <textarea
-        className="mx-[2px] mb-4 h-12 min-w-0 flex-grow cursor-auto rounded-lg border border-solid border-setta-100 bg-white px-2 py-1 font-mono text-xs font-medium text-setta-600 outline-0 placeholder:text-setta-200 focus-visible:border-white focus-visible:ring-2 dark:border-setta-800 dark:bg-setta-900 dark:text-setta-300 dark:placeholder:text-setta-700 dark:focus-visible:border-setta-900"
+        className="mx-[2px] mb-4 h-12 min-w-0 grow cursor-auto rounded-lg border border-solid border-setta-100 bg-white px-2 py-1 font-mono text-xs font-medium text-setta-600 outline-0 placeholder:text-setta-200 focus-visible:border-white focus-visible:ring-2 dark:border-setta-800 dark:bg-setta-900 dark:text-setta-300 dark:placeholder:text-setta-700 dark:focus-visible:border-setta-900"
         value={description}
         onChange={(e) => {
           useSectionInfos.setState((state) => {

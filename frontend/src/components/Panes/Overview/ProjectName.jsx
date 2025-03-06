@@ -7,10 +7,10 @@ import { useEditableOnSubmit } from "state/hooks/editableText";
 import { PAGE_LOAD_TYPES, pathRelativeToProject } from "utils/constants";
 
 const editing =
-  "flex-1 box-border [border-width:0_0_1px_0] border-solid bg-transparent focus:border-blue-300 focus-visible:ring-0 focus-visible:outline-none w-full ";
+  "flex-1 box-border [border-width:0_0_1px_0] border-solid bg-transparent focus:border-blue-300 focus-visible:ring-0 focus-visible:outline-hidden w-full ";
 
 const notEditing =
-  "flex-1 box-border border-b border-solid border-transparent bg-transparent focus-visible:border-blue-300 focus-visible:ring-0 focus-visible:outline-none w-full truncate";
+  "flex-1 box-border border-b border-solid border-transparent bg-transparent focus-visible:border-blue-300 focus-visible:ring-0 focus-visible:outline-hidden w-full truncate";
 
 export function ProjectName() {
   return (

@@ -46,8 +46,8 @@ function _ParamContainer({
         {
           content: maybeErrorMessage,
           wrapperClassName:
-            "!border-red-300 dark:!border-red-900 [&_.tooltip-footer]:!text-red-500 dark:[&_.tooltip-footer]:!text-red-800 dark:[&_.tooltip-footer]:!border-red-950 !bg-red-50/90 dark:!bg-[#120000]/90 [&_.tooltip-copy]:!text-red-400 dark:[&_.tooltip-copy]:!text-red-300 [&>.tooltip-copy]:hover:!bg-transparent",
-          contentClassName: "!text-red-700 dark:!text-red-300 font-mono",
+            "border-red-300! dark:border-red-900! [&_.tooltip-footer]:text-red-500! dark:[&_.tooltip-footer]:text-red-800! dark:[&_.tooltip-footer]:border-red-950! bg-red-50/90! dark:bg-[#120000]/90! [&_.tooltip-copy]:text-red-400! dark:[&_.tooltip-copy]:text-red-300! hover:[&>.tooltip-copy]:bg-transparent!",
+          contentClassName: "text-red-700! dark:text-red-300! font-mono",
         },
         {
           title: paramName,
@@ -60,7 +60,7 @@ function _ParamContainer({
     <>
       <article
         id={`ParamContainer-${sectionId}-${paramInfoId}`} // used for project-level search results
-        className={`section-args-nested-key-value section-key-value group/arg-group section-min-rows grid grid-cols-subgrid items-center justify-between rounded-sm px-[2px] hover:bg-setta-100/50 hover:dark:bg-setta-800/70 ${bg} ${border} `}
+        className={`section-args-nested-key-value section-key-value group/arg-group section-min-rows grid grid-cols-subgrid items-center justify-between rounded-xs px-[2px] hover:bg-setta-100/50 dark:hover:bg-setta-800/70 ${bg} ${border} `}
         {...getFloatingBoxHandlers(...tooltipContentArray)}
         onMouseDownCapture={onMouseDown} // has to be on capture, otherwise it doesn't get triggered when clicking above DummyCodeMirror when ParamNameInput is taller than DummyCodeMirror
         ref={childlessRef}
@@ -84,7 +84,7 @@ function _ParamContainer({
   ) : (
     <article
       id={`ParamContainer-${sectionId}-${paramInfoId}`} // used for project-level search results
-      className={`section-args-nested section-lg-value group/arg-group section-min-rows [&>p]:section-key-value grid grid-cols-subgrid items-center justify-between gap-y-1 rounded-sm ${isTopLevelWithPad ? "[&>p]:!pb-0 [&>p]:!pt-2" : ""}`}
+      className={`section-args-nested section-lg-value group/arg-group section-min-rows [&>p]:section-key-value grid grid-cols-subgrid items-center justify-between gap-y-1 rounded-xs ${isTopLevelWithPad ? "[&>p]:pb-0! [&>p]:pt-2!" : ""}`}
       {...getFloatingBoxHandlers(...tooltipContentArray)}
       ref={parentRef}
     >
@@ -137,7 +137,7 @@ function ErrorSection({ paramInfoId }) {
 
   return (
     <BiError
-      className="section-key-value grid-row-start-1 group/ w-45overflow-y-clip ml-auto aspect-square  cursor-help rounded-full bg-red-500/80 px-0.5 pb-0.5 pt-[1px] text-white  peer-focus-within/textinput:text-red-100 peer-focus-within/textinput:!opacity-20 dark:bg-red-700/80 dark:peer-focus-within/textinput:text-red-400"
+      className="section-key-value grid-row-start-1 group/ w-45overflow-y-clip ml-auto aspect-square  cursor-help rounded-full bg-red-500/80 px-0.5 pb-0.5 pt-[1px] text-white  peer-focus-within/textinput:text-red-100 peer-focus-within/textinput:opacity-20! dark:bg-red-700/80 dark:peer-focus-within/textinput:text-red-400"
       onContextMenu={onContextMenu}
     />
   );
@@ -161,7 +161,7 @@ const AccordionTrigger = React.forwardRef(
     <Accordion.Header className="flex">
       <Accordion.Trigger {...props} ref={forwardedRef} asChild>
         {/* <p className="w-[calc(100%-1rem)] truncate">{children}</p> */}
-        <i className="group ml-auto flex h-4 cursor-default items-center overflow-hidden rounded-full bg-red-500 pl-[2px] pr-1 font-mono text-xs font-bold text-red-50 outline-none transition-all hover:cursor-help dark:bg-red-800">
+        <i className="group ml-auto flex h-4 cursor-default items-center overflow-hidden rounded-full bg-red-500 pl-[2px] pr-1 font-mono text-xs font-bold text-red-50 outline-hidden transition-all hover:cursor-help dark:bg-red-800">
           <BiChevronUp className="ease-[cubic-bezier(0.87, 0, 0.13, 1)] ml-auto transition-transform duration-300 group-data-[state=closed]:rotate-180" />
         </i>
       </Accordion.Trigger>

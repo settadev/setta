@@ -54,7 +54,7 @@ export function PaneContainer({
     ? "justify-self-end left-auto border-l pr-10 place-items-center"
     : "justify-self-start right-auto border-r pl-10 place-items-center";
 
-  // flex flex-grow flex-col
+  // flex grow flex-col
 
   return (
     <Resizable

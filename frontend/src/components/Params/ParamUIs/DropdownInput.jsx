@@ -28,7 +28,7 @@ export function DropdownInputConfig({ onChange, config }) {
         aria-label="Add choice"
       >
         <p className="text-sm font-black ">Add Choices</p>
-        <i className="gg-add !scale-90" />
+        <i className="gg-add scale-90!" />
       </button>
 
       <div className="flex flex-col gap-2 overflow-y-auto">
@@ -40,7 +40,7 @@ export function DropdownInputConfig({ onChange, config }) {
                 value={c.id}
                 onChange={(e) => updateChoice(idx, e.target.value)}
                 placeholder="Add description..."
-                className="m-[2px] w-full truncate rounded border px-2 py-1 text-xs text-setta-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-setta-400 dark:placeholder-setta-700"
+                className="m-[2px] w-full truncate rounded-sm border px-2 py-1 text-xs text-setta-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:text-setta-400 dark:placeholder-setta-700"
               />
             </div>
             <button
@@ -48,7 +48,7 @@ export function DropdownInputConfig({ onChange, config }) {
               className="flex cursor-pointer items-center rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
               aria-label="Remove choice"
             >
-              <i className="gg-close !scale-75" />
+              <i className="gg-close scale-75!" />
             </button>
           </div>
         ))}

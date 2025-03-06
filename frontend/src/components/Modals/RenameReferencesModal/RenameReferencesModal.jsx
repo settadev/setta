@@ -47,7 +47,7 @@ export function RenameReferencesModal() {
     <div className="mx-auto flex h-full w-full flex-col items-center">
       <header className="flex flex-col gap-2 self-start">
         <div className="flex items-center gap-2">
-          <VscReferences className="h-6 w-6 rounded-sm p-0.5 text-setta-600  dark:text-setta-200" />
+          <VscReferences className="h-6 w-6 rounded-xs p-0.5 text-setta-600  dark:text-setta-200" />
           <Dialog.Title className="text-xl font-semibold text-setta-800 dark:text-setta-200">
             Rename References
           </Dialog.Title>
@@ -58,7 +58,7 @@ export function RenameReferencesModal() {
         </Dialog.Description>
       </header>
       {/* Scrollable content section */}
-      {/* <div className="mb-6 w-full flex-grow overflow-auto rounded-lg bg-setta-50 p-4 dark:bg-setta-900">
+      {/* <div className="mb-6 w-full grow overflow-auto rounded-lg bg-setta-50 p-4 dark:bg-setta-900">
         <h4 className="mb-2 text-sm font-medium text-setta-700 dark:text-setta-300">
           References to be updated:
         </h4>
@@ -68,7 +68,7 @@ export function RenameReferencesModal() {
               key={r}
               className="flex items-center space-x-2 text-sm text-setta-600 dark:text-setta-400"
             >
-              <span className="h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
+              <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
               <span>{r}</span>
             </li>
           ))}
@@ -79,7 +79,7 @@ export function RenameReferencesModal() {
         <label className="flex items-center space-x-2 text-sm text-setta-600 dark:text-setta-400">
           <input
             type="checkbox"
-            className="h-4 w-4 cursor-pointer rounded bg-setta-100 text-blue-600 checked:!bg-blue-500 focus:ring-1  dark:bg-setta-700"
+            className="h-4 w-4 cursor-pointer rounded-sm bg-setta-100 text-blue-600 checked:bg-blue-500! focus:ring-1  dark:bg-setta-700"
             onChange={(e) => {
               setDoNotAsk(e.target.checked);
             }}

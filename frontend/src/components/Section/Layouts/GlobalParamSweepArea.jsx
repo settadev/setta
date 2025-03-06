@@ -139,7 +139,7 @@ function RunGroupList({ sectionId }) {
 
   return (
     <ul
-      className={`${isScrollable ? "nowheel" : ""} flex flex-grow flex-col overflow-visible py-[2px] @sm/multipane:overflow-y-scroll`}
+      className={`${isScrollable ? "nowheel" : ""} flex grow flex-col overflow-visible py-[2px] @sm/multipane:overflow-y-scroll`}
       ref={ref}
       onMouseLeave={() => onMouseLeaveSetPreviewVariantId(sectionId)}
     >
@@ -198,7 +198,7 @@ const SectionListCore = React.forwardRef(
     return (
       sections.length > 0 && (
         <ul
-          className={`${className} flex flex-grow flex-col overflow-visible rounded-lg bg-setta-50/40 pl-3 pr-2 pt-1 @sm/multipane:overflow-y-scroll dark:bg-setta-875`}
+          className={`${className} flex grow flex-col overflow-visible rounded-lg bg-setta-50/40 pl-3 pr-2 pt-1 @sm/multipane:overflow-y-scroll dark:bg-setta-875`}
           ref={ref}
         >
           {sections.map((x, idx) => (
@@ -317,7 +317,7 @@ function VersionsList({
   const accordionRootStyles =
     atLeastOneVersionSelected || !isSelected
       ? undefined
-      : "bg-red-100 dark:bg-red-950/20 hover:bg-red-500/20 border-red-300 hover:dark:bg-red-950/50 dark:border-red-700/80 hover:dark:border-red-700 [&_ul]:!bg-transparent";
+      : "bg-red-100 dark:bg-red-950/20 hover:bg-red-500/20 border-red-300 dark:hover:bg-red-950/50 dark:border-red-700/80 dark:hover:border-red-700 [&_ul]:bg-transparent!";
 
   return (
     <GenericList
@@ -374,7 +374,7 @@ function _GenericList({
 }) {
   return (
     <StandardAccordion
-      rootStyles={`${accordionRootStyles ?? "hover:bg-white hover:dark:bg-setta-700/10 hover:border-setta-50 dark:hover:border-setta-700"} border border-transparent rounded-lg px-2 ml-7 -mr-2 -mt-0.5`}
+      rootStyles={`${accordionRootStyles ?? "hover:bg-white dark:hover:bg-setta-700/10 hover:border-setta-50 dark:hover:border-setta-700"} border border-transparent rounded-lg px-2 ml-7 -mr-2 -mt-0.5`}
       itemStyles="focus-within:relative focus-within:z-10"
       headerStyles="flex flex-1 cursor-default items-center justify-between my-0.5 ml-1"
       triggerStyles="flex justify-between px-2 -mx-2 w-full items-center hover:cursor-pointer rounded-md italic text-xs font-semibold opacity-60 group-hover:opacity-100 text-setta-500 dark:text-setta-300 focus-visible:outline outline-blue-500"
@@ -389,7 +389,7 @@ function _GenericList({
         {inputList.map((e, idx) => (
           <li
             key={idx}
-            className="ml-[4px] flex min-h-6 cursor-pointer flex-col rounded"
+            className="ml-[4px] flex min-h-6 cursor-pointer flex-col rounded-sm"
           >
             <ChildComponent
               id={e.id}
@@ -514,7 +514,7 @@ function CheckboxNextToLabel({
       onMouseEnter={onMouseEnter}
     >
       <label
-        className={`flex min-h-6 cursor-pointer items-center gap-2 truncate rounded px-1 py-0.5 text-xs text-setta-700  group-hover/runitem:!text-blue-500 dark:text-setta-200 ${shown ? "font-bold !text-blue-500" : ""}`}
+        className={`flex min-h-6 cursor-pointer items-center gap-2 truncate rounded-sm px-1 py-0.5 text-xs text-setta-700  group-hover/runitem:text-blue-500! dark:text-setta-200 ${shown ? "font-bold text-blue-500!" : ""}`}
       >
         <input
           type="checkbox"
@@ -526,7 +526,7 @@ function CheckboxNextToLabel({
         <p className="truncate">{children}</p>
       </label>
       <button
-        className={`mr-0.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-transparent outline-blue-500 hover:!text-setta-500  focus-visible:outline group-hover/runitem:text-setta-300 dark:hover:!text-setta-300 dark:group-hover/runitem:text-setta-600 ${shown ? "!text-blue-500" : ""}`}
+        className={`mr-0.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-transparent outline-blue-500 hover:text-setta-500!  focus-visible:outline group-hover/runitem:text-setta-300 dark:hover:text-setta-300! dark:group-hover/runitem:text-setta-600 ${shown ? "text-blue-500!" : ""}`}
         onClick={onClick}
       >
         <i className="gg-pen  " />
@@ -543,7 +543,7 @@ function FilterSection() {
     <div className="-mt-1 flex-1">
       <StandardSearch
         leftElement={
-          <i className="gg-sort-az mb-[2px] !scale-50 text-setta-400" />
+          <i className="gg-sort-az mb-[2px] scale-50! text-setta-400" />
         }
         placeholder="Filter"
         inputStyles={inputStyles}
@@ -560,7 +560,7 @@ function CreateNewRunGroupButton({ sectionId }) {
 
   return (
     <button
-      className="nodrag mt-2 flex min-w-0 cursor-pointer select-none items-center justify-center gap-1 rounded-md border border-solid border-setta-100 px-2 py-1 text-xs font-bold uppercase leading-none text-setta-400 outline-none transition-colors duration-150 hover:bg-setta-50 focus-visible:!border-blue-500 focus-visible:outline-none focus-visible:ring-0 dark:border-setta-800 dark:text-setta-500 dark:hover:bg-setta-800 dark:hover:text-setta-400"
+      className="nodrag mt-2 flex min-w-0 cursor-pointer select-none items-center justify-center gap-1 rounded-md border border-solid border-setta-100 px-2 py-1 text-xs font-bold uppercase leading-none text-setta-400 outline-hidden transition-colors duration-150 hover:bg-setta-50 focus-visible:border-blue-500! focus-visible:outline-hidden focus-visible:ring-0 dark:border-setta-800 dark:text-setta-500 dark:hover:bg-setta-800 dark:hover:text-setta-400"
       onClick={onClick}
     >
       <span className="relative">

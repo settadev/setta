@@ -56,13 +56,13 @@ export function IframeSettings({ sectionId }) {
         <textarea
           value={code}
           onChange={handleCodeChange}
-          className="h-48 w-full resize-y rounded-md border border-solid border-setta-200 bg-white/80 p-3 font-mono text-sm text-setta-800 placeholder-setta-300 focus:!border-blue-500 focus:outline-0 focus:ring-0 dark:border-setta-700 dark:bg-setta-900 dark:text-setta-300 dark:placeholder-setta-600"
+          className="h-48 w-full resize-y rounded-md border border-solid border-setta-200 bg-white/80 p-3 font-mono text-sm text-setta-800 placeholder-setta-300 focus:border-blue-500! focus:outline-0 focus:ring-0 dark:border-setta-700 dark:bg-setta-900 dark:text-setta-300 dark:placeholder-setta-600"
           placeholder="<iframe src='...'></iframe>"
           spellCheck="false"
         />
 
         {error && (
-          <div className="dark:red-500 my-2 rounded border border-red-600 bg-red-500 px-4 py-3 font-bold text-white">
+          <div className="dark:red-500 my-2 rounded-sm border border-red-600 bg-red-500 px-4 py-3 font-bold text-white">
             {error}
           </div>
         )}

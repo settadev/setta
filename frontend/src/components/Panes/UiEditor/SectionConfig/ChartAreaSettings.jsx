@@ -8,7 +8,7 @@ import { JustListOfArtifacts } from "./ListOfArtifacts";
 
 export function ChartAreaSettings({ sectionId }) {
   return (
-    <div className="flex-1 overflow-x-hidden overflow-y-scroll [&>*]:mr-[2px]">
+    <div className="flex-1 overflow-x-hidden overflow-y-scroll *:mr-[2px]">
       <ChartConfig sectionId={sectionId} />
       <JustListOfArtifacts sectionId={sectionId} sectionTypeName={C.CHART} />
     </div>
@@ -232,7 +232,7 @@ function ChartConfigToggle({ sectionId, name, value, title }) {
       <input
         type="checkbox"
         id={name}
-        className="h-4 w-4 cursor-pointer rounded bg-setta-500/50  text-blue-500 outline outline-offset-2 outline-transparent checked:bg-blue-500 focus-visible:!outline-blue-500 dark:text-blue-400 dark:focus-visible:ring-blue-400"
+        className="h-4 w-4 cursor-pointer rounded-sm bg-setta-500/50  text-blue-500 outline outline-offset-2 outline-transparent checked:bg-blue-500 focus-visible:outline-blue-500! dark:text-blue-400 dark:focus-visible:ring-blue-400"
         checked={value}
         onChange={(e) => setChartSetting(sectionId, name, e.target.checked)}
       />

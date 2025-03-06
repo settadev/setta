@@ -16,7 +16,7 @@ export function MinimizeButton({ sectionId, twClasses, ...props }) {
         !isMinimized ? (
           <i className="gg-math-minus" />
         ) : (
-          <i className="gg-maximize !scale-[.4]" />
+          <i className="gg-maximize scale-[.4]!" />
         )
       }
       color="text-setta-600 hover:text-white"

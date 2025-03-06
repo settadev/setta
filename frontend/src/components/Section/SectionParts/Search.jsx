@@ -43,7 +43,7 @@ export function SectionSearch({ sectionId, selectedItem }) {
       onEnter={onEnter}
       onShiftEnter={onShiftEnter}
       dummyCodeClassName={`${NO_PAN_CLASS_NAME} single-cell-child rounded-2xl border border-solid border-setta-100 bg-white py-1 dark:border-setta-800 dark:bg-setta-950 nodrag cursor-text select-text break-words px-[.625rem] font-mono mx-[.125rem] text-xs [tab-size:4] [word-break:break-word]`}
-      realCodeClassName={`${NO_PAN_CLASS_NAME} single-cell-child nodrag [&_*]:!outline-0 cursor-text select-text [&_.cm-activeLine]:rounded-md [&_.cm-content]:!py-0 [&_.cm-content]:text-xs first:[&_.cm-line>*]:mt-[3px] rounded-2xl border border-solid border-blue-500 bg-white mx-[.125rem] py-1  dark:border-blue-400/50 dark:bg-setta-950 [&_.cm-line]:px-[.625rem] [&_.cm-activeLine]:!bg-inherit`}
+      realCodeClassName={`${NO_PAN_CLASS_NAME} single-cell-child nodrag **:outline-0! cursor-text select-text [&_.cm-activeLine]:rounded-md [&_.cm-content]:py-0! [&_.cm-content]:text-xs [&_.cm-line>*]:first:mt-[3px] rounded-2xl border border-solid border-blue-500 bg-white mx-[.125rem] py-1  dark:border-blue-400/50 dark:bg-setta-950 [&_.cm-line]:px-[.625rem] [&_.cm-activeLine]:bg-inherit!`}
       isDisabled={variantIsFrozen}
     />
   );
@@ -88,12 +88,12 @@ export function ParamSweepSectionSearch({
         onShiftEnter={onShiftEnter}
         isDisabled={isDisabled}
         dummyCodeClassName="single-cell-child rounded-2xl border border-solid border-setta-100 bg-white py-1 dark:border-setta-800 dark:bg-setta-950 nodrag cursor-text select-text break-words px-[.625rem] font-mono mx-[.125rem] text-xs [tab-size:4] [word-break:break-word]"
-        realCodeClassName="single-cell-child nodrag [&_*]:!outline-0 cursor-text select-text [&_.cm-activeLine]:rounded-md [&_.cm-content]:!py-0 [&_.cm-content]:text-xs first:[&_.cm-line>*]:mt-[3px] rounded-2xl border border-solid border-blue-500 bg-white mx-[.125rem] py-1  dark:border-blue-400/50 dark:bg-setta-950 [&_.cm-line]:px-[.625rem] [&_.cm-activeLine]:!bg-inherit"
+        realCodeClassName="single-cell-child nodrag **:outline-0! cursor-text select-text [&_.cm-activeLine]:rounded-md [&_.cm-content]:py-0! [&_.cm-content]:text-xs [&_.cm-line>*]:first:mt-[3px] rounded-2xl border border-solid border-blue-500 bg-white mx-[.125rem] py-1  dark:border-blue-400/50 dark:bg-setta-950 [&_.cm-line]:px-[.625rem] [&_.cm-activeLine]:bg-inherit!"
       />
       <div className="flex">
         <button
           className="flex h-[22px] cursor-pointer rounded-full text-setta-300 
-            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 [&>i]:focus-visible:!border-blue-500"
+            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 focus-visible:[&>i]:border-blue-500!"
           onClick={onMinusClick}
           disabled={isDisabled}
         >
@@ -101,7 +101,7 @@ export function ParamSweepSectionSearch({
         </button>
         <button
           className="flex h-[22px] cursor-pointer rounded-full text-setta-300 
-            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 [&>i]:focus-visible:!border-blue-500"
+            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 focus-visible:[&>i]:border-blue-500!"
           onClick={onPlusClick}
           disabled={disablePlusButton || isDisabled}
         >
@@ -208,7 +208,7 @@ function SectionSearchCore({
 
   // TODO: Shouldn't use important for this, but ok for now. FIX.
   const valueNameInconsistentStyle = valueNameInconsistent
-    ? "!border-amber-500 dark:!border-amber-800"
+    ? "border-amber-500! dark:border-amber-800!"
     : "";
 
   return (

@@ -1,126 +1,205 @@
-@config "./tailwind.config.js";
+@import 'tailwindcss';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/container-queries';
 
-@layer utilities {
-  .section-title {
-    grid-area: title;
-    /* grid-column: key / value; */
-  }
+@custom-variant dark (&:is(.dark *));
 
-  .section-center {
-    grid-area: center-gutter;
-  }
+@theme {
+  --color-setta-50: hsl(222, 28%, 95%);
+  --color-setta-100: hsl(219, 24%, 89%);
+  --color-setta-200: hsl(219, 25%, 77%);
+  --color-setta-300: hsl(220, 25%, 67%);
+  --color-setta-400: hsl(220, 26%, 57%);
+  --color-setta-500: hsl(220, 25%, 45%);
+  --color-setta-600: hsl(219, 25%, 34%);
+  --color-setta-700: hsl(219, 26%, 23%);
+  --color-setta-800: hsl(220, 26%, 14%);
+  --color-setta-850: hsl(220, 25%, 11%);
+  --color-setta-860: hsl(220, 25%, 8.5%);
+  --color-setta-875: hsl(220, 25%, 7.5%);
+  --color-setta-900: hsl(220, 27%, 6%);
+  --color-setta-925: hsl(220, 24%, 4.5%);
+  --color-setta-950: hsl(220, 25%, 3%);
+  --color-setta-975: hsl(220, 33%, 0.5%);
+  --color-setta-light: #94a3b8;
+  --color-setta-dark: hsl(220, 27%, 15%);
 
-  .section-search {
-    grid-area: search;
-  }
-  .section-args {
-    grid-area: args;
-  }
-  .section-key {
-    grid-column: key / key;
-    grid-row: 1 / 2;
-  }
-  .section-value {
-    grid-column: value / value;
-    grid-row: 1 / 2;
-  }
-  .section-key-value {
-    grid-column: key / value;
-  }
+  --font-heading: Work Sans, sans-serif;
 
-  .section-key-right-gutter {
-    grid-column: key / right-gutter;
-  }
-  .section-w-full {
-    grid-column: left-gutter / right-gutter;
-  }
+  --animate-slow-dash: dash 40s linear infinite;
+  --animate-slide-down: slideDown 200ms cubic-bezier(0.87, 0, 0.13, 1);
+  --animate-slide-up: slideUp 200ms cubic-bezier(0.87, 0, 0.13, 1);
 
-  .section-lg-value {
-    grid-column: left-gutter / value;
+  @keyframes dash {
+    to {
+      background-position:
+        100% 0%,
+        0% 100%,
+        0% 0%,
+        100% 100%;
+    }
   }
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes slideUp {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
 
-  .section-row-search-gutter {
-    grid-row: search / left-gutter;
-  }
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-  .section-full {
-    grid-row: title / left-gutter;
-    grid-column: left-gutter / right-gutter;
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
   }
-  .section-full-no-title {
-    grid-row: search / left-gutter;
-    grid-column: left-gutter / right-gutter;
-  }
+}
 
-  .section-min-rows {
-    grid-auto-rows: min-content;
-  }
+@utility section-title {
+  grid-area: title;
+  /* grid-column: key / value; */
+}
 
-  .section-main {
-    grid-row: search / left-gutter;
-    grid-column: key / value;
-  }
-  .section-main-full-w {
-    grid-row: search / left-gutter;
-    grid-column: left-gutter / right-gutter;
-  }
-  .section-row-main {
-    grid-row: left-gutter;
-  }
+@utility section-center {
+  grid-area: center-gutter;
+}
 
-  .section-row-left-bottom {
-    grid-row: left-gutter / bottom-gutter;
-  }
+@utility section-search {
+  grid-area: search;
+}
 
-  .section-row-pin {
-    grid-row: pin-lg;
-  }
+@utility section-args {
+  grid-area: args;
+}
 
-  .section-row-pin-main {
-    grid-row: pin-lg / left-gutter;
-  }
+@utility section-key {
+  grid-column: key / key;
+  grid-row: 1 / 2;
+}
 
-  .section-left-gutter {
-    grid-column: left-gutter / span 1;
-  }
+@utility section-value {
+  grid-column: value / value;
+  grid-row: 1 / 2;
+}
 
-  .section-right-gutter {
-    grid-column: right-gutter / span 1;
-  }
+@utility section-key-value {
+  grid-column: key / value;
+}
 
-  .section-bottom-gutter {
-    grid-row: bottom-gutter;
-  }
+@utility section-key-right-gutter {
+  grid-column: key / right-gutter;
+}
 
-  .grid-row-reset {
-    grid-row-start: -1;
-  }
+@utility section-w-full {
+  grid-column: left-gutter / right-gutter;
+}
 
-  .grid-row-start-1 {
-    grid-row-start: 1;
-  }
+@utility section-lg-value {
+  grid-column: left-gutter / value;
+}
 
-  .single-row {
-    grid-template-rows: 1fr;
-  }
-  .single-row-area {
-    grid-row: 1 / 2;
-  }
+@utility section-row-search-gutter {
+  grid-row: search / left-gutter;
+}
 
-  .single-cell-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-  }
+@utility section-full {
+  grid-row: title / left-gutter;
+  grid-column: left-gutter / right-gutter;
+}
 
-  .single-cell-child {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-  }
+@utility section-full-no-title {
+  grid-row: search / left-gutter;
+  grid-column: left-gutter / right-gutter;
+}
+
+@utility section-min-rows {
+  grid-auto-rows: min-content;
+}
+
+@utility section-main {
+  grid-row: search / left-gutter;
+  grid-column: key / value;
+}
+
+@utility section-main-full-w {
+  grid-row: search / left-gutter;
+  grid-column: left-gutter / right-gutter;
+}
+
+@utility section-row-main {
+  grid-row: left-gutter;
+}
+
+@utility section-row-left-bottom {
+  grid-row: left-gutter / bottom-gutter;
+}
+
+@utility section-row-pin {
+  grid-row: pin-lg;
+}
+
+@utility section-row-pin-main {
+  grid-row: pin-lg / left-gutter;
+}
+
+@utility section-left-gutter {
+  grid-column: left-gutter / span 1;
+}
+
+@utility section-right-gutter {
+  grid-column: right-gutter / span 1;
+}
+
+@utility section-bottom-gutter {
+  grid-row: bottom-gutter;
+}
+
+@utility grid-row-reset {
+  grid-row-start: -1;
+}
+
+@utility grid-row-start-1 {
+  grid-row-start: 1;
+}
+
+@utility single-row {
+  grid-template-rows: 1fr;
+}
+
+@utility single-row-area {
+  grid-row: 1 / 2;
+}
+
+@utility single-cell-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+@utility single-cell-child {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
 }
 
 button,

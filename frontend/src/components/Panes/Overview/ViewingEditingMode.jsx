@@ -38,7 +38,7 @@ export function ViewingEditingMode() {
       {modes.map((mode) => (
         <button
           key={mode.id}
-          className={`flex flex-1 items-center gap-2 rounded p-2 transition-all ${selectedMode === mode.id ? "bg-white text-blue-600 shadow-sm dark:bg-setta-800" : "text-setta-700 hover:bg-setta-100 dark:text-setta-300 dark:hover:bg-setta-800/50"} cursor-pointer text-xs`}
+          className={`flex flex-1 items-center gap-2 rounded-sm p-2 transition-all ${selectedMode === mode.id ? "bg-white text-blue-600 shadow-xs dark:bg-setta-800" : "text-setta-700 hover:bg-setta-100 dark:text-setta-300 dark:hover:bg-setta-800/50"} cursor-pointer text-xs`}
           onClick={() => handleModeChange(mode.id)}
           title={mode.label}
         >

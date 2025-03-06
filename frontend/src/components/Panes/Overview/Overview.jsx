@@ -26,7 +26,7 @@ export function Overview() {
     tab,
     onTabClick: onOverviewTabClick,
     className:
-      "flex h-10 w-10 cursor-pointer items-center justify-center focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-light-blue-500",
+      "flex h-10 w-10 cursor-pointer items-center justify-center focus-visible:border-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-light-blue-500",
   };
 
   // The ProjectOverviewButtonDiv div id is used when tabbing from document.body
@@ -36,20 +36,20 @@ export function Overview() {
       className="contents"
       onKeyDown={overviewPaneOnKeyDown}
     >
-      <div className="absolute left-0 z-[19] flex h-[calc(100%_-_48px)] w-[50px] flex-col items-center gap-1 border-r border-setta-200/75 bg-setta-50 py-3 dark:border-setta-850 dark:bg-setta-900">
+      <div className="absolute left-0 z-19 flex h-[calc(100%_-_48px)] w-[50px] flex-col items-center gap-1 border-r border-setta-200/75 bg-setta-50 py-3 dark:border-setta-850 dark:bg-setta-900">
         <TabButton
           tabName="tab1"
           {...commonProps}
           {...getFloatingBoxHandlers({ content: "Project Overview" })}
         >
-          <i className="gg-list  !scale-100" />
+          <i className="gg-list  scale-100!" />
         </TabButton>
         <TabButton
           tabName="tab2"
           {...commonProps}
           {...getFloatingBoxHandlers({ content: "Config Preview" })}
         >
-          <i className="gg-git-branch !scale-100" />
+          <i className="gg-git-branch scale-100!" />
         </TabButton>
         <TabButton
           tabName="tab3"
@@ -62,7 +62,7 @@ export function Overview() {
         <a
           href="https://docs.setta.dev"
           target="_blank"
-          className="focus-visible:ring-light-blue-500 absolute bottom-2 left-1 flex h-10 w-10 cursor-pointer items-center justify-center text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500"
+          className="focus-visible:ring-light-blue-500 absolute bottom-2 left-1 flex h-10 w-10 cursor-pointer items-center justify-center text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-hidden focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500"
           rel="noreferrer"
         >
           <BiHelpCircle />

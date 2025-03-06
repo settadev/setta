@@ -37,7 +37,7 @@ export function DeleteProjectWarningModal() {
         </Dialog.Description>
       </header>
       {/* Scrollable content section */}
-      <div className="mb-6 w-full flex-grow overflow-auto rounded-lg bg-setta-50 p-4 dark:bg-setta-900">
+      <div className="mb-6 w-full grow overflow-auto rounded-lg bg-setta-50 p-4 dark:bg-setta-900">
         <h4 className="mb-2 text-sm font-medium text-setta-700 dark:text-setta-300">
           Projects to be deleted:
         </h4>
@@ -47,7 +47,7 @@ export function DeleteProjectWarningModal() {
               key={project.name}
               className="flex items-center space-x-2 text-sm text-setta-600 dark:text-setta-400"
             >
-              <span className="h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+              <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />
               <span>{project.name}</span>
             </li>
           ))}

@@ -17,7 +17,7 @@ export const StandardSearch = React.forwardRef(
     },
     ref,
   ) => {
-    const classes = ` flex-grow outline-0 cursor-auto min-w-0 placeholder-setta-300 dark:placeholder-setta-700 ${twClasses}`;
+    const classes = ` grow outline-0 cursor-auto min-w-0 placeholder-setta-300 dark:placeholder-setta-700 ${twClasses}`;
 
     return (
       <MaybeForm onFormSubmit={onFormSubmit} outerClasses={outerClasses}>
@@ -26,7 +26,7 @@ export const StandardSearch = React.forwardRef(
             className={`absolute left-0 grid select-none place-items-center ${leftElementStyles}`}
           >
             {leftElement || (
-              <i className="gg-sort-az ml-[.4rem] !scale-75 text-setta-300 dark:text-setta-600" />
+              <i className="gg-sort-az ml-[.4rem] scale-75! text-setta-300 dark:text-setta-600" />
             )}
           </div>
         )}

@@ -171,8 +171,8 @@ function CustomResizableSuperCore({
 
   const inputClasses = `${
     disablePointerEvents ? "pointer-events-none select-none" : ""
-  } ${bgColor} section-grid-cols section-grid-rows section-grid-areas grid h-full transition-radius ${!positionAndSizeLocked ? "rounded-xl shadow-md" : "rounded-sm"}   before:content-none before:block before:absolute before:top-0 before:right-0 before:bottom-0 before:left-0 before:border before:border-white dark:before:border-setta-700 ${isYouTube ? "overflow-clip" : ""} ${
-    isActiveSection ? "z-[150]" : "z-10"
+  } ${bgColor} section-grid-cols section-grid-rows section-grid-areas grid h-full transition-radius ${!positionAndSizeLocked ? "rounded-xl shadow-md" : "rounded-xs"}   before:content-none before:block before:absolute before:top-0 before:right-0 before:bottom-0 before:left-0 before:border before:border-white dark:before:border-setta-700 ${isYouTube ? "overflow-clip" : ""} ${
+    isActiveSection ? "z-150" : "z-10"
   }`;
 
   return (
@@ -189,7 +189,7 @@ function CustomResizableSuperCore({
       lockAspectRatio={aspectRatio}
       lockAspectRatioExtraHeight={aspectRatioExtraHeight}
       lockAspectRatioExtraWidth={aspectRatioExtraWidth}
-      handleWrapperClass="absolute pointer-events-none [&>*]:pointer-events-auto h-full bottom-0 w-full nodrag [&>div]:z-20"
+      handleWrapperClass="absolute pointer-events-none *:pointer-events-auto h-full bottom-0 w-full nodrag [&>div]:z-20"
       enable={enable}
       className={inputClasses}
       handleStyles={{ right: { right: "-8px" }, bottom: { bottom: "-8px" } }}

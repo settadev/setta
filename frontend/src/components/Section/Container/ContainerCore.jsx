@@ -48,7 +48,7 @@ function _Container({
     </ContainerGroup>
   ) : (
     <div
-      className={`${className} focus-visible:outline-none`}
+      className={`${className} focus-visible:outline-hidden`}
       style={style}
       {...commonProps}
       onKeyDown={(e) =>
@@ -102,7 +102,7 @@ function ContainerGroup({
 
   return (
     <div
-      className={`group/group-section flex min-w-[250px] flex-col items-stretch px-6 pb-6 pt-2 focus-visible:outline-none ${className}`}
+      className={`group/group-section flex min-w-[250px] flex-col items-stretch px-6 pb-6 pt-2 focus-visible:outline-hidden ${className}`}
       {...commonProps}
       onClick={getOnSectionClick(sectionId, isActiveSection)}
       onKeyDown={(e) =>
@@ -112,7 +112,7 @@ function ContainerGroup({
       style={style}
     >
       <div
-        className={`outline outline-4 ${outlineColor} transition-radius absolute left-0 right-0 top-0 z-0 h-full w-full ${positionAndSizeLocked ? "rounded-sm border-setta-400/90 dark:border-setta-975/35" : "rounded-3xl border-setta-50/50 dark:border-setta-700"}  border border-solid  bg-setta-100/40 outline outline-2 outline-transparent   dark:bg-setta-860/50`}
+        className={`outline outline-4 ${outlineColor} transition-radius absolute left-0 right-0 top-0 z-0 h-full w-full ${positionAndSizeLocked ? "rounded-xs border-setta-400/90 dark:border-setta-975/35" : "rounded-3xl border-setta-50/50 dark:border-setta-700"}  border border-solid  bg-setta-100/40 outline outline-2 outline-transparent   dark:bg-setta-860/50`}
       />
       <div className="z-10 flex min-h-10 w-full items-center">
         <MenuButton
@@ -150,10 +150,10 @@ function ContainerGroup({
 function GroupSectionTitle({ sectionId }) {
   const titleProps = {
     editing:
-      "absolute nodrag cursor-text box-border px-1 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-blue-500 rounded-lg border border-solid border-transparent w-full tracking-tighter text-setta-500 dark:text-setta-500 cursor-pointer flex-shrink",
+      "absolute nodrag cursor-text box-border px-1 focus-visible:ring-0 focus-visible:outline-hidden focus-visible:border-blue-500 rounded-lg border border-solid border-transparent w-full tracking-tighter text-setta-500 dark:text-setta-500 cursor-pointer shrink",
 
     notEditing:
-      "absolute cursor-pointer box-border px-1 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-blue-500 rounded-lg border border-solid border-transparent w-full truncate tracking-tighter text-setta-500 dark:text-setta-500  flex-shrink",
+      "absolute cursor-pointer box-border px-1 focus-visible:ring-0 focus-visible:outline-hidden focus-visible:border-blue-500 rounded-lg border border-solid border-transparent w-full truncate tracking-tighter text-setta-500 dark:text-setta-500  shrink",
   };
 
   return <SectionTitle sectionId={sectionId} titleProps={titleProps} />;

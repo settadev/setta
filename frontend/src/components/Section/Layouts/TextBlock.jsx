@@ -42,7 +42,7 @@ function _Markdown({ sectionId }) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
-        className="prose-headings: prose prose-sm min-w-[100%] [flex:1_1_auto] dark:prose-invert   prose-headings:tracking-tighter prose-headings:text-setta-400  prose-h1:text-2xl prose-h1:leading-none prose-p:text-sm prose-code:before:hidden prose-code:after:hidden [&_*]:[word-wrap:break-word]"
+        className="prose-headings: prose prose-sm min-w-[100%] [flex:1_1_auto] dark:prose-invert   prose-headings:tracking-tighter prose-headings:text-setta-400  prose-h1:text-2xl prose-h1:leading-none prose-p:text-sm prose-code:before:hidden prose-code:after:hidden **:[word-wrap:break-word]"
         components={{
           code: CodeBlock,
         }}
@@ -98,7 +98,7 @@ export const CodeBlock = ({ node, inline, className, children, ...props }) => {
       <button
         onClick={handleCopy}
         className="absolute right-0 top-0.5 cursor-pointer rounded bg-transparent text-setta-300 opacity-0 transition-opacity 
-                   duration-200 hover:text-setta-600 focus:outline-none
+                   duration-200 hover:text-setta-600 focus:outline-hidden
                    focus:ring-2 focus-visible:ring-blue-500 group-hover:opacity-100 dark:hover:text-white"
         aria-label="Copy code"
       >

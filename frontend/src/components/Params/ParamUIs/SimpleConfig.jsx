@@ -5,7 +5,7 @@ export function SimpleConfig({ options, onChange, onBlur, config }) {
     <div className="mt-1 flex flex-col">
       {options.map((e, idx) => (
         <div
-          className="flex flex-grow items-center justify-between rounded-full px-3 py-[0.33rem] hover:bg-[#cbd5e02b]"
+          className="flex grow items-center justify-between rounded-full px-3 py-[0.33rem] hover:bg-[#cbd5e02b]"
           key={`SimpleConfig-${idx}`}
         >
           <p className="flex-1 font-sans text-xs font-semibold text-setta-600">

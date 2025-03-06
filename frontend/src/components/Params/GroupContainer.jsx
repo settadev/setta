@@ -39,7 +39,7 @@ function _ParamGroupContainer({ sectionId }) {
       ref={outerRef}
     >
       {waitingForResult ? (
-        <i className="section-args gg-spinner mt-3 !scale-100 place-self-center before:!border-t-blue-500 after:!border-blue-500" />
+        <i className="section-args gg-spinner mt-3 scale-100! place-self-center before:border-t-blue-500! after:border-blue-500!" />
       ) : (
         <>
           <GetPinnedParams
@@ -131,7 +131,7 @@ function ResizablePinnedArea({
   return (
     <ResizableWithScale
       handleWrapperClass="nodrag"
-      className="relative -mt-1 flex max-h-[50%] w-full flex-col items-start border-b border-white bg-blue-200/50 pb-3 pt-4 shadow-sm dark:border-setta-700/30 dark:bg-blue-950/30"
+      className="relative -mt-1 flex max-h-[50%] w-full flex-col items-start border-b border-white bg-blue-200/50 pb-3 pt-4 shadow-xs dark:border-setta-700/30 dark:bg-blue-950/30"
       as="section"
       size={{ height }}
       onResizeStop={onResizeStop}

@@ -95,7 +95,7 @@ export function DrawAreaControls({
   }
 
   return (
-    <div className="section-search section-w-full z-10 flex  flex-wrap items-center gap-2 rounded-xl border-b border-solid border-white px-3 py-3 shadow-sm @container dark:border-setta-700 [&_.colorpicker]:!max-h-6 [&_.colorpicker]:max-w-24 ">
+    <div className="section-search section-w-full z-10 flex  flex-wrap items-center gap-2 rounded-xl border-b border-solid border-white px-3 py-3 shadow-xs @container dark:border-setta-700 [&_.colorpicker]:max-h-6! [&_.colorpicker]:max-w-24 ">
       <DrawAreaColorPicker
         sectionId={sectionId}
         color={color}
@@ -243,14 +243,14 @@ function BrushSettings({
   const sliderRootClassName =
     "data[orientation='vertical']:flex-col data[orientation='vertical']:w-5 data[orientation='vertical']:h-24 SliderRoot relative flex flex-1 min-w-16 touch-none select-none items-center my-auto data-[orientation='horizontal']:h-5";
   const sliderTrackClassName =
-    "relative flex-grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700";
+    "relative grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700";
   const sliderRangeClassName = "absolute h-full rounded-full bg-blue-500";
   const sliderThumbClassName =
-    "block h-3 w-3 cursor-pointer rounded-full border-2 border-setta-300 bg-white shadow-sm drop-shadow-md hover:bg-setta-100 focus:border-blue-500 focus-visible:outline-none dark:border-setta-400 dark:bg-setta-600";
+    "block h-3 w-3 cursor-pointer rounded-full border-2 border-setta-300 bg-white shadow-xs drop-shadow-md hover:bg-setta-100 focus:border-blue-500 focus-visible:outline-hidden dark:border-setta-400 dark:bg-setta-600";
   const textInputClassName =
     "my-auto w-7 rounded-lg border border-solid border-setta-600/10 px-2 py-1 text-center font-mono text-xs text-setta-700 dark:border-setta-600/30 dark:text-setta-400";
   return (
-    <div className="grid w-full grid-cols-[1fr,_2fr] gap-2">
+    <div className="grid w-full grid-cols-[1fr__2fr] gap-2">
       <p className="self-center text-xs font-bold text-setta-600 dark:text-setta-400">
         Opacity
       </p>
@@ -316,14 +316,14 @@ function EraserSettings({ brushSize, setBrushSize }) {
   const sliderRootClassName =
     "data[orientation='vertical']:flex-col data[orientation='vertical']:w-5 data[orientation='vertical']:h-24 SliderRoot relative flex flex-1 min-w-16 touch-none select-none items-center my-auto data-[orientation='horizontal']:h-5";
   const sliderTrackClassName =
-    "relative flex-grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700";
+    "relative grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700";
   const sliderRangeClassName = "absolute h-full rounded-full bg-blue-500";
   const sliderThumbClassName =
-    "block h-3 w-3 cursor-pointer rounded-full border-2 border-setta-300 bg-white shadow-sm drop-shadow-md hover:bg-setta-100 focus:border-blue-500 focus-visible:outline-none dark:border-setta-400 dark:bg-setta-600";
+    "block h-3 w-3 cursor-pointer rounded-full border-2 border-setta-300 bg-white shadow-xs drop-shadow-md hover:bg-setta-100 focus:border-blue-500 focus-visible:outline-hidden dark:border-setta-400 dark:bg-setta-600";
   const textInputClassName =
     "my-auto w-7 rounded-lg border border-solid border-setta-600/10 px-2 py-1 text-center font-mono text-xs text-setta-700 dark:border-setta-600/30 dark:text-setta-400";
   return (
-    <div className="grid w-full grid-cols-[1fr,_2fr] gap-2">
+    <div className="grid w-full grid-cols-[1fr__2fr] gap-2">
       <p className="self-center text-xs font-bold text-setta-600 dark:text-setta-400">
         Size
       </p>
@@ -355,14 +355,14 @@ function LayerSettings({ opacity, setOpacity }) {
   const sliderRootClassName =
     "data[orientation='vertical']:flex-col data[orientation='vertical']:w-5 data[orientation='vertical']:h-24 SliderRoot relative flex flex-1 min-w-16 touch-none select-none items-center my-auto data-[orientation='horizontal']:h-5";
   const sliderTrackClassName =
-    "relative flex-grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700";
+    "relative grow rounded-full bg-setta-200 data-[orientation='horizontal']:h-[3px] data-[orientation='vertical']:w-[3px] dark:bg-setta-700";
   const sliderRangeClassName = "absolute h-full rounded-full bg-blue-500";
   const sliderThumbClassName =
-    "block h-3 w-3 cursor-pointer rounded-full border-2 border-setta-300 bg-white shadow-sm drop-shadow-md hover:bg-setta-100 focus:border-blue-500 focus-visible:outline-none dark:border-setta-400 dark:bg-setta-600";
+    "block h-3 w-3 cursor-pointer rounded-full border-2 border-setta-300 bg-white shadow-xs drop-shadow-md hover:bg-setta-100 focus:border-blue-500 focus-visible:outline-hidden dark:border-setta-400 dark:bg-setta-600";
   const textInputClassName =
     "my-auto w-7 rounded-lg border border-solid border-setta-600/10 px-2 py-1 text-center font-mono text-xs text-setta-700 dark:border-setta-600/30 dark:text-setta-400";
   return (
-    <div className="grid w-full grid-cols-[1fr,_2fr] gap-2">
+    <div className="grid w-full grid-cols-[1fr__2fr] gap-2">
       <p className="self-center text-xs font-bold text-setta-600 dark:text-setta-400">
         Layer Opacity
       </p>
@@ -456,7 +456,7 @@ function LayerList({
             </button>
 
             <p
-              className={`truncate text-sm font-semibold ${activeLayerId === layer.id ? " !text-blue-500" : "text-setta-600 dark:text-setta-400"}`}
+              className={`truncate text-sm font-semibold ${activeLayerId === layer.id ? " text-blue-500!" : "text-setta-600 dark:text-setta-400"}`}
             >
               {layer.name}
             </p>
@@ -465,14 +465,14 @@ function LayerList({
               onClick={() => deleteLayer(layer.id)}
               className="flex h-4 w-4 cursor-pointer items-center"
             >
-              <i className="gg-close  text-setta-400 hover:!text-red-500 dark:text-setta-700" />
+              <i className="gg-close  text-setta-400 hover:text-red-500! dark:text-setta-700" />
             </button>
           </li>
         ))}
       </ul>
       <button
         onClick={addLayer}
-        className="flex max-w-full cursor-pointer items-center justify-center rounded p-2 text-sm text-setta-600 hover:text-blue-500"
+        className="flex max-w-full cursor-pointer items-center justify-center rounded-sm p-2 text-sm text-setta-600 hover:text-blue-500"
       >
         <FaPlus className="mr-2 h-3 w-3" />
         Add Layer

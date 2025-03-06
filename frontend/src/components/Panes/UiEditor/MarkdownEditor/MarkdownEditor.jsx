@@ -19,7 +19,7 @@ export function MarkdownEditorInPane({ sectionId }) {
   return (
     <MarkdownEditorCore
       sectionId={sectionId}
-      wrapperClassName="cursor-auto overflow-y-scroll [&_*]:!outline-0"
+      wrapperClassName="cursor-auto overflow-y-scroll **:outline-0!"
       ref={wrapperRef}
     />
   );
@@ -35,7 +35,7 @@ export function MarkdownEditorInSection({ sectionId }) {
       onCreateEditor={handleCreateEditor}
       maxHeight={maxHeight}
       ref={wrapperRef}
-      wrapperClassName={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title cursor-auto [&_*]:!outline-0 ${overflow} ${nowheel}`}
+      wrapperClassName={`${SETTA_PREVENT_SECTION_ACTIVE_CSS} nodrag section-full-no-title cursor-auto **:outline-0! ${overflow} ${nowheel}`}
     />
   );
 }

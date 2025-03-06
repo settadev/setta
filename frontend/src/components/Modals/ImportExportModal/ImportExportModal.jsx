@@ -76,11 +76,11 @@ function TextAreaModal({
   onClick,
 }) {
   return (
-    <div className="flex h-full flex-grow flex-col  ">
+    <div className="flex h-full grow flex-col  ">
       <Dialog.Title className="mx-3 mb-4 font-bold uppercase tracking-widest text-setta-400">
         {title}
       </Dialog.Title>
-      <article className="relative flex flex-grow overflow-hidden rounded-lg border border-setta-100 bg-setta-50 p-4  dark:border-setta-700/50 dark:bg-setta-900 dark:text-setta-300">
+      <article className="relative flex grow overflow-hidden rounded-lg border border-setta-100 bg-setta-50 p-4  dark:border-setta-700/50 dark:bg-setta-900 dark:text-setta-300">
         {copyBtn && (
           <HiOutlineDuplicate
             className="absolute right-8 top-4 h-5 w-5 cursor-pointer text-setta-300 hover:text-setta-600 dark:hover:text-white"
@@ -89,7 +89,7 @@ function TextAreaModal({
         )}
         <textarea
           disabled={disabled}
-          className="overflow-y min-h-[30vh] flex-grow resize-none bg-transparent font-mono text-xs outline-none"
+          className="overflow-y min-h-[30vh] grow resize-none bg-transparent font-mono text-xs outline-hidden"
           value={value}
           onChange={(v) => setValue(v.target.value)}
           placeholder="JSON, state 'em..."

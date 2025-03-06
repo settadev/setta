@@ -44,7 +44,7 @@ export function KwargsControls({
   return (
     <>
       <section
-        className={`section-args z-10 mt-1 flex min-w-0 flex-wrap rounded-xl border-b border-solid  border-white px-1 pb-1 shadow-sm @container dark:border-setta-700 ${bgColor}`}
+        className={`section-args z-10 mt-1 flex min-w-0 flex-wrap rounded-xl border-b border-solid  border-white px-1 pb-1 shadow-xs @container dark:border-setta-700 ${bgColor}`}
       >
         <article className="flex flex-wrap items-center">
           <section className="ml-1 flex">
@@ -58,7 +58,7 @@ export function KwargsControls({
               tabIndex="0"
               disabled={variantIsFrozen}
             >
-              <i className="gg-math-minus before:!left-0 " />
+              <i className="gg-math-minus before:left-0! " />
             </button>
             <button
               className={classes}
@@ -66,11 +66,11 @@ export function KwargsControls({
               tabIndex="0"
               disabled={variantIsFrozen}
             >
-              <i className="gg-math-plus !scale-50" />
+              <i className="gg-math-plus scale-50!" />
             </button>
 
             <button className={classes} onClick={onClickPinParam} tabIndex="0">
-              <i className="gg-pin-alt mt-1 !scale-50" />
+              <i className="gg-pin-alt mt-1 scale-50!" />
             </button>
             <button
               className={classes}
@@ -78,7 +78,7 @@ export function KwargsControls({
               tabIndex="0"
               disabled={variantIsFrozen}
             >
-              <i className="gg-close !scale-50" />
+              <i className="gg-close scale-50!" />
             </button>
           </section>
         </article>

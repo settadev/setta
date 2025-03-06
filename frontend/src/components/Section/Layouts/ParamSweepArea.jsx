@@ -84,7 +84,7 @@ function _ParamSweepAreaGUI({ sectionId }) {
             onClick={onAddCallableClick}
             disabled={variantIsFrozen}
           >
-            <i className="gg-play-list-add !scale-75" />
+            <i className="gg-play-list-add scale-75!" />
             <p>Callable</p>
           </button>
         )}
@@ -249,7 +249,7 @@ function ArgItem({
         <div className="flex items-center pl-0.5">
           <button
             className="h-[22px] cursor-pointer
-            text-setta-300 hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 [&>i]:focus-visible:!border-blue-500"
+            text-setta-300 hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 focus-visible:[&>i]:border-blue-500!"
             onClick={onMinus}
             disabled={isDisabled}
           >
@@ -257,7 +257,7 @@ function ArgItem({
           </button>
           <button
             className="&>i]:focus-visible:!border-blue-500 h-[22px]  cursor-pointer rounded-full
-            text-setta-300 hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 [&>i]:focus-visible:!border-blue-500"
+            text-setta-300 hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 focus-visible:[&>i]:border-blue-500!"
             onClick={onPlus}
             disabled={isDisabled}
           >
@@ -324,12 +324,12 @@ function Input({
   return (
     <div className="group contents">
       <button
-        className="section-left-gutter ml-2 flex h-[0.66rem] w-[0.66rem] cursor-pointer items-center justify-center place-self-center rounded-full bg-transparent text-transparent opacity-75 outline-blue-500 hover:!text-setta-600 focus-visible:text-blue-500 focus-visible:outline group-hover:text-setta-300 dark:hover:!text-setta-200 group-hover:dark:text-setta-600"
+        className="section-left-gutter ml-2 flex h-[0.66rem] w-[0.66rem] cursor-pointer items-center justify-center place-self-center rounded-full bg-transparent text-transparent opacity-75 outline-blue-500 hover:text-setta-600! focus-visible:text-blue-500 focus-visible:outline group-hover:text-setta-300 dark:hover:text-setta-200! dark:group-hover:text-setta-600"
         onClick={onDelete}
         tabIndex="-1"
         disabled={isDisabled}
       >
-        <i className="gg-close !scale-50" />
+        <i className="gg-close scale-50!" />
       </button>
       <article className="section-key-value group/arg-group group/textinput mr-3  grid grid-cols-subgrid items-center justify-between rounded-lg">
         <ParamSweepUI
@@ -374,7 +374,7 @@ function AddRemoveButtonsForNoCallableSection({
       </p>
       <button
         className="flex h-4 w-4 cursor-pointer items-center justify-center rounded-full text-setta-300 
-            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 [&>i]:focus-visible:!border-blue-500"
+            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 focus-visible:[&>i]:border-blue-500!"
         onClick={onClickRemoveParam}
         disabled={isDisabled}
       >
@@ -382,7 +382,7 @@ function AddRemoveButtonsForNoCallableSection({
       </button>
       <button
         className="flex h-4 w-4 cursor-pointer items-center justify-center rounded-full text-setta-300 
-            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 [&>i]:focus-visible:!border-blue-500"
+            hover:text-setta-600 dark:text-setta-700 dark:hover:text-setta-400 focus-visible:[&>i]:border-blue-500!"
         onClick={onClickAddParam}
         disabled={disablePlusButton || isDisabled}
       >
