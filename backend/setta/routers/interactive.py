@@ -139,6 +139,11 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
     return initialContent
 
 
+@router.post(C.ROUTE_KILL_IN_MEMORY_SUBPROCESSES)
+async def route_kill_in_memory_subprocesses(tasks=Depends(get_tasks)):
+    tasks.kill_in_memory_subprocesses()
+
+
 @router.post(C.ROUTE_FORMAT_CODE)
 async def route_format_code(x: FormatCodeRequest):
     p = x.project

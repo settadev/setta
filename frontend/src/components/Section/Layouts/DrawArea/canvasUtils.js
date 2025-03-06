@@ -427,4 +427,5 @@ export const sendDrawingToInteractiveTasks = _.throttle(
     sendToInteractiveTasks([sectionId, "drawing"], null, fnToBase64);
   },
   200,
+  { leading: false },
 );

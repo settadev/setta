@@ -91,7 +91,6 @@ class Tasks:
                 if call_fn_condition(
                     call_all, call_fns_with_empty_dependency_array, fnInfo, message
                 ):
-                    print('fnInfo["dependencies"]', fnInfo["dependencies"], flush=True)
                     fns_to_call.append(fn_name)
 
             if fns_to_call:
@@ -143,22 +142,26 @@ class Tasks:
     ):
         # Process each function sequentially for this subprocess
         for fn_name in fn_names:
-            # Send message to subprocess
-            subprocess.parent_conn.send(
-                {
-                    "type": call_type,
-                    "fn_name": fn_name,
-                    "message": message,
-                    "other_data": other_data,
-                }
-            )
+            try:
+                # Send message to subprocess
+                subprocess.parent_conn.send(
+                    {
+                        "type": call_type,
+                        "fn_name": fn_name,
+                        "message": message,
+                        "other_data": other_data,
+                    }
+                )
 
-            # Wait for and handle the response before sending the next message
-            start_time = time.perf_counter()
-            result = await self.task_runner.run(
-                subprocess.parent_conn.recv, [], RunType.THREAD
-            )
-            elapsed_time = time.perf_counter() - start_time
+                # Wait for and handle the response before sending the next message
+                start_time = time.perf_counter()
+                result = await self.task_runner.run(
+                    subprocess.parent_conn.recv, [], RunType.THREAD
+                )
+                elapsed_time = time.perf_counter() - start_time
+            except:
+                logger.debug("error while waiting for recv")
+                continue
 
             if result["status"] == "success":
                 self.update_average_subprocess_fn_time(
@@ -240,10 +243,15 @@ class Tasks:
 
         return initial_result["content"]
 
-    def close(self):
+    def kill_in_memory_subprocesses(self):
         self.stop_event.set()
         for v in self.in_memory_subprocesses.values():
             v["subprocess"].close()
+        self.in_memory_subprocesses = {}
+        self.stop_event.clear()
+
+    def close(self):
+        self.kill_in_memory_subprocesses()
 
     def update_average_subprocess_fn_time(self, subprocess_key, fn_name, new_time):
         fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"][fn_name]
