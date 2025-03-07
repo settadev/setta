@@ -62,7 +62,7 @@ export function ContextMenuCore({ children, x, y, isOpen, closeContextMenu }) {
   return (
     <DropdownMenu.Root open={isOpen} modal={false}>
       <DropdownMenu.Content
-        className="absolute z-10 flex w-[clamp(5rem,_20vw,_10rem)] min-w-32 cursor-pointer flex-col rounded-md border border-solid border-setta-500/50 bg-white px-2 py-2 shadow-xl dark:bg-setta-900"
+        className="absolute z-10 flex max-h-[80vh] w-[clamp(5rem,_20vw,_10rem)] min-w-32 cursor-pointer flex-col overflow-y-auto rounded-md border border-solid border-setta-500/50 bg-white px-2 py-2 shadow-xl dark:bg-setta-900"
         style={{
           left: position.left,
           top: position.top,
