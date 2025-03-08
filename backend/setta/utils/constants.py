@@ -162,7 +162,7 @@ PROJECT_CONFIG_TABLE_DATA_JSON_FIELDS = set(
 
 
 class ParameterPassingStyle:
-    NONE = None
+    DEFAULT = "DEFAULT"
     ARGS = "ARGS"
     KWARGS = "KWARGS"
     POSITIONAL_ONLY = "POSITIONAL_ONLY"

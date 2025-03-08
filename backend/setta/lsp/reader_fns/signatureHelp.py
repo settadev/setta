@@ -29,7 +29,7 @@ def process_docstring(signature):
     if "documentation" in signature:
         parsed = docstring_parser.parse(signature["documentation"]["value"])
         return {
-            v.arg_name: {
+            extract_variable_name(v.arg_name): {
                 "default": v.default,
                 "description": v.description,
             }
@@ -54,10 +54,10 @@ def wrapper_parse_signature(signature, docstring, get_proposed_params):
         if name in [None, "/", "*", "", "..."]:
             continue
 
-        name = extract_variable_name(name)
         passingStyle = get_passing_style(
             idx, positional_only_indicator_idx, keyword_only_indicator_idx, name
         )
+        name = name.lstrip("*")
 
         if not default:
             default = ""
@@ -87,12 +87,33 @@ def get_pyright_param_proposals(signature, _):
     params = [(p["label"], p["documentation"]["value"]) for p in parameters]
     proposals = []
     for param, description in params:
-        parts = param.split("=")
-        name = parts[0].strip()
-        default = parts[1].strip() if len(parts) > 1 else None
+        name, _, default = parse_param_name(param)
         proposals.append((name, default, description))
 
     return proposals
+
+
+def parse_param_name(param_string):
+    # Special cases for / and *
+    if param_string in ["/", "*"]:
+        return param_string, None, None
+
+    # Extract default value if present
+    default_value = None
+    if "=" in param_string:
+        param_string, default_part = param_string.split("=", 1)
+        default_value = default_part.strip()
+
+    # Extract type annotation if present
+    type_annotation = None
+    if ":" in param_string:
+        param_string, type_part = param_string.split(":", 1)
+        type_annotation = type_part.strip()
+
+    # Variable name is what remains, trimmed of whitespace
+    name = extract_variable_name(param_string)
+
+    return name, type_annotation, default_value
 
 
 def extract_variable_name(code_string):
@@ -117,4 +138,4 @@ def get_passing_style(
         return ParameterPassingStyle.POSITIONAL_ONLY
     if keyword_only_indicator_idx > -1 and idx > keyword_only_indicator_idx:
         return ParameterPassingStyle.KEYWORD_ONLY
-    return ParameterPassingStyle.NONE
+    return ParameterPassingStyle.DEFAULT
