@@ -82,13 +82,61 @@ function ProjectPageCommandPalette({ children }) {
   console.log("command palette activated");
 
   return (
-    <ProjectPageAdvancedCore allItems={allItems}>
+    <ProjectPageCommandPaletteCore allItems={allItems}>
       {children}
-    </ProjectPageAdvancedCore>
+    </ProjectPageCommandPaletteCore>
   );
 }
 
 function ProjectPageAdvancedCore({ allItems, children }) {
+  function onSelectedItemChange(id) {
+    goToSection(id);
+    focusOnSection(null, id, false);
+  }
+
+  const {
+    isOpen,
+    filteredItems,
+    // getToggleButtonProps,
+    getMenuProps,
+    getInputProps,
+    highlightedIndex,
+    getItemProps,
+    itemToString,
+    onKeyDown,
+  } = useIdNameCombobox({
+    allItems,
+    onSelectedItemChange,
+  });
+
+  const inputRef = useRef();
+
+  return (
+    <>
+      {React.cloneElement(children, {
+        ...getInputProps({
+          onKeyDown,
+          ref: inputRef,
+        }),
+      })}
+
+      <ComboboxList
+        isOpen={isOpen}
+        getMenuProps={getMenuProps}
+        inputRef={inputRef}
+      >
+        <ComboboxItems
+          filteredItems={filteredItems}
+          getItemProps={getItemProps}
+          highlightedIndex={highlightedIndex}
+          itemToString={itemToString}
+        />
+      </ComboboxList>
+    </>
+  );
+}
+
+function ProjectPageCommandPaletteCore({ allItems, children }) {
   function onSelectedItemChange(id) {
     goToSection(id);
     focusOnSection(null, id, false);
