@@ -3,7 +3,6 @@ import { Item } from "components/Utils/atoms/dropdown/item";
 import C from "constants/constants.json";
 import { screenToFlowPosition } from "forks/xyflow/core/hooks/useViewportHelper";
 import _ from "lodash";
-import { FiChevronRight } from "react-icons/fi";
 import { closeAllContextMenus } from "state/actions/contextMenus";
 import { addSectionAtPosition } from "state/actions/sections/createSections";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
@@ -53,8 +52,18 @@ export function PaneContextMenu() {
         <Item onClick={getOnClickFn({ type: C.DICT_ROOT })}>Dict</Item>
         <Item onClick={getOnClickFn({ type: C.GROUP })}>Group</Item>
         <Item onClick={getOnClickFn({ type: C.TEXT_BLOCK })}>Text</Item>
+        {!singletonSections[C.GLOBAL_VARIABLES] && (
+          <Item onClick={getOnClickFn({ type: C.GLOBAL_VARIABLES })}>
+            Global Variables
+          </Item>
+        )}
+        {!singletonSections[C.GLOBAL_PARAM_SWEEP] && (
+          <Item onClick={getOnClickFn({ type: C.GLOBAL_PARAM_SWEEP })}>
+            Global Param Sweep
+          </Item>
+        )}
 
-        <DropdownMenu.Sub>
+        {/* <DropdownMenu.Sub>
           <DropdownMenu.SubTrigger className={itemStyle}>
             Global
             <FiChevronRight className="ml-auto" size={10} />
@@ -79,7 +88,7 @@ export function PaneContextMenu() {
               )}
             </DropdownMenu.SubContent>
           </DropdownMenu.Portal>
-        </DropdownMenu.Sub>
+        </DropdownMenu.Sub> */}
       </DropdownMenu.Group>
       <DropdownMenu.Group>
         <DropdownMenu.Label className="mx-2 mb-1 mt-1.5 min-w-[100px] border-b border-setta-100 py-1 text-xs font-bold uppercase text-setta-300 dark:border-setta-700 dark:text-setta-500">
@@ -113,8 +122,17 @@ export function PaneContextMenu() {
         <Item onClick={getOnClickFn({ type: C.CHART })}>Chart</Item>
         <Item onClick={getOnClickFn({ type: C.CHAT })}>Chat</Item>
       </DropdownMenu.Group>
-      <DropdownMenu.Separator className="mx-2 my-1 h-px bg-setta-100 dark:bg-setta-700" />
-      <DropdownMenu.Sub>
+      {/* <DropdownMenu.Separator className="mx-2 my-1 h-px bg-setta-100 dark:bg-setta-700" /> */}
+
+      <DropdownMenu.Group>
+        <DropdownMenu.Label className="mx-2 mb-1 mt-1.5 min-w-[100px] border-b border-setta-100 py-1 text-xs font-bold uppercase text-setta-300 dark:border-setta-700 dark:text-setta-500">
+          Embed
+        </DropdownMenu.Label>
+        <Item onClick={getOnClickFn({ type: C.SOCIAL })}>Social</Item>
+        <Item onClick={getOnClickFn({ type: C.IFRAME })}>IFrame</Item>
+      </DropdownMenu.Group>
+
+      {/* <DropdownMenu.Sub>
         <DropdownMenu.SubTrigger className={itemStyle}>
           Embed
           <FiChevronRight className="ml-auto" size={10} />
@@ -125,7 +143,7 @@ export function PaneContextMenu() {
             <Item onClick={getOnClickFn({ type: C.IFRAME })}>IFrame</Item>
           </DropdownMenu.SubContent>
         </DropdownMenu.Portal>
-      </DropdownMenu.Sub>
+      </DropdownMenu.Sub> */}
     </ContextMenuCore>
   );
 }
