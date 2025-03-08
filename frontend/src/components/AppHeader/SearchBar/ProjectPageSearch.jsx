@@ -7,8 +7,11 @@ import {
 import { useIdNameCombobox } from "components/Utils/Combobox/useIdNameCombobox";
 import { getFloatingBoxHandlers } from "components/Utils/FloatingBox";
 import React, { useRef } from "react";
+import { addSectionInEmptySpace } from "state/actions/sections/createSections";
+import { useCreateSectionsList } from "state/actions/sections/createSectionsHelper";
 import { goToSection } from "state/actions/sections/sectionPositions";
-import { useProjectSearch } from "state/definitions";
+import { maybeIncrementProjectStateVersion } from "state/actions/undo";
+import { useProjectSearch, useSectionInfos } from "state/definitions";
 import { useUpdateProjectSearch } from "state/hooks/search";
 import { focusOnSection } from "utils/tabbingLogic";
 
@@ -23,10 +26,16 @@ export function ProjectPageSearchBar() {
 function ProjectPageSearchBarWrapper({ children }) {
   const mode = useProjectSearch((x) => x.mode);
 
-  if (mode === "find") {
-    return <ProjectPageFind>{children}</ProjectPageFind>;
+  switch (mode) {
+    case "find":
+      return <ProjectPageFind>{children}</ProjectPageFind>;
+    case "advanced":
+      return <ProjectPageAdvanced>{children}</ProjectPageAdvanced>;
+    case "commandPalette":
+      return <ProjectPageCommandPalette>{children}</ProjectPageCommandPalette>;
+    default:
+      return null;
   }
-  return <ProjectPageAdvanced>{children}</ProjectPageAdvanced>;
 }
 
 const ProjectPageSearchInput = React.forwardRef((props, ref) => {
@@ -62,20 +71,60 @@ function ProjectPageFind({ children }) {
 function ProjectPageAdvanced({ children }) {
   const allSections = useOverviewListing();
   const allItems = [{ group: "Sections", items: allSections }];
-
-  return (
-    <ProjectPageAdvancedCore allItems={allItems}>
-      {children}
-    </ProjectPageAdvancedCore>
-  );
-}
-
-function ProjectPageAdvancedCore({ allItems, children }) {
   function onSelectedItemChange(id) {
     goToSection(id);
     focusOnSection(null, id, false);
   }
 
+  return (
+    <ProjectPageAdvancedCore
+      allItems={allItems}
+      onSelectedItemChange={onSelectedItemChange}
+    >
+      {children}
+    </ProjectPageAdvancedCore>
+  );
+}
+
+function ProjectPageCommandPalette({ children }) {
+  // const allSections = useOverviewListing();
+
+  function getOnClickFn(specificProps) {
+    return () => {
+      useSectionInfos.setState((state) => {
+        addSectionInEmptySpace({
+          state,
+          ...specificProps,
+        });
+      });
+      maybeIncrementProjectStateVersion(true);
+    };
+  }
+
+  const allItems = useCreateSectionsList(getOnClickFn);
+  for (const g of allItems) {
+    for (const item of g.items) {
+      item.id = item.name;
+    }
+  }
+  function onSelectedItemChange(id) {
+    // goToSection(id);
+    // focusOnSection(null, id, false);
+  }
+
+  console.log("command palette activated");
+
+  return (
+    <ProjectPageAdvancedCore
+      allItems={allItems}
+      onSelectedItemChange={onSelectedItemChange}
+    >
+      {children}
+    </ProjectPageAdvancedCore>
+  );
+}
+
+function ProjectPageAdvancedCore({ allItems, onSelectedItemChange, children }) {
   const {
     isOpen,
     filteredItems,

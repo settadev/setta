@@ -30,3 +30,14 @@ export function focusOnAdvancedSearch() {
     }
   });
 }
+
+export function focusOnCommandPalette() {
+  useProjectSearch.setState({ mode: "commandPalette" });
+  // wait for re-render, otherwise the search bar re-renders after clicking on it
+  requestAnimationFrame(() => {
+    const element = document.getElementById("ProjectPageSearchBar");
+    if (element) {
+      element.click();
+    }
+  });
+}
