@@ -72,20 +72,36 @@ export const FloatingBox = () => {
       ref={boxRef}
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
     >
-      <Resizable
-        defaultSize={{
-          width: 256,
-        }}
+      <MaybeResizable
+        isFrozen={isFrozen}
         className={`flex max-h-96 w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
         tabIndex="0"
       >
         <TooltipCopyButton item={contentArray[idx]} copied={copied} />
         <TooltipPage item={contentArray[idx]} isFrozen={isFrozen} />
         <TooltipPageCountIndicator numPages={contentArray.length} idx={idx} />
-      </Resizable>
+      </MaybeResizable>
     </div>
   );
 };
+
+function MaybeResizable({ isFrozen, className, tabIndex, children }) {
+  return isFrozen ? (
+    <Resizable
+      defaultSize={{
+        width: 256,
+      }}
+      className={className}
+      tabIndex={tabIndex}
+    >
+      {children}
+    </Resizable>
+  ) : (
+    <div className={className} tabIndex={tabIndex}>
+      {children}
+    </div>
+  );
+}
 
 const TooltipPage = React.memo(({ item, isFrozen }) => {
   return (
