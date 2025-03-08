@@ -74,7 +74,7 @@ export const FloatingBox = () => {
     >
       <MaybeResizable
         isFrozen={isFrozen}
-        className={`flex max-h-96 w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
+        className={`flex max-h-96 min-h-32 w-64 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
         tabIndex="0"
       >
         <TooltipCopyButton item={contentArray[idx]} copied={copied} />
@@ -91,6 +91,7 @@ function MaybeResizable({ isFrozen, className, tabIndex, children }) {
       defaultSize={{
         width: 256,
       }}
+      midWidth="256px"
       className={className}
       tabIndex={tabIndex}
     >
