@@ -94,7 +94,7 @@ function createChildrenCodeInfo(sectionId, parent, params, state) {
       rcType: C.PARAMETER,
       defaultVal: p.defaultVal,
       description: p.description,
-      positionalOnly: p.positionalOnly,
+      passingStyle: p.passingStyle,
     });
     paramIdsInOrder.push(info.id);
     if (!existingId) {

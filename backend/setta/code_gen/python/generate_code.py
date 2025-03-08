@@ -2,7 +2,7 @@ from setta.code_gen.export_selected import get_gen_code_template_var
 from setta.code_gen.python.make_parseable import make_parseable
 from setta.utils.utils import replace_at_positions
 
-from ...utils.constants import C
+from ...utils.constants import C, ParameterPassingStyle
 from ..utils import push_var_deep
 from .ast_utils import find_missing_imports, find_top_level_symbols
 
@@ -12,13 +12,22 @@ def get_import_text(code, chars_before_template_var):
     return f"\n{chars_before_template_var}".join(imports)
 
 
-def get_mappings(var_names, selected, is_dict, positionalOnlyParams=None):
+def get_mappings(var_names, selected, is_dict=False, passingStyles=None):
+    if passingStyles is None:
+        passingStyles = {}
     output = ""
     relative_positions = []
     curr_position = 0
     for idx, v in enumerate(var_names):
         prefix = "" if idx == 0 else ", "
-        if is_dict or v not in positionalOnlyParams:
+        if passingStyles.get(v) == ParameterPassingStyle.ARGS:
+            prefix = "*"
+        elif passingStyles.get(v) == ParameterPassingStyle.KWARGS:
+            prefix = "**"
+        elif is_dict or (
+            passingStyles.get(v) == ParameterPassingStyle.DEFAULT
+            or passingStyles.get(v) == ParameterPassingStyle.KEYWORD_ONLY
+        ):
             var_decl_prefix = var_declaration(
                 selected[v]["name"],
                 v,
@@ -40,14 +49,12 @@ def get_dict_contents(var_names, selected):
     return get_mappings(var_names, selected, is_dict=True)
 
 
-def get_callable_params(var_names, positionalOnlyParams, selected):
-    return get_mappings(
-        var_names, selected, is_dict=False, positionalOnlyParams=positionalOnlyParams
-    )
+def get_callable_params(var_names, passingStyles, selected):
+    return get_mappings(var_names, selected, passingStyles=passingStyles)
 
 
 def get_list_of_vars(var_names):
-    return get_mappings(var_names, None, is_dict=False, positionalOnlyParams=var_names)
+    return get_mappings(var_names, None)
 
 
 def get_boolean(value):
@@ -97,7 +104,7 @@ def get_value(x, selected):
             prefix_len = len(prefix)
         else:
             output, relative_positions = get_callable_params(
-                x["value"]["usedParams"], x["value"]["positionalOnlyParams"], selected
+                x["value"]["usedParams"], x["value"]["passingStyles"], selected
             )
             prefix = f"{x['value']['callable']}("
             output = f"{prefix}{output})"
