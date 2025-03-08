@@ -57,7 +57,6 @@ def wrapper_parse_signature(signature, docstring, get_proposed_params):
         passingStyle = get_passing_style(
             idx, positional_only_indicator_idx, keyword_only_indicator_idx, name
         )
-        name = name.lstrip("*")
 
         if not default:
             default = ""
@@ -68,7 +67,7 @@ def wrapper_parse_signature(signature, docstring, get_proposed_params):
         # Append parsed information to list
         param_info_list.append(
             {
-                "name": name,
+                "name": name.lstrip("*"),
                 "defaultVal": default,
                 "description": description,
                 "passingStyle": passingStyle,
