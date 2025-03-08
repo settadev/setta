@@ -12,7 +12,7 @@
 
 ## News
 
-**March 5**: [v0.0.15](https://github.com/settadev/setta/releases/tag/v0.0.15)
+**March 7**: [v0.0.15](https://github.com/settadev/setta/releases/tag/v0.0.15)
 - Improved context menu organization.
 - Added ability to change size of artifacts while preserving aspect ratio.
 - Added Stop button for stopping subprocesses.
