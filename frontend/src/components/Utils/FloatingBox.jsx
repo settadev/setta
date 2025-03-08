@@ -1,5 +1,6 @@
 import C from "constants/constants.json";
 import _ from "lodash";
+import { Resizable } from "re-resizable";
 import React, { useEffect, useRef, useState } from "react";
 import { HiCheck, HiOutlineDuplicate } from "react-icons/hi";
 import { addSectionInEmptySpace } from "state/actions/sections/createSections";
@@ -67,16 +68,21 @@ export const FloatingBox = () => {
   return (
     <div
       id={TOOLTIP_DIV_ID}
+      className="absolute left-0 top-0 z-20"
       ref={boxRef}
-      className={`fixed left-0 top-0 z-50 flex max-h-96 w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
-      style={{
-        transform: `translate(${position.x}px, ${position.y}px)`,
-      }}
-      tabIndex="0"
+      style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
     >
-      <TooltipCopyButton item={contentArray[idx]} copied={copied} />
-      <TooltipPage item={contentArray[idx]} isFrozen={isFrozen} />
-      <TooltipPageCountIndicator numPages={contentArray.length} idx={idx} />
+      <Resizable
+        defaultSize={{
+          width: 256,
+        }}
+        className={`flex max-h-96 w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
+        tabIndex="0"
+      >
+        <TooltipCopyButton item={contentArray[idx]} copied={copied} />
+        <TooltipPage item={contentArray[idx]} isFrozen={isFrozen} />
+        <TooltipPageCountIndicator numPages={contentArray.length} idx={idx} />
+      </Resizable>
     </div>
   );
 };
