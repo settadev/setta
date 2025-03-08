@@ -23,10 +23,16 @@ export function ProjectPageSearchBar() {
 function ProjectPageSearchBarWrapper({ children }) {
   const mode = useProjectSearch((x) => x.mode);
 
-  if (mode === "find") {
-    return <ProjectPageFind>{children}</ProjectPageFind>;
+  switch (mode) {
+    case "find":
+      return <ProjectPageFind>{children}</ProjectPageFind>;
+    case "advanced":
+      return <ProjectPageAdvanced>{children}</ProjectPageAdvanced>;
+    case "commandPalette":
+      return <ProjectPageCommandPalette>{children}</ProjectPageCommandPalette>;
+    default:
+      return null;
   }
-  return <ProjectPageAdvanced>{children}</ProjectPageAdvanced>;
 }
 
 const ProjectPageSearchInput = React.forwardRef((props, ref) => {
@@ -62,6 +68,18 @@ function ProjectPageFind({ children }) {
 function ProjectPageAdvanced({ children }) {
   const allSections = useOverviewListing();
   const allItems = [{ group: "Sections", items: allSections }];
+
+  return (
+    <ProjectPageAdvancedCore allItems={allItems}>
+      {children}
+    </ProjectPageAdvancedCore>
+  );
+}
+
+function ProjectPageCommandPalette({ children }) {
+  const allSections = useOverviewListing();
+  const allItems = [{ group: "Sections", items: allSections }];
+  console.log("command palette activated");
 
   return (
     <ProjectPageAdvancedCore allItems={allItems}>
