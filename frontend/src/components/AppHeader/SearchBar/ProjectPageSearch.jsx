@@ -7,6 +7,7 @@ import {
 import { useIdNameCombobox } from "components/Utils/Combobox/useIdNameCombobox";
 import { getFloatingBoxHandlers } from "components/Utils/FloatingBox";
 import React, { useRef } from "react";
+import { useCreateSectionsList } from "state/actions/sections/createSectionsHelper";
 import { goToSection } from "state/actions/sections/sectionPositions";
 import { useProjectSearch } from "state/definitions";
 import { useUpdateProjectSearch } from "state/hooks/search";
@@ -77,14 +78,20 @@ function ProjectPageAdvanced({ children }) {
 }
 
 function ProjectPageCommandPalette({ children }) {
-  const allSections = useOverviewListing();
-  const allItems = [{ group: "Sections", items: allSections }];
+  // const allSections = useOverviewListing();
+  const allItems = useCreateSectionsList(() => {});
+  for (const g of allItems) {
+    for (const item of g.items) {
+      item.id = item.name;
+    }
+  }
+
   console.log("command palette activated");
 
   return (
-    <ProjectPageCommandPaletteCore allItems={allItems}>
+    <ProjectPageAdvancedCore allItems={allItems}>
       {children}
-    </ProjectPageCommandPaletteCore>
+    </ProjectPageAdvancedCore>
   );
 }
 
@@ -136,50 +143,50 @@ function ProjectPageAdvancedCore({ allItems, children }) {
   );
 }
 
-function ProjectPageCommandPaletteCore({ allItems, children }) {
-  function onSelectedItemChange(id) {
-    goToSection(id);
-    focusOnSection(null, id, false);
-  }
+// function ProjectPageCommandPaletteCore({ allItems, children }) {
+//   function onSelectedItemChange(id) {
+//     goToSection(id);
+//     focusOnSection(null, id, false);
+//   }
 
-  const {
-    isOpen,
-    filteredItems,
-    // getToggleButtonProps,
-    getMenuProps,
-    getInputProps,
-    highlightedIndex,
-    getItemProps,
-    itemToString,
-    onKeyDown,
-  } = useIdNameCombobox({
-    allItems,
-    onSelectedItemChange,
-  });
+//   const {
+//     isOpen,
+//     filteredItems,
+//     // getToggleButtonProps,
+//     getMenuProps,
+//     getInputProps,
+//     highlightedIndex,
+//     getItemProps,
+//     itemToString,
+//     onKeyDown,
+//   } = useIdNameCombobox({
+//     allItems,
+//     onSelectedItemChange,
+//   });
 
-  const inputRef = useRef();
+//   const inputRef = useRef();
 
-  return (
-    <>
-      {React.cloneElement(children, {
-        ...getInputProps({
-          onKeyDown,
-          ref: inputRef,
-        }),
-      })}
+//   return (
+//     <>
+//       {React.cloneElement(children, {
+//         ...getInputProps({
+//           onKeyDown,
+//           ref: inputRef,
+//         }),
+//       })}
 
-      <ComboboxList
-        isOpen={isOpen}
-        getMenuProps={getMenuProps}
-        inputRef={inputRef}
-      >
-        <ComboboxItems
-          filteredItems={filteredItems}
-          getItemProps={getItemProps}
-          highlightedIndex={highlightedIndex}
-          itemToString={itemToString}
-        />
-      </ComboboxList>
-    </>
-  );
-}
+//       <ComboboxList
+//         isOpen={isOpen}
+//         getMenuProps={getMenuProps}
+//         inputRef={inputRef}
+//       >
+//         <ComboboxItems
+//           filteredItems={filteredItems}
+//           getItemProps={getItemProps}
+//           highlightedIndex={highlightedIndex}
+//           itemToString={itemToString}
+//         />
+//       </ComboboxList>
+//     </>
+//   );
+// }
