@@ -1,6 +1,12 @@
 import C from "constants/constants.json";
+import _ from "lodash";
+import { useSectionInfos } from "state/definitions";
 
-export function getCreateSectionsList(getOnClickFn) {
+export function useCreateSectionsList(getOnClickFn) {
+  const singletonSections = useSectionInfos(
+    (x) => x.singletonSections,
+    _.isEqual,
+  );
   return [
     {
       group: "Section",
@@ -13,10 +19,12 @@ export function getCreateSectionsList(getOnClickFn) {
         {
           name: "Global Variables",
           fn: getOnClickFn({ type: C.GLOBAL_VARIABLES }),
+          doRender: !singletonSections[C.GLOBAL_VARIABLES],
         },
         {
-          name: "GLobal Param Sweep",
+          name: "Global Param Sweep",
           fn: getOnClickFn({ type: C.GLOBAL_PARAM_SWEEP }),
+          doRender: !singletonSections[C.GLOBAL_PARAM_SWEEP],
         },
       ],
     },

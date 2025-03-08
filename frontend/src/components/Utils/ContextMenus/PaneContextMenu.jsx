@@ -4,17 +4,13 @@ import { screenToFlowPosition } from "forks/xyflow/core/hooks/useViewportHelper"
 import _ from "lodash";
 import { closeAllContextMenus } from "state/actions/contextMenus";
 import { addSectionAtPosition } from "state/actions/sections/createSections";
-import { getCreateSectionsList } from "state/actions/sections/createSectionsHelper";
+import { useCreateSectionsList } from "state/actions/sections/createSectionsHelper";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
 import { useContextMenus, useSectionInfos } from "state/definitions";
 import { ContextMenuCore } from "./ContextMenuCore";
 
 export function PaneContextMenu() {
   const { isOpen, x, y } = useContextMenus((x) => x.pane, _.isEqual);
-  const singletonSections = useSectionInfos(
-    (x) => x.singletonSections,
-    _.isEqual,
-  );
 
   function getOnClickFn(specificProps) {
     return () => {
@@ -30,7 +26,7 @@ export function PaneContextMenu() {
     };
   }
 
-  const contextMenuItems = getCreateSectionsList(getOnClickFn);
+  const contextMenuItems = useCreateSectionsList(getOnClickFn);
 
   const itemStyle =
     "flex cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-[0.15rem] font-sans text-xs font-semibold text-setta-700 outline-none hover:bg-setta-100 hover:ring-0 focus-visible:ring-1 dark:text-setta-100 dark:hover:bg-setta-700 data-[disabled]:pointer-events-none group-data-[disabled]:text-setta-300 group-data-[disabled]:dark:text-setta-700";
@@ -52,17 +48,20 @@ export function PaneContextMenu() {
   );
 }
 
-function DropdownGroup({ name, items = [], children }) {
+function DropdownGroup({ name, items = [] }) {
   return (
     <DropdownMenu.Group>
       <DropdownMenu.Label className="mx-2 mb-1 mt-1.5 min-w-[100px] border-b border-setta-100 py-1 text-xs font-bold uppercase text-setta-300 dark:border-setta-700 dark:text-setta-500">
         {name}
       </DropdownMenu.Label>
-      {items.map((e) => (
-        <Item key={e.name} onClick={e.fn}>
-          {e.name}
-        </Item>
-      ))}
+      {items.map(
+        (e) =>
+          (e.doRender === undefined || e.doRender) && (
+            <Item key={e.name} onClick={e.fn}>
+              {e.name}
+            </Item>
+          ),
+      )}
     </DropdownMenu.Group>
   );
 }
