@@ -94,7 +94,7 @@ CODE_INFO_TABLE_DATA_JSON_FIELDS = set(
         "rcType",
         "defaultVal",
         "description",
-        "positionalOnly",
+        "passingStyle",
         "isPinned",
         "isFrozen",
         "ignoreTypeErrors",
@@ -159,3 +159,11 @@ UI_TYPE_TABLE_DATA_JSON_FIELDS = set(
 PROJECT_CONFIG_TABLE_DATA_JSON_FIELDS = set(
     ["viewport", "previewImgColor", "viewingEditingMode"]
 )
+
+
+class ParameterPassingStyle:
+    NONE = None
+    ARGS = "ARGS"
+    KWARGS = "KWARGS"
+    POSITIONAL_ONLY = "POSITIONAL_ONLY"
+    KEYWORD_ONLY = "KEYWORD_ONLY"
