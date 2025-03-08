@@ -18,6 +18,13 @@ export async function dbSendProjectToInteractiveCode(projects) {
   });
 }
 
+export async function dbKillInMemorySubprocesses() {
+  return await post({
+    body: {},
+    address: C.ROUTE_KILL_IN_MEMORY_SUBPROCESSES,
+  });
+}
+
 export async function dbFormateCode() {
   const project = getProjectData({});
   const candidateTemplateVars = {};

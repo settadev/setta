@@ -15,6 +15,7 @@ import {
   PROJECT_CONFIG_PREVIEW_IMG_COLORS,
 } from "utils/constants";
 import { maybeRunGuiToYamlOnAllSections } from "../guiToYaml";
+import { getSectionVisibilityKeyForDisplay } from "../sectionInfos";
 import { maybeIncrementProjectStateVersion } from "../undo";
 
 export async function loadProjectConfig({ projectConfigName }) {
@@ -67,7 +68,7 @@ export async function loadProjectState({
   });
   useSectionColumnWidth.setState(_.mapValues(sections, (x) => x.columnWidth));
   useNodeInternals.setState({
-    x: createNodesMapFromProjectConfigChildren(projectConfig),
+    x: createNodesMapFromProjectConfigChildren(projectConfig, sections),
   });
   await maybeRunGuiToYamlOnAllSections();
   maybeIncrementProjectStateVersion(true, false);
@@ -101,8 +102,11 @@ export function useNavigateToAnotherConfig() {
   };
 }
 
-function createNodesMapFromProjectConfigChildren(projectConfig) {
+function createNodesMapFromProjectConfigChildren(projectConfig, sections) {
   const nodesMap = new Map();
+  const visibilityKey = getSectionVisibilityKeyForDisplay(
+    projectConfig.viewingEditingMode,
+  );
 
   for (let k of Object.keys(projectConfig.children)) {
     const v = projectConfig.children[k];
@@ -111,7 +115,7 @@ function createNodesMapFromProjectConfigChildren(projectConfig) {
       position: { x: v.x, y: v.y },
       zIndex: v.zIndex,
       tempZIndex: v.zIndex,
-      visibility: true,
+      visibility: sections[k].visibility[visibilityKey],
     });
   }
 

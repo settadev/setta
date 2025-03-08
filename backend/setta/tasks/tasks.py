@@ -64,6 +64,7 @@ class Tasks:
         message: TaskMessage,
         websocket_manager=None,
         call_all=False,
+        call_fns_with_empty_dependency_array=False,
         subprocess_key=None,
         project_config_id=None,
         section_id=None,
@@ -87,10 +88,8 @@ class Tasks:
             # For each matching subprocess, collect all functions that need to be called
             fns_to_call = []
             for fn_name, fnInfo in sp_info["fnInfo"].items():
-                if (
-                    call_all
-                    or None in fnInfo["dependencies"]
-                    or any(k in fnInfo["dependencies"] for k in message.content.keys())
+                if call_fn_condition(
+                    call_all, call_fns_with_empty_dependency_array, fnInfo, message
                 ):
                     fns_to_call.append(fn_name)
 
@@ -143,22 +142,27 @@ class Tasks:
     ):
         # Process each function sequentially for this subprocess
         for fn_name in fn_names:
-            # Send message to subprocess
-            subprocess.parent_conn.send(
-                {
-                    "type": call_type,
-                    "fn_name": fn_name,
-                    "message": message,
-                    "other_data": other_data,
-                }
-            )
+            try:
+                # Send message to subprocess
+                subprocess.parent_conn.send(
+                    {
+                        "type": call_type,
+                        "fn_name": fn_name,
+                        "message": message,
+                        "other_data": other_data,
+                    }
+                )
 
-            # Wait for and handle the response before sending the next message
-            start_time = time.perf_counter()
-            result = await self.task_runner.run(
-                subprocess.parent_conn.recv, [], RunType.THREAD
-            )
-            elapsed_time = time.perf_counter() - start_time
+                # Wait for and handle the response before sending the next message
+                start_time = time.perf_counter()
+                result = await self.task_runner.run(
+                    subprocess.parent_conn.recv, [], RunType.THREAD
+                )
+                elapsed_time = time.perf_counter() - start_time
+            except Exception as e:
+                logger.debug("error while sending or receiving from subprocess")
+                results.append({"content":[e]})
+                continue
 
             if result["status"] == "success":
                 self.update_average_subprocess_fn_time(
@@ -231,7 +235,7 @@ class Tasks:
     ):
         initial_result = await self.call_in_memory_subprocess_fn(
             TaskMessage(id=create_new_id(), content={}),
-            call_all=True,
+            call_fns_with_empty_dependency_array=True,
             project_config_id=project_config_id,
             idx=idx,
             call_type="call_with_new_exporter_obj",
@@ -240,10 +244,15 @@ class Tasks:
 
         return initial_result["content"]
 
-    def close(self):
+    def kill_in_memory_subprocesses(self):
         self.stop_event.set()
         for v in self.in_memory_subprocesses.values():
             v["subprocess"].close()
+        self.in_memory_subprocesses = {}
+        self.stop_event.clear()
+
+    def close(self):
+        self.kill_in_memory_subprocesses()
 
     def update_average_subprocess_fn_time(self, subprocess_key, fn_name, new_time):
         fnInfo = self.in_memory_subprocesses[subprocess_key]["fnInfo"][fn_name]
@@ -305,3 +314,17 @@ def match_subprocess_key(
         return False
 
     return True
+
+
+def call_fn_condition(call_all, call_fns_with_empty_dependency_array, fnInfo, message):
+    return (
+        call_all
+        or (call_fns_with_empty_dependency_array and not fnInfo["dependencies"])
+        or (
+            not call_fns_with_empty_dependency_array
+            and (
+                None in fnInfo["dependencies"]
+                or any(k in fnInfo["dependencies"] for k in message.content)
+            )
+        )
+    )

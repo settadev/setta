@@ -12,28 +12,17 @@
 
 ## News
 
+**March 5**: [v0.0.15](https://github.com/settadev/setta/releases/tag/v0.0.15)
+- Improved context menu organization.
+- Added ability to change size of artifacts while preserving aspect ratio.
+- Added Stop button for stopping subprocesses.
+
 **March 5**: [v0.0.14](https://github.com/settadev/setta/releases/tag/v0.0.14)
 - Allow access to individual layers of Drawing sections, as well as the combined output.
 - Added button + shortcut for sending current full project state to in-memory functions.
 
-
 **March 4**: [v0.0.13](https://github.com/settadev/setta/releases/tag/v0.0.13)
 - Updated frontend javascript dependencies.
-
-
-**March 3**: [v0.0.12](https://github.com/settadev/setta/releases/tag/v0.0.12)
-- Moved the zoom/map/view controls into the left side pane:
-
-<table>
-  <tr>
-    <th width="50%">Before</th>
-    <th width="50%">After</th>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/2f7088fb-65ad-4744-b8d5-ea8c93c47962" /></td>
-    <td><img src="https://github.com/user-attachments/assets/aca41d9c-00e0-4853-81a7-a709c50f24fd" /></td>
-  </tr>
-</table>
 
 
 ## What does Setta do?

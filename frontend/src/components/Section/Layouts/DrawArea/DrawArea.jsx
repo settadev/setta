@@ -60,7 +60,9 @@ export function DrawArea({ sectionId }) {
     (a) => loadedArtifacts[a.artifactId]?.type === "brushStrokes",
   )?.artifactId;
 
-  const updateDrawAreas = useMisc((x) => x.updateDrawAreas);
+  const updateDrawArea = useMisc(
+    (x) => x.updateAllDrawAreas || x.updateDrawArea[sectionId],
+  );
   const layerIds = allLayersMetadata.map((x) => x.id);
 
   useEffect(() => {
@@ -90,8 +92,8 @@ export function DrawArea({ sectionId }) {
         state,
       });
     });
-    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
-  }, [height, width, JSON.stringify(layerIds), updateDrawAreas]);
+    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs, fnCanvasToBase64);
+  }, [height, width, JSON.stringify(layerIds), updateDrawArea]);
 
   useEffect(() => {
     setDraftCanvasProperties({
@@ -108,7 +110,7 @@ export function DrawArea({ sectionId }) {
     brushShape,
     brushOpacity,
     layerOpacity,
-    updateDrawAreas,
+    updateDrawArea,
   ]);
 
   useDeepCompareEffect(() => {
@@ -116,13 +118,13 @@ export function DrawArea({ sectionId }) {
       selectedIdx.current = null;
       resizeHandleCorners.current = null;
     }
-    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs);
+    drawAllLayers(sectionId, layerCanvasRefs, tempCanvasRefs, fnCanvasToBase64);
   }, [
     mode,
     layerOpacity,
     allLayersMetadata,
     loadedArtifactIdsWithDuplicates,
-    updateDrawAreas,
+    updateDrawArea,
   ]);
   // loadedArtifactIdsWithDuplicates contains all artifacts ids present in all layers
   // including duplicates (e.g. the same artifact present multiple times in a single layer, or across multiple layers)
@@ -135,7 +137,7 @@ export function DrawArea({ sectionId }) {
         useArtifacts.getState().x[currBrushStrokeArtifactId].value,
       );
     }
-  }, [currBrushStrokeArtifactId, updateDrawAreas]);
+  }, [currBrushStrokeArtifactId, updateDrawArea]);
 
   useDeepCompareEffectNoCheck(() => {
     if (!activeLayer?.artifactTransforms) {
@@ -145,7 +147,7 @@ export function DrawArea({ sectionId }) {
         activeLayer.artifactTransforms,
       );
     }
-  }, [activeLayer?.artifactTransforms, updateDrawAreas]);
+  }, [activeLayer?.artifactTransforms, updateDrawArea]);
 
   const { onMouseDown, onMouseMove, onMouseUp, onMouseEnter } =
     useDrawModeMouseHandlers({
@@ -185,6 +187,7 @@ export function DrawArea({ sectionId }) {
       layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
+      fnCanvasToBase64,
     );
   }
 

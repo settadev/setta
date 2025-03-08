@@ -9,7 +9,6 @@ import {
   getInverseTransform,
   getXY,
   RESIZE_HANDLE_SIZE,
-  sendDrawingToInteractiveTasks,
   setGlobalArtifactTransformsAndDrawAllLayers,
   setGlobalBrushStrokesAndDrawAllLayers,
   startNewEraserStroke,
@@ -76,13 +75,11 @@ export function useDrawModeMouseHandlers({
       activeLayerId,
       currBrushStrokeArtifactId,
       localArtifactTransformsRef,
+      fnCanvasToBase64,
     });
 
     onMouseDown = (...props) => {
       didChange = onMouseDownCore(...props);
-      if (didChange) {
-        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
-      }
     };
 
     const onMouseMoveCore = drawingOnMouseMove({
@@ -99,13 +96,11 @@ export function useDrawModeMouseHandlers({
       activeLayerId,
       currBrushStrokeArtifactId,
       localArtifactTransformsRef,
+      fnCanvasToBase64,
     });
 
     onMouseMove = (...props) => {
       didChange = onMouseMoveCore(...props);
-      if (didChange) {
-        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
-      }
     };
 
     const onMouseUpCore = drawingOnMouseUp({
@@ -120,13 +115,11 @@ export function useDrawModeMouseHandlers({
       layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
+      fnCanvasToBase64,
     });
 
     onMouseUp = (...props) => {
       didChange = onMouseUpCore(...props);
-      if (didChange) {
-        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
-      }
     };
 
     onMouseEnter = drawingOnMouseEnter({ draftCanvasRef, onMouseDown });
@@ -150,11 +143,11 @@ export function useDrawModeMouseHandlers({
           sectionId,
           layerCanvasRefs,
           tempCanvasRefs,
+          fnCanvasToBase64,
           {},
           { [activeLayerId]: localArtifactTransformsRef.current },
           { [activeLayerId]: resizeHandleCorners.current },
         );
-        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -177,11 +170,11 @@ export function useDrawModeMouseHandlers({
           sectionId,
           layerCanvasRefs,
           tempCanvasRefs,
+          fnCanvasToBase64,
           {},
           { [activeLayerId]: localArtifactTransformsRef.current },
           { [activeLayerId]: resizeHandleCorners.current },
         );
-        sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
       }
     };
 
@@ -195,11 +188,11 @@ export function useDrawModeMouseHandlers({
       localArtifactTransformsRef,
       layerCanvasRefs,
       tempCanvasRefs,
+      fnCanvasToBase64,
     });
 
     onMouseUp = (...props) => {
       onMouseUpCore(...props);
-      sendDrawingToInteractiveTasks(sectionId, fnCanvasToBase64);
     };
 
     onMouseEnter = () => {};
@@ -236,6 +229,7 @@ function drawingOnMouseDown({
   activeLayerId,
   currBrushStrokeArtifactId,
   localArtifactTransformsRef,
+  fnCanvasToBase64,
 }) {
   return (e, offsetX, offsetY) => {
     if (useMisc.getState().mouseDownDraggingSection) {
@@ -268,6 +262,7 @@ function drawingOnMouseDown({
         sectionId,
         layerCanvasRefs,
         tempCanvasRefs,
+        fnCanvasToBase64,
         {},
         {},
         {},
@@ -310,6 +305,7 @@ function drawingOnMouseMove({
   activeLayerId,
   currBrushStrokeArtifactId,
   localArtifactTransformsRef,
+  fnCanvasToBase64,
 }) {
   return (e) => {
     if (!isDrawing) {
@@ -330,6 +326,7 @@ function drawingOnMouseMove({
         sectionId,
         layerCanvasRefs,
         tempCanvasRefs,
+        fnCanvasToBase64,
         {},
         {},
         {},
@@ -343,6 +340,7 @@ function drawingOnMouseMove({
         layerCanvasRefs,
         tempCanvasRefs,
         draftCanvasRef,
+        fnCanvasToBase64,
         false,
       );
       const currentBrushStrokeTransformInfo =
@@ -380,6 +378,7 @@ function drawingOnMouseUp({
   layerCanvasRefs,
   tempCanvasRefs,
   draftCanvasRef,
+  fnCanvasToBase64,
 }) {
   return () => {
     if (!isDrawing) {
@@ -440,6 +439,7 @@ function drawingOnMouseUp({
       layerCanvasRefs,
       tempCanvasRefs,
       draftCanvasRef,
+      fnCanvasToBase64,
     );
 
     return true;
@@ -562,6 +562,8 @@ function editingOnMouseMove({
     const y = (e.clientY - rect.top) / zoom;
     const dx = x - lastPos.current.x;
     const dy = y - lastPos.current.y;
+    // Check if shift key is pressed to preserve aspect ratio
+    const preserveAspectRatio = e.shiftKey;
 
     if (isDragging.current && draggedIdx.current !== null) {
       const { transform } =
@@ -586,25 +588,108 @@ function editingOnMouseMove({
           resizeHandle.current.wasPositive.xScale,
           resizeHandle.current.wasPositive.yScale,
         );
-        handleBehaviorFn(
-          transform,
-          scaledWidth,
-          scaledHeight,
-          dx,
-          dy,
-          artifact,
-        );
+
+        if (preserveAspectRatio) {
+          // When preserving aspect ratio, use the dimension with the larger change
+          const aspectRatio = scaledWidth / scaledHeight;
+
+          // Always use the mouse movement as the dominant input
+          // If dx is close to zero, use dy as the primary change
+          // If dy is close to zero, use dx as the primary change
+          // Otherwise, use whichever has a larger absolute value
+
+          // Use a small threshold to prevent division by zero or tiny values
+          const epsilon = 0.001;
+          const absDx = Math.abs(dx);
+          const absDy = Math.abs(dy);
+
+          let newDx = dx;
+          let newDy = dy;
+
+          // Normalize the changes based on handle position and dominant dimension
+          if (absDx < epsilon && absDy < epsilon) {
+            // Both changes are too small, keep original values
+            newDx = dx;
+            newDy = dy;
+          } else if (absDx < epsilon) {
+            // Height change is dominant (dx is nearly zero)
+            newDx = (dy > 0 ? 1 : -1) * absDy * aspectRatio;
+            // Adjust direction based on handle
+            if (
+              resizeHandle.current.idx === 1 ||
+              resizeHandle.current.idx === 2
+            ) {
+              newDx = -newDx;
+            }
+          } else if (absDy < epsilon) {
+            // Width change is dominant (dy is nearly zero)
+            newDy = ((dx > 0 ? 1 : -1) * absDx) / aspectRatio;
+            // Adjust direction based on handle
+            if (
+              resizeHandle.current.idx === 1 ||
+              resizeHandle.current.idx === 2
+            ) {
+              newDy = -newDy;
+            }
+          } else if (absDx > absDy) {
+            // Width change is dominant
+            newDy = ((dx > 0 ? 1 : -1) * absDx) / aspectRatio;
+            // For top-right and bottom-left handles, flip the sign
+            if (
+              resizeHandle.current.idx === 1 ||
+              resizeHandle.current.idx === 2
+            ) {
+              newDy = -newDy;
+            }
+          } else {
+            // Height change is dominant
+            newDx = (dy > 0 ? 1 : -1) * absDy * aspectRatio;
+            // For top-right and bottom-left handles, flip the sign
+            if (
+              resizeHandle.current.idx === 1 ||
+              resizeHandle.current.idx === 2
+            ) {
+              newDx = -newDx;
+            }
+          }
+
+          handleBehaviorFn(
+            transform,
+            scaledWidth,
+            scaledHeight,
+            newDx,
+            newDy,
+            artifact,
+          );
+        } else {
+          // Original behavior without aspect ratio preservation
+          handleBehaviorFn(
+            transform,
+            scaledWidth,
+            scaledHeight,
+            dx,
+            dy,
+            artifact,
+          );
+        }
       } else if (artifact.type === "brushStrokes") {
         const bounds =
           getPseudoBoundsFromResizeHandleCorners(resizeHandleCorners);
         const width = bounds.maxX - bounds.minX;
         const height = bounds.maxY - bounds.minY;
 
+        // For each case, we'll modify handling when preserveAspectRatio is true
         switch (resizeHandle.current.idx) {
           case 0: {
             // Top-left
-            const scaleX = (width - dx) / width;
-            const scaleY = (height - dy) / height;
+            let scaleX = (width - dx) / width;
+            let scaleY = (height - dy) / height;
+
+            if (preserveAspectRatio) {
+              // Use the larger scale factor for both dimensions
+              const uniformScale = Math.max(scaleX, scaleY);
+              scaleX = scaleY = uniformScale;
+            }
 
             // Anchor point is bottom-right
             const anchorX = bounds.maxX;
@@ -619,8 +704,14 @@ function editingOnMouseMove({
           }
           case 1: {
             // Top-right
-            const scaleX = (width + dx) / width;
-            const scaleY = (height - dy) / height;
+            let scaleX = (width + dx) / width;
+            let scaleY = (height - dy) / height;
+
+            if (preserveAspectRatio) {
+              // Use the larger scale factor for both dimensions
+              const uniformScale = Math.max(scaleX, scaleY);
+              scaleX = scaleY = uniformScale;
+            }
 
             // Anchor point is bottom-left
             const anchorX = bounds.minX;
@@ -635,8 +726,14 @@ function editingOnMouseMove({
           }
           case 2: {
             // Bottom-left
-            const scaleX = (width - dx) / width;
-            const scaleY = (height + dy) / height;
+            let scaleX = (width - dx) / width;
+            let scaleY = (height + dy) / height;
+
+            if (preserveAspectRatio) {
+              // Use the larger scale factor for both dimensions
+              const uniformScale = Math.max(scaleX, scaleY);
+              scaleX = scaleY = uniformScale;
+            }
 
             // Anchor point is top-right
             const anchorX = bounds.maxX;
@@ -651,8 +748,14 @@ function editingOnMouseMove({
           }
           case 3: {
             // Bottom-right
-            const scaleX = (width + dx) / width;
-            const scaleY = (height + dy) / height;
+            let scaleX = (width + dx) / width;
+            let scaleY = (height + dy) / height;
+
+            if (preserveAspectRatio) {
+              // Use the larger scale factor for both dimensions
+              const uniformScale = Math.max(scaleX, scaleY);
+              scaleX = scaleY = uniformScale;
+            }
 
             // Anchor point is top-left
             const anchorX = bounds.minX;
@@ -667,13 +770,24 @@ function editingOnMouseMove({
         }
       }
 
-      incrementResizeHandleCorners(
-        resizeHandle,
-        resizeHandleCorners,
-        dx,
-        dy,
-        transform,
-      );
+      // When preserving aspect ratio, we need to update the corners based on
+      // the actual transform rather than the mouse movement
+      if (preserveAspectRatio && artifact) {
+        const bounds =
+          artifact.type === "img"
+            ? getImageBounds(artifact.value, transform)
+            : getBrushStrokesBounds(artifact.value, transform);
+
+        setResizeHandleCorners(resizeHandleCorners, bounds);
+      } else {
+        incrementResizeHandleCorners(
+          resizeHandle,
+          resizeHandleCorners,
+          preserveAspectRatio ? 0 : dx,
+          preserveAspectRatio ? 0 : dy,
+          transform,
+        );
+      }
 
       lastPos.current = { x, y };
     }
@@ -692,6 +806,7 @@ function editingOnMouseUp({
   localArtifactTransformsRef,
   layerCanvasRefs,
   tempCanvasRefs,
+  fnCanvasToBase64,
 }) {
   return () => {
     // have to update the corners
@@ -709,6 +824,7 @@ function editingOnMouseUp({
       resizeHandleCorners,
       layerCanvasRefs,
       tempCanvasRefs,
+      fnCanvasToBase64,
     );
     isDragging.current = false;
     draggedIdx.current = null;

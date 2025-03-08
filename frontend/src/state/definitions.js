@@ -221,7 +221,8 @@ export const useMisc = withProjectState(
         numDisplayedCodeAreas: 0,
         numInitializedCodeAreas: 0,
         requestUpdateNodeDimensions: false,
-        updateDrawAreas: 0, // increments every time we want to update
+        updateAllDrawAreas: 0,
+        updateDrawArea: {}, // sectionId to number that increments every time we want to update
         chartDisplayedSeriesNames: {}, //sectionId to series names
       })),
     ),

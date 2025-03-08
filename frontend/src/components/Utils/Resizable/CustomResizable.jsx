@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useEffect } from "react";
 import { setSelfParentSiblingChildrenWidths } from "state/actions/sections/sectionSizes";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
-import { useSectionInfos, useSettings } from "state/definitions";
+import { useMisc, useSectionInfos, useSettings } from "state/definitions";
 import { useShouldDisablePointerEvents } from "state/hooks/keyActivations";
 import { localStorageFns } from "state/hooks/localStorage";
 import { useSectionMinMaxDims } from "state/hooks/sectionSizes";
@@ -80,6 +80,7 @@ function CustomResizableCore({
     useSectionInfos.setState((state) => {
       setSectionResizeEvent(sectionId, "start", state);
     });
+    useMisc.setState({ mouseDownDraggingSection: true });
   }
 
   function onResizeStop(...props) {
@@ -92,6 +93,7 @@ function CustomResizableCore({
       setSelfParentSiblingChildrenWidths(sectionId, changedSize, state);
       setSectionResizeEvent(sectionId, "end", state);
     });
+    useMisc.setState({ mouseDownDraggingSection: false });
     maybeIncrementProjectStateVersion(true);
   }
 

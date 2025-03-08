@@ -41,7 +41,11 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
     updateInMemorySubprocessInfo(res.data.inMemorySubprocessInfo);
     await maybeGetNewArtifactIds(res.data.content);
     await updateInteractiveArtifacts(res.data.content);
-    setNotificationMessage("Done importing");
+    // TODO: status should not be 200.
+    // TODO: should say import failed or something
+    if (!res.data.exceptionOccurred) {
+      setNotificationMessage("Done importing");
+    }
   }
 }
 

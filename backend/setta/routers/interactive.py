@@ -68,9 +68,20 @@ async def route_update_interactive_code(
 
 async def process_returned_content_from_multiple_tasks(tasks, to_run):
     all_content = await asyncio.gather(*to_run)
-    content = [item for sublist in all_content for item in sublist]
+    content = []
+    exception_occurred = False
+    for sublist in all_content:
+        for item in sublist:
+            if isinstance(item, Exception):
+                exception_occurred = True
+            else:
+                content.append(item)
     inMemorySubprocessInfo = tasks.getInMemorySubprocessInfo()
-    return {"inMemorySubprocessInfo": inMemorySubprocessInfo, "content": content}
+    return {
+        "inMemorySubprocessInfo": inMemorySubprocessInfo,
+        "content": content,
+        "exceptionOccurred": exception_occurred,
+    }
 
 
 async def update_interactive_code(p, tasks, lsp_writers, idx):
@@ -137,6 +148,11 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
     )
 
     return initialContent
+
+
+@router.post(C.ROUTE_KILL_IN_MEMORY_SUBPROCESSES)
+async def route_kill_in_memory_subprocesses(tasks=Depends(get_tasks)):
+    tasks.kill_in_memory_subprocesses()
 
 
 @router.post(C.ROUTE_FORMAT_CODE)
