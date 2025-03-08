@@ -34,6 +34,8 @@ export function getIsSeriesElementHelper(
   _state = {},
 ) {
   const state = _state ?? useSectionInfos.getState();
+  // if (!state.x[sectionId]) return false;
+
   const { parentId } = state.x[sectionId];
   const uiTypeId = state.x[parentId]?.uiTypeId;
   return uiTypeId
