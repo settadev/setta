@@ -20,8 +20,6 @@ export const useFloatingBox = create(() => ({
 let mouseMoved = false;
 const TOOLTIP_DIV_ID = "setta-tooltip-floating-box";
 
-// Modify the FloatingBox component to add dragging functionality in freeze mode
-
 export const FloatingBox = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const { isEnabled, contentArray, isFrozen, idx, copied } = useFloatingBox();
@@ -117,7 +115,7 @@ export const FloatingBox = () => {
     >
       <MaybeResizable
         isFrozen={isFrozen}
-        className={`min-h-32q flex max-h-96 w-64 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
+        className={`min-h-32q flex max-h-96 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
         tabIndex="0"
       >
         {/* Add a drag handle when in frozen mode */}
@@ -167,13 +165,13 @@ const TooltipPage = React.memo(({ item, isFrozen }) => {
     <>
       {item.title && (
         <h3
-          className={`break-words pb-1 text-xs font-black uppercase text-setta-500 dark:text-setta-600 ${item.titleClassName}`}
+          className={`break-words pb-1 pr-4 text-xs font-black uppercase text-setta-500 dark:text-setta-600 ${item.titleClassName}`}
         >
           {item.title}
         </h3>
       )}
       <article
-        className={`flex-1 overflow-y-auto whitespace-pre-line break-words text-sm text-setta-700 dark:text-setta-300 ${item.contentClassName}`}
+        className={`flex-1 overflow-y-auto whitespace-pre-line break-words pr-4 text-sm text-setta-700 dark:text-setta-300 ${item.contentClassName}`}
       >
         {item.content}
       </article>
