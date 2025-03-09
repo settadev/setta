@@ -13,6 +13,7 @@ export function useCreateSectionsList() {
     { name: "Dict", specificProps: { type: C.DICT_ROOT } },
     { name: "Group", specificProps: { type: C.GROUP } },
     { name: "Text", specificProps: { type: C.TEXT_BLOCK } },
+    { name: "API", specificProps: { type: C.API } },
   ];
 
   if (!singletonSections[C.GLOBAL_VARIABLES]) {

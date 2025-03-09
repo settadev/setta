@@ -96,6 +96,16 @@ function getMenuItems(uiTypeName) {
         ClearValues,
         ResetToDefaultVersion,
       ];
+    case C.API:
+      return [
+        CreateNewVersionButton,
+        MultirunButton,
+        HideShowParamsButton,
+        HideShowUnpinnedParamsButton,
+        ShowYaml,
+        ClearValues,
+        ResetToDefaultVersion,
+      ];
     case C.GLOBAL_VARIABLES:
       return [
         CreateNewVersionButton,

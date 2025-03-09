@@ -1,3 +1,4 @@
+from .api_specs import router as api_specs_router
 from .artifact import router as artifact_router
 from .code_info import router as code_info_router
 from .in_memory_fn_stdout_websocket import router as in_memory_fn_stdout_router

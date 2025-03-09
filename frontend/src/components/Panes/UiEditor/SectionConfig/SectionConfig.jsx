@@ -2,6 +2,7 @@ import C from "constants/constants.json";
 import React from "react";
 import { getSectionType } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
+import { APIAreaSettings } from "./APIAreaSettings";
 import { ChartAreaSettings } from "./ChartAreaSettings";
 import { ChatAreaSettings } from "./ChatAreaSettings";
 import { CodeAreaSettings } from "./CodeAreaSettings";
@@ -49,5 +50,7 @@ function SpecializedConfiguration({ sectionId }) {
       return <IframeSettings sectionId={sectionId} />;
     case C.CHAT:
       return <ChatAreaSettings sectionId={sectionId} />;
+    case C.API:
+      return <APIAreaSettings sectionId={sectionId} />;
   }
 }
