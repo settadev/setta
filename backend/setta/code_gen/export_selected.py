@@ -283,6 +283,7 @@ class Exporter:
             C.CODE,
             C.GLOBAL_VARIABLES,
             C.TEXT_BLOCK,
+            C.API,
         ]
 
     def export(self):
@@ -383,6 +384,28 @@ class Exporter:
                 info["dependencies"] = []
                 info["ref_var_name_positions"] = []
                 self.output[var_name] = info
+            elif type == C.API:
+                (
+                    used_params,
+                    unused_params,
+                    positionalOnlyParams,
+                ) = self.export_section_params(id)
+                url_info = get_selected_item(self.p, id)
+                callable = "requests.get" if url_info["apiRequestType"] == "get" else "requests.post"
+                info["value"] = {
+                    "url": url_info["name"],
+                    "callable": callable,
+                    "usedParams": used_params,
+                    "unusedParams": unused_params,
+                    "positionalOnlyParams": positionalOnlyParams,
+                }
+                info["dependencies"] = used_params
+                info["ref_var_name_positions"] = []
+                self.output[var_name] = info
+
+
+
+
             else:
                 raise ValueError
         return var_name

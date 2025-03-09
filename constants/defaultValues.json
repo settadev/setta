@@ -96,7 +96,8 @@
     "isFrozen": false,
     "isSelected": false,
     "evRefs": [],
-    "ignoreTypeErrors": false
+    "ignoreTypeErrors": false,
+    "apiRequestType": null
   },
   "codeInfoCol": {
     "children": { "null": [] }
