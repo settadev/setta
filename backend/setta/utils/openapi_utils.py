@@ -2,11 +2,9 @@ import hashlib
 import json
 import logging
 from datetime import datetime, timedelta
-from pathlib import Path
-from urllib.parse import urlparse
 
 import requests
-import yaml
+from openapi_core import OpenAPI
 
 from setta.utils.constants import API_SPECS_FOLDER
 
@@ -16,13 +14,13 @@ logger = logging.getLogger(__name__)
 def get_openapi_spec(api_url):
     """
     Downloads and caches OpenAPI specs locally in the setta_files folder structure.
-    Handles both JSON and YAML formats.
+    Uses openapi_core to parse the specification.
 
     Args:
         api_url: URL to the OpenAPI specification
 
     Returns:
-        dict: The parsed OpenAPI specification
+        OpenAPI: The parsed OpenAPI specification object or None if parsing fails
     """
     # Create specs directory if it doesn't exist
     API_SPECS_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -30,14 +28,7 @@ def get_openapi_spec(api_url):
     # Create a filename based on URL hash
     url_hash = hashlib.md5(api_url.encode()).hexdigest()
     metadata_file = API_SPECS_FOLDER / f"{url_hash}.meta.json"
-
-    # Determine file format from URL extension
-    url_path = urlparse(api_url).path
-    is_yaml = url_path.endswith((".yaml", ".yml"))
-
-    # Set cache file extension based on format
-    file_ext = ".yaml" if is_yaml else ".json"
-    cache_file = API_SPECS_FOLDER / f"{url_hash}{file_ext}"
+    cache_file = API_SPECS_FOLDER / f"{url_hash}.spec"
 
     # Check if we have a cached version that's less than 24 hours old
     if metadata_file.exists() and cache_file.exists():
@@ -47,83 +38,93 @@ def get_openapi_spec(api_url):
         last_updated = datetime.fromisoformat(metadata["last_updated"])
         if datetime.now() - last_updated < timedelta(hours=24):
             # Use cached version
-            return load_spec(cache_file)
+            try:
+                # Use openapi_core to load and validate the spec
+                return OpenAPI.from_file_path(cache_file)
+            except Exception as e:
+                logger.error(f"Error loading cached spec: {str(e)}")
 
     # Download fresh copy
     try:
         response = requests.get(api_url)
         response.raise_for_status()
 
-        # Get content as text since we don't know the format yet
-        content = response.text
+        # Save raw content directly to file
+        with cache_file.open("wb") as f:
+            f.write(response.content)
 
-        # Parse content based on format
-        if is_yaml:
-            spec = yaml.safe_load(content)
-            # Save as YAML
-            with cache_file.open("w") as f:
-                yaml.dump(spec, f, sort_keys=False)
-        else:
-            # Try JSON format
-            try:
-                spec = json.loads(content)
-                # Save as JSON
-                with cache_file.open("w") as f:
-                    json.dump(spec, f, indent=2)
-            except json.JSONDecodeError:
-                # Maybe it's YAML even though the extension doesn't indicate it
-                spec = yaml.safe_load(content)
-                # Change file extension
-                cache_file = API_SPECS_FOLDER / f"{url_hash}.yaml"
-                with cache_file.open("w") as f:
-                    yaml.dump(spec, f, sort_keys=False)
+        # Use openapi_core to load and validate the spec
+        try:
+            spec = OpenAPI.from_file_path(cache_file)
+            info = get_api_info(spec)
 
-        # Save metadata with human-readable name for UI display
-        metadata = {
-            "url": api_url,
-            "last_updated": datetime.now().isoformat(),
-            "api_name": extract_api_name(spec, api_url),
-            "version": extract_api_version(spec),
-            "format": "yaml" if is_yaml else "json",
-            "cache_path": str(
-                cache_file
-            ),  # Convert Path to string for JSON serialization
-        }
-        with metadata_file.open("w") as f:
-            json.dump(metadata, f, indent=2)
+            # Save metadata
+            metadata = {
+                "url": api_url,
+                "last_updated": datetime.now().isoformat(),
+                "api_name": info["title"],
+                "version": info["version"],
+            }
+            with metadata_file.open("w") as f:
+                json.dump(metadata, f, indent=2)
 
-        return spec
+            return spec
+
+        except Exception as e:
+            logger.error(f"Error validating spec with openapi_core: {str(e)}")
+            return None
+
     except Exception as e:
+        logger.error(f"Error downloading or parsing spec: {str(e)}")
+
         # Return cached version if available, even if expired
         if cache_file.exists():
-            return load_spec(cache_file)
+            try:
+                return OpenAPI.from_file_path(cache_file)
+            except Exception as inner_e:
+                logger.error(f"Error loading cached spec file: {str(inner_e)}")
 
-        logger.debug(f"Failed to get OpenAPI spec from {api_url}: {str(e)}")
+        # Return None if all attempts fail
         return None
 
 
-def load_spec(file_path):
-    """Load a spec from file based on extension"""
-    file_path = Path(file_path)  # Convert to Path object if it's a string
-    ext = file_path.suffix
+def get_api_info(openapi_obj):
+    """
+    Extract API name, version, and other metadata from an OpenAPI object
 
-    with file_path.open("r") as f:
-        if ext.lower() in [".yaml", ".yml"]:
-            return yaml.safe_load(f)
-        else:
-            return json.load(f)
+    Args:
+        openapi_obj: The OpenAPI object returned by get_openapi_spec
 
+    Returns:
+        dict: Dictionary containing API metadata
+    """
+    if not openapi_obj or not hasattr(openapi_obj, "spec"):
+        return {"error": "Invalid OpenAPI object"}
 
-def extract_api_name(spec, fallback_url):
-    """Extract a human-readable API name from the spec"""
-    if "info" in spec and "title" in spec["info"]:
-        return spec["info"]["title"]
-    # Fallback to URL domain
-    return urlparse(fallback_url).netloc
+    # Get the raw specification dictionary
+    spec_dict = openapi_obj.spec.contents()
 
+    # Extract API information from the 'info' section
+    info = spec_dict.get("info", {})
 
-def extract_api_version(spec):
-    """Extract API version from the spec"""
-    if "info" in spec and "version" in spec["info"]:
-        return spec["info"]["version"]
-    return "unknown"
+    result = {
+        "title": info.get("title", "Unknown API"),
+        "version": info.get("version", "Unknown"),
+        "description": info.get("description", ""),
+    }
+
+    # Additional metadata if available
+    if "contact" in info:
+        result["contact"] = info["contact"]
+
+    if "license" in info:
+        result["license"] = info["license"]
+
+    if "termsOfService" in info:
+        result["termsOfService"] = info["termsOfService"]
+
+    # Server information if available
+    if "servers" in spec_dict and spec_dict["servers"]:
+        result["servers"] = spec_dict["servers"]
+
+    return result
