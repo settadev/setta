@@ -156,5 +156,12 @@
     "name": "",
     "presetType": "BASE",
     "config": {}
+  },
+  "d67b59ee-217c-4494-871a-547e3b30d331": {
+    "id": "d67b59ee-217c-4494-871a-547e3b30d331",
+    "type": "API",
+    "name": "",
+    "presetType": "BASE",
+    "config": {}
   }
 }
