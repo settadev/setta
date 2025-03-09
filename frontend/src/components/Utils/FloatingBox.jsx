@@ -6,6 +6,7 @@ import { HiCheck, HiOutlineDuplicate } from "react-icons/hi";
 import { addSectionInEmptySpace } from "state/actions/sections/createSections";
 import { maybeIncrementProjectStateVersion } from "state/actions/undo";
 import { useSectionInfos, useSettings } from "state/definitions";
+import { localStorageFns } from "state/hooks/localStorage";
 import { positiveMod, shortcutPrettified } from "utils/utils";
 import { create } from "zustand";
 
@@ -20,12 +21,13 @@ export const useFloatingBox = create(() => ({
 let mouseMoved = false;
 const TOOLTIP_DIV_ID = "setta-tooltip-floating-box";
 
-export const FloatingBox = () => {
+export function FloatingBox() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const { isEnabled, contentArray, isFrozen, idx, copied } = useFloatingBox();
   const boxRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const [tooltipWidth, setTooltipWidth] = localStorageFns.tooltipWidth.hook();
 
   // Store initial position when freezing
   useEffect(() => {
@@ -110,13 +112,21 @@ export const FloatingBox = () => {
       id={TOOLTIP_DIV_ID}
       className="absolute left-0 top-0 z-20"
       ref={boxRef}
-      style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        width: `${tooltipWidth}px`,
+      }}
       onMouseUp={handleMouseUp}
     >
       <MaybeResizable
         isFrozen={isFrozen}
-        className={`min-h-32q flex max-h-96 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
+        className={`flex max-h-96 min-h-32 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
         tabIndex="0"
+        tooltipWidth={tooltipWidth}
+        onResizeStop={(e, direction, ref, d) => {
+          setTooltipWidth(tooltipWidth + d.width);
+        }}
+        width={tooltipWidth}
       >
         {/* Add a drag handle when in frozen mode */}
         {isFrozen && (
@@ -139,17 +149,32 @@ export const FloatingBox = () => {
       </MaybeResizable>
     </div>
   );
-};
+}
 
-function MaybeResizable({ isFrozen, className, tabIndex, children }) {
+function MaybeResizable({
+  isFrozen,
+  className,
+  tabIndex,
+  children,
+  onResizeStop,
+  width,
+}) {
   return isFrozen ? (
     <Resizable
-      defaultSize={{
-        width: 256,
-      }}
-      midWidth="256px"
+      width={width}
       className={className}
       tabIndex={tabIndex}
+      onResizeStop={onResizeStop}
+      enable={{
+        top: false,
+        right: true,
+        bottom: true,
+        left: false,
+        topRight: false,
+        bottomRight: true,
+        bottomLeft: false,
+        topLeft: false,
+      }}
     >
       {children}
     </Resizable>
