@@ -64,6 +64,7 @@ async def lifespan(app: FastAPI):
     app.state.dbq = DBQueue(
         C.DB_PATH,
     )
+    app.state.api_specs_in_memory = {}
 
     maybe_create_tables_and_seed(
         app.state.dbq,

@@ -11,6 +11,12 @@ export function APIAreaSettings({ sectionId }) {
     setValue(e.target.value);
   }
 
+  function onBlur() {
+    useSectionInfos.setState((state) => {
+      state.x[sectionId].apiSpecs = value;
+    });
+  }
+
   useEffect(() => {
     setValue(apiSpecs ?? "");
   }, [apiSpecs]);
@@ -29,6 +35,7 @@ export function APIAreaSettings({ sectionId }) {
           className="mr-[2px] w-full truncate rounded-full bg-white px-4 py-1 text-sm text-setta-700 ring-2 ring-setta-200 focus:ring-2 focus:ring-blue-500 dark:bg-setta-900 dark:text-setta-400 dark:ring-setta-700"
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
         />
       </div>
       <div className="flex justify-end">

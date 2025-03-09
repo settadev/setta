@@ -128,3 +128,50 @@ def get_api_info(openapi_obj):
         result["servers"] = spec_dict["servers"]
 
     return result
+
+
+def get_endpoints_from_spec(openapi_obj):
+    """
+    Extract endpoint information from an OpenAPI object
+
+    Args:
+        openapi_obj: The OpenAPI object returned by get_openapi_spec
+
+    Returns:
+        list: List of dictionaries containing endpoint information
+    """
+    if not openapi_obj or not hasattr(openapi_obj, "spec"):
+        return []
+
+    # Get the raw specification dictionary
+    spec_dict = openapi_obj.spec.contents()
+
+    endpoints = []
+    paths_dict = spec_dict.get("paths", {})
+
+    for path, path_item in paths_dict.items():
+        for method, operation in path_item.items():
+            # Skip non-operation keys
+            if method not in [
+                "get",
+                "post",
+                "put",
+                "delete",
+                "patch",
+                "options",
+                "head",
+            ]:
+                continue
+
+            endpoint_info = {
+                "path": path,
+                "method": method.upper(),
+                "summary": operation.get("summary", ""),
+                "description": operation.get("description", ""),
+                "operationId": operation.get("operationId", ""),
+                "tags": operation.get("tags", []),
+            }
+
+            endpoints.append(endpoint_info)
+
+    return endpoints
