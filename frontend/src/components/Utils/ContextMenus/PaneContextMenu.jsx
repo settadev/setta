@@ -47,8 +47,8 @@ export function PaneContextMenu() {
 
 function DropdownGroup({ name, items = [], onClick }) {
   return (
-    <DropdownMenu.Group>
-      <DropdownMenu.Label className="mx-2 mb-1 mt-1.5 min-w-[100px] border-b border-setta-100 py-1 text-xs font-bold uppercase text-setta-300 dark:border-setta-700 dark:text-setta-500">
+    <DropdownMenu.Group className="[&:not(:first-child)]:mt-1.5">
+      <DropdownMenu.Label className="menulabel mx-2 mb-1  min-w-[100px] border-b border-setta-100 py-1 text-xs font-bold uppercase text-setta-300 dark:border-setta-700 dark:text-setta-500">
         {name}
       </DropdownMenu.Label>
       {items.map((e) => (
