@@ -3,7 +3,14 @@ import { IoClose } from "react-icons/io5";
 
 export function NotificationsArea() {
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-4 overflow-y-auto">
+      <NotificationItem />
+      <NotificationItem />
+      <NotificationItem />
+      <NotificationItem />
+      <NotificationItem />
+      <NotificationItem />
+      <NotificationItem />
       <NotificationItem />
       <NotificationItem />
       <NotificationItem />
