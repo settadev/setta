@@ -7,26 +7,31 @@ export function useCreateSectionsList() {
     (x) => x.singletonSections,
     _.isEqual,
   );
+  const sectionGroupItems = [
+    { name: "Section", specificProps: { type: C.SECTION } },
+    { name: "List", specificProps: { type: C.LIST_ROOT } },
+    { name: "Dict", specificProps: { type: C.DICT_ROOT } },
+    { name: "Group", specificProps: { type: C.GROUP } },
+    { name: "Text", specificProps: { type: C.TEXT_BLOCK } },
+  ];
+
+  if (!singletonSections[C.GLOBAL_VARIABLES]) {
+    sectionGroupItems.push({
+      name: "Global Variables",
+      specificProps: { type: C.GLOBAL_VARIABLES },
+    });
+  }
+  if (!singletonSections[C.GLOBAL_PARAM_SWEEP]) {
+    sectionGroupItems.push({
+      name: "Global Param Sweep",
+      specificProps: { type: C.GLOBAL_PARAM_SWEEP },
+    });
+  }
+
   return [
     {
       group: "Section",
-      items: [
-        { name: "Section", specificProps: { type: C.SECTION } },
-        { name: "List", specificProps: { type: C.LIST_ROOT } },
-        { name: "Dict", specificProps: { type: C.DICT_ROOT } },
-        { name: "Group", specificProps: { type: C.GROUP } },
-        { name: "Text", specificProps: { type: C.TEXT_BLOCK } },
-        {
-          name: "Global Variables",
-          specificProps: { type: C.GLOBAL_VARIABLES },
-          doRender: !singletonSections[C.GLOBAL_VARIABLES],
-        },
-        {
-          name: "Global Param Sweep",
-          specificProps: { type: C.GLOBAL_PARAM_SWEEP },
-          doRender: !singletonSections[C.GLOBAL_PARAM_SWEEP],
-        },
-      ],
+      items: sectionGroupItems,
     },
     {
       group: "Code",

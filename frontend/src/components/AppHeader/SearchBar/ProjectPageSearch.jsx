@@ -163,6 +163,7 @@ function ProjectPageAdvancedCore({ allItems, onSelectedItemChange, children }) {
   } = useIdNameCombobox({
     allItems,
     onSelectedItemChange,
+    clearInputAfterSelection: true,
   });
 
   const inputRef = useRef();
