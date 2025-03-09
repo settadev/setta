@@ -20,24 +20,46 @@ export const useFloatingBox = create(() => ({
 let mouseMoved = false;
 const TOOLTIP_DIV_ID = "setta-tooltip-floating-box";
 
+// Modify the FloatingBox component to add dragging functionality in freeze mode
+
 export const FloatingBox = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const { isEnabled, contentArray, isFrozen, idx, copied } = useFloatingBox();
   const boxRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
 
+  // Store initial position when freezing
+  useEffect(() => {
+    if (isFrozen) {
+      // Save current position when freezing
+      const initialPos = { ...position };
+      setPosition(initialPos);
+    }
+  }, [isFrozen]);
+
+  // Handle mouse movement for both following cursor and dragging
   useEffect(() => {
     const handleMouseMove = (event) => {
       mouseMoved = true;
+
       if (!isFrozen) {
+        // Regular behavior: follow the mouse when not frozen
         setPosition({ x: event.clientX + 10, y: event.clientY + 10 });
+      } else if (isDragging) {
+        // Only update position when explicitly dragging in frozen mode
+        setPosition({
+          x: event.clientX - dragStartRef.current.x,
+          y: event.clientY - dragStartRef.current.y,
+        });
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [isFrozen]);
+  }, [isFrozen, isDragging]);
 
-  // Ensure the box stays within viewport bounds
+  // Keep box within viewport bounds
   useEffect(() => {
     if (!boxRef.current || !isEnabled) return;
 
@@ -65,18 +87,54 @@ export const FloatingBox = () => {
   if (!isEnabled || !contentArray || contentArray.length === 0 || !mouseMoved)
     return null;
 
+  // Create a custom drag handle when in frozen mode
+  const dragHandleMouseDown = (event) => {
+    if (!isFrozen) return;
+
+    // Prevent default to avoid text selection during drag
+    event.preventDefault();
+
+    setIsDragging(true);
+    const rect = boxRef.current.getBoundingClientRect();
+    dragStartRef.current = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  };
+
+  // Handle mouse up to end dragging
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   return (
     <div
       id={TOOLTIP_DIV_ID}
       className="absolute left-0 top-0 z-20"
       ref={boxRef}
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+      onMouseUp={handleMouseUp}
     >
       <MaybeResizable
         isFrozen={isFrozen}
-        className={`flex max-h-96 min-h-32 w-64 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
+        className={`min-h-32q flex max-h-96 w-64 min-w-64 flex-col rounded-2xl border border-setta-200 bg-white p-4 shadow-lg focus:outline focus:outline-2 focus:outline-blue-600 dark:border-setta-700 dark:bg-setta-950 ${contentArray[idx].wrapperClassName}`}
         tabIndex="0"
       >
+        {/* Add a drag handle when in frozen mode */}
+        {isFrozen && (
+          <div
+            className="absolute left-0 right-0 top-0 h-8 cursor-move rounded-t-2xl bg-transparent"
+            onMouseDown={dragHandleMouseDown}
+            style={{
+              zIndex: 10, // Above other content but below copy button
+              marginTop: "4px", // Match the p-4 padding
+              marginLeft: "4px",
+              marginRight: "4px",
+              // Visualize the drag area subtly when debugging
+              // backgroundColor: 'rgba(0,0,255,0.1)'
+            }}
+          />
+        )}
         <TooltipCopyButton item={contentArray[idx]} copied={copied} />
         <TooltipPage item={contentArray[idx]} isFrozen={isFrozen} />
         <TooltipPageCountIndicator numPages={contentArray.length} idx={idx} />
