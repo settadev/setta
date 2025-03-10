@@ -99,6 +99,7 @@
   "ROUTE_RESTART_LANGUAGE_SERVER": "/restartLanguageServer",
   "ROUTE_FILE_WATCH_LIST": "/fileWatchList",
   "ROUTE_FETCH_API_SPECS": "/fetchAPISpecs",
+  "ROUTE_GET_LIST_OF_ENDPOINTS": "/getListOfEndpoints",
   "NESTED_PARAM": "NESTED_PARAM",
   "ARGS_PREFIX": "__",
   "TEMPLATE_PREFIX": "$",

@@ -391,9 +391,13 @@ class Exporter:
                     positionalOnlyParams,
                 ) = self.export_section_params(id)
                 url_info = get_selected_item(self.p, id)
-                callable = "requests.get" if url_info["apiRequestType"] == "get" else "requests.post"
+                if url_info:
+                    url = url_info["name"]
+                    callable = "requests.get" if url_info["apiRequestType"] == "get" else "requests.post"
+                else:
+                    url, callable = None, None
                 info["value"] = {
-                    "url": url_info["name"],
+                    "url": url,
                     "callable": callable,
                     "usedParams": used_params,
                     "unusedParams": unused_params,
@@ -402,10 +406,6 @@ class Exporter:
                 info["dependencies"] = used_params
                 info["ref_var_name_positions"] = []
                 self.output[var_name] = info
-
-
-
-
             else:
                 raise ValueError
         return var_name

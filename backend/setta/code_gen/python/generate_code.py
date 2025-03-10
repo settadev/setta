@@ -118,12 +118,15 @@ def get_value(x, selected):
             {**r, "startPos": r["startPos"] + 1} for r in relative_positions
         ]
     elif type_value == C.API:
-        output, relative_positions = get_callable_params(
-            x["value"]["usedParams"], x["value"]["positionalOnlyParams"], selected
-        )
-        prefix = f"{x['value']['callable']}({x['value']['url']}, "
-        output = f"{prefix}{output})"
-        prefix_len = len(prefix)
+        if not x['value']['callable']:
+            output = "{}"
+        else:
+            output, relative_positions = get_callable_params(
+                x["value"]["usedParams"], x["value"]["positionalOnlyParams"], selected
+            )
+            prefix = f"{x['value']['callable']}({x['value']['url']}, "
+            output = f"{prefix}{output})"
+            # prefix_len = len(prefix)
     else:
         output = None
         relative_positions = []

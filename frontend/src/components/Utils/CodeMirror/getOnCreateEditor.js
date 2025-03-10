@@ -1,5 +1,8 @@
+import C from "constants/constants.json";
 import { useReactFlow } from "forks/xyflow/core/store";
+import { dbGetListOfEndpoints } from "requests/apiSpecs";
 import { setTextFieldWaitingForLSP } from "state/actions/lsp";
+import { getSectionType } from "state/actions/sectionInfos";
 import { goToSection } from "state/actions/sections/sectionPositions";
 import { useEVRefRegex } from "state/definitions";
 import { roundUpIdx } from "./utils";
@@ -94,6 +97,28 @@ export function getCompletionsFn(
   language,
 ) {
   if (language === "python") {
+    if (!paramInfoId && getSectionType(sectionId) === C.API) {
+      return async (context) => {
+        const fullText = context.state.doc.toString();
+        if (!fullText.trim()) return null;
+        const before = context.matchBefore(/([^.=\\(+-\/ ]*)$/);
+        const setToNotWaiting = setTextFieldWaitingForLSP({
+          sectionId,
+          paramInfoId,
+        });
+        const res = await dbGetListOfEndpoints(sectionId);
+        setToNotWaiting();
+        if (res.data) {
+          return {
+            filter: true,
+            ...getFromTo(res.data, before, context),
+            options: res.data,
+            // validFor: /([^.=\\(]*)$/,
+          };
+        }
+        return null;
+      };
+    }
     return async (context) => {
       const fullText = context.state.doc.toString();
       if (!fullText.trim()) return null;

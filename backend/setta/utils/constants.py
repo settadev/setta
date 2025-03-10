@@ -123,7 +123,7 @@ SECTION_TABLE_DATA_JSON_FIELDS = set(
         "isReadOnlyTerminal",
         "subprocessStartMethod",
         "headingAsSectionName",
-        "apiSpecs",
+        "apiSpecsURL",
     )
 )
 

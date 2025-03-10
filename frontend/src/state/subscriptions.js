@@ -230,6 +230,7 @@ function regexSubscriptionFn(x) {
           C.DICT_ROOT,
           C.GROUP,
           C.TEXT_BLOCK,
+          C.API,
         ].includes(sectionTypeName),
     };
 

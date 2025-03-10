@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { dbFetchAPISpecs } from "requests/api_specs";
+import { dbFetchAPISpecs } from "requests/apiSpecs";
 import { useSectionInfos } from "state/definitions";
 
 // TODO: enable this stuff again, but it should show jsonSourceGlob I guess
 export function APIAreaSettings({ sectionId }) {
-  const apiSpecs = useSectionInfos((x) => x.x[sectionId].apiSpecs);
-  const [value, setValue] = useState(apiSpecs ?? "");
+  const apiSpecsURL = useSectionInfos((x) => x.x[sectionId].apiSpecsURL);
+  const [value, setValue] = useState(apiSpecsURL ?? "");
 
   function onChange(e) {
     setValue(e.target.value);
@@ -13,13 +13,13 @@ export function APIAreaSettings({ sectionId }) {
 
   function onBlur() {
     useSectionInfos.setState((state) => {
-      state.x[sectionId].apiSpecs = value;
+      state.x[sectionId].apiSpecsURL = value;
     });
   }
 
   useEffect(() => {
-    setValue(apiSpecs ?? "");
-  }, [apiSpecs]);
+    setValue(apiSpecsURL ?? "");
+  }, [apiSpecsURL]);
 
   async function onClick() {
     await dbFetchAPISpecs(value);
