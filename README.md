@@ -12,6 +12,11 @@
 
 ## News
 
+**March 10**: [v0.0.16](https://github.com/settadev/setta/releases/tag/v0.0.16)
+- Made tooltips resizable and draggable.
+- Added command palette.
+- Improved code generation to account for different argument-passing styles.
+
 **March 7**: [v0.0.15](https://github.com/settadev/setta/releases/tag/v0.0.15)
 - Improved context menu organization.
 - Added ability to change size of artifacts while preserving aspect ratio.
@@ -20,10 +25,6 @@
 **March 5**: [v0.0.14](https://github.com/settadev/setta/releases/tag/v0.0.14)
 - Allow access to individual layers of Drawing sections, as well as the combined output.
 - Added button + shortcut for sending current full project state to in-memory functions.
-
-**March 4**: [v0.0.13](https://github.com/settadev/setta/releases/tag/v0.0.13)
-- Updated frontend javascript dependencies.
-
 
 ## What does Setta do?
 
