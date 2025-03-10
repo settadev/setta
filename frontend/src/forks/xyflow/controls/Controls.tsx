@@ -52,7 +52,8 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
   const [snapToGrid] = localStorageFns.snapToGrid.hook();
   const [overviewWidth] = localStorageFns.overviewTrueWidth.hook();
   const [showMinimap] = localStorageFns.showMinimap.hook();
-  const styleForActive = " dark:!text-blue-600 !text-white";
+  const styleForActive =
+    "text-white bg-blue-500 dark:text-blue-600 dark:bg-transparent";
 
   useEffect(() => {
     setIsVisible(true);
@@ -77,7 +78,7 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
     >
       <button
         onClick={onZoomInHandler}
-        className="react-flow__controls-zoomin focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500"
+        className="react-flow__controls-zoomin cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-setta-600 dark:hover:text-setta-500"
         title="zoom in"
         aria-label="zoom in"
         disabled={maxZoomReached}
@@ -86,7 +87,7 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
       </button>
       <button
         onClick={onZoomOutHandler}
-        className="react-flow__controls-zoomout focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500"
+        className="react-flow__controls-zoomout cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-setta-600 dark:hover:text-setta-500"
         title="zoom out"
         aria-label="zoom out"
         disabled={minZoomReached}
@@ -94,7 +95,7 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
         <FaMinus size={15} />
       </button>
       <button
-        className={`react-flow__controls-fitview focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600  dark:hover:text-setta-500 ${fitViewOnInit ? styleForActive : ""}`}
+        className={`react-flow__controls-fitview cursor-pointer items-center justify-center overflow-clip rounded-md p-1  hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500  dark:hover:text-setta-500 ${fitViewOnInit ? styleForActive : "text-setta-400 dark:text-setta-600"}`}
         onClick={onFitViewHandler}
         title="fit view"
         aria-label="fit view"
@@ -116,19 +117,19 @@ const Controls: FC<PropsWithChildren<ControlProps>> = ({
       </button> */}
       <button
         onClick={toggleSnapToGrid}
-        className={`focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600  dark:hover:text-setta-500 overflow-clip${snapToGrid ? styleForActive : ""}`}
+        className={`cursor-pointer items-center justify-center overflow-clip rounded-md  p-1 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:text-setta-500 ${snapToGrid ? styleForActive : "text-setta-400 dark:text-setta-600"}`}
       >
         <TbGridDots size={15} />
       </button>
       <button
-        className="react-flow__controls-button focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500"
+        className="react-flow__controls-button cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-setta-600 dark:hover:text-setta-500"
         onClick={resetZoom}
       >
         <TbZoomReset size={15} />
       </button>
       <button
         onClick={toggleMiniMap}
-        className={`focus-visible:ring-light-blue-500 cursor-pointer items-center justify-center overflow-clip rounded-md p-1 text-setta-400 hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 dark:text-setta-600 dark:hover:text-setta-500 ${showMinimap ? styleForActive : ""}`}
+        className={`cursor-pointer items-center justify-center overflow-clip rounded-md p-1  hover:text-setta-600 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500  dark:hover:text-setta-500 ${showMinimap ? styleForActive : "text-setta-400 dark:text-setta-600"}`}
       >
         <IoMapOutline size={15} />
       </button>

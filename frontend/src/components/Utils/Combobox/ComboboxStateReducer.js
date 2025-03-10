@@ -62,6 +62,7 @@ function getReducerModifications({
   changes,
   items,
   selectedItemCanBeNull,
+  clearInputAfterSelection,
 }) {
   const changeTypes = useCombobox.stateChangeTypes;
 
@@ -83,6 +84,9 @@ function getReducerModifications({
       return getValueFromHighlightedIndex(items, changes.highlightedIndex);
     case changeTypes.InputKeyDownEnter:
       if (state.highlightedIndex !== -1) {
+        if (clearInputAfterSelection) {
+          return { inputValue: "" };
+        }
         return {};
       }
       // only do the following if no item is highlighted
@@ -91,7 +95,7 @@ function getReducerModifications({
         if (objContainingValue) {
           return {
             selectedItem: objContainingValue,
-            inputValue: objContainingValue.name,
+            inputValue: clearInputAfterSelection ? "" : objContainingValue.name,
           };
         }
       }
@@ -101,6 +105,10 @@ function getReducerModifications({
         return setSelectedItemToNull();
       }
       return resetToPreviousVal(state);
+    case changeTypes.ItemClick:
+      if (clearInputAfterSelection) {
+        return { inputValue: "" };
+      }
     default:
       return {};
   }
@@ -111,6 +119,7 @@ export function useComboboxStateReducerWithFilteredItems(
   value,
   setValue,
   selectedItemCanBeNull,
+  clearInputAfterSelection,
 ) {
   const [selection, setSelection] = useState(null);
   const [filteredItems, setFilteredItems] = useState(allItems);
@@ -177,6 +186,7 @@ export function useComboboxStateReducerWithFilteredItems(
       changes,
       items: latestItems,
       selectedItemCanBeNull,
+      clearInputAfterSelection,
     });
 
     return { ...changes, ...mods };
