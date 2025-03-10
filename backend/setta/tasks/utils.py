@@ -32,7 +32,7 @@ def import_code_from_string(code_string, module_name=None, add_to_sys_modules=Tr
 
     # Optionally add the module to sys.modules
     if add_to_sys_modules:
-        print(f"adding {module_name} to sys.modules", flush=True)
+        # print(f"adding {module_name} to sys.modules", flush=True)
         sys.modules[module_name] = module
 
     # Compile the code string
