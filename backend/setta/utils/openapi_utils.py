@@ -175,3 +175,126 @@ def get_endpoints_from_spec(openapi_obj):
             endpoints.append(endpoint_info)
 
     return endpoints
+
+
+def get_endpoint_parameters(openapi_obj, endpoint_path, method="get"):
+    """
+    Extract parameters for a specific endpoint from an OpenAPI object,
+    resolving any $ref references to their actual schema definitions.
+
+    Args:
+        openapi_obj: The OpenAPI object
+        endpoint_path: API endpoint path (e.g., '/completions')
+        method: HTTP method (get, post, put, delete, etc.)
+
+    Returns:
+        dict: Dictionary containing parameters for the specified endpoint
+    """
+    if not openapi_obj or not hasattr(openapi_obj, "spec"):
+        return {"error": "Invalid OpenAPI object"}
+
+    # Get the raw specification dictionary
+    spec_dict = openapi_obj.spec.contents()
+    paths_dict = spec_dict.get("paths", {})
+
+    # Check if the path exists
+    if endpoint_path not in paths_dict:
+        return {"error": f"Path '{endpoint_path}' not found in API specification"}
+
+    path_item = paths_dict[endpoint_path]
+
+    # Check if the method exists for this path
+    method = method.lower()
+    if method not in path_item:
+        return {"error": f"Method '{method}' not supported for path '{endpoint_path}'"}
+
+    operation = path_item[method]
+
+    # Initialize parameters dictionary dynamically
+    parameters = {}
+
+    # Process operation parameters
+    for param in operation.get("parameters", []):
+        # Resolve parameter reference if needed
+        if "$ref" in param:
+            param = resolve_reference(spec_dict, param["$ref"])
+
+        param_location = param.get("in")
+
+        # Skip if no location specified
+        if not param_location:
+            continue
+
+        # Create the location category if it doesn't exist
+        if param_location not in parameters:
+            parameters[param_location] = []
+
+        # Resolve schema reference if present
+        schema = param.get("schema", {})
+        if schema and "$ref" in schema:
+            schema = resolve_reference(spec_dict, schema["$ref"])
+
+        param_info = {
+            "name": param.get("name"),
+            "required": param.get("required", False),
+            "description": param.get("description", ""),
+            "schema": schema,
+        }
+
+        parameters[param_location].append(param_info)
+
+    # Process request body if present
+    request_body = None
+    if "requestBody" in operation:
+        request_body = {
+            "required": operation["requestBody"].get("required", False),
+            "content": {},
+        }
+
+        content = operation["requestBody"].get("content", {})
+        for content_type, media_type in content.items():
+            # Resolve schema reference if present
+            schema = media_type.get("schema", {})
+            if schema and "$ref" in schema:
+                schema = resolve_reference(spec_dict, schema["$ref"])
+
+            request_body["content"][content_type] = {"schema": schema}
+
+    return {
+        "path": endpoint_path,
+        "method": method.upper(),
+        "parameters": parameters,
+        "requestBody": request_body,
+    }
+
+
+def resolve_reference(spec_dict, ref):
+    """
+    Resolve a JSON reference within the OpenAPI specification
+
+    Args:
+        spec_dict: The full OpenAPI specification dictionary
+        ref: Reference string (e.g., '#/components/schemas/MySchema')
+
+    Returns:
+        dict: The resolved reference object
+    """
+    if not ref.startswith("#/"):
+        # External references not supported in this simple implementation
+        return {"error": f"External reference not supported: {ref}"}
+
+    # Parse the reference path
+    path_parts = ref[2:].split("/")  # Remove '#/' and split by '/'
+
+    # Navigate through the spec dict
+    current = spec_dict
+    for part in path_parts:
+        if part not in current:
+            return {"error": f"Reference path not found: {ref}"}
+        current = current[part]
+
+    # If the resolved object is itself a reference, resolve it recursively
+    if isinstance(current, dict) and "$ref" in current:
+        return resolve_reference(spec_dict, current["$ref"])
+
+    return current

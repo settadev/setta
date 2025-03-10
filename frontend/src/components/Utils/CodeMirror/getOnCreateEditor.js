@@ -101,7 +101,6 @@ export function getCompletionsFn(
       return async (context) => {
         const fullText = context.state.doc.toString();
         if (!fullText.trim()) return null;
-        const before = context.matchBefore(/([^.=\\(+-\/ ]*)$/);
         const setToNotWaiting = setTextFieldWaitingForLSP({
           sectionId,
           paramInfoId,
@@ -111,7 +110,7 @@ export function getCompletionsFn(
         if (res.data) {
           return {
             filter: true,
-            ...getFromTo(res.data, before, context),
+            from: 0,
             options: res.data,
             // validFor: /([^.=\\(]*)$/,
           };

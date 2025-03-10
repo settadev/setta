@@ -1,11 +1,16 @@
 import C from "constants/constants.json";
+import { dbGetEndpointParameters } from "requests/apiSpecs";
 import { dbParametersRequest } from "requests/sections";
 import { useSectionInfos } from "state/definitions";
 import { newCodeInfo } from "utils/objs/codeInfo";
 import { addCodeInfo } from "../codeInfo";
 import { setParametersRequestWaitingForLSP } from "../lsp";
 import { setNotificationMessage } from "../notification";
-import { getCodeInfoCol, getSectionVariant } from "../sectionInfos";
+import {
+  getCodeInfoCol,
+  getSectionType,
+  getSectionVariant,
+} from "../sectionInfos";
 import { maybeIncrementProjectStateVersion } from "../undo";
 
 export async function setSelectedItem(
@@ -38,11 +43,17 @@ export async function setSelectedItem(
 
   const setToNotWaiting = setParametersRequestWaitingForLSP(visualSectionId);
 
-  const paramRes = await dbParametersRequest({
-    sectionId: dataSectionId,
-    fullText: selectedItemName,
-    position: selectedItemName.length,
-  });
+  let paramRes;
+  if (getSectionType(dataSectionId) === C.API) {
+    const res = await dbGetEndpointParameters(dataSectionId, selectedItemName);
+    paramRes = { data: ["", res.data], otherData: { evRefs: [] } };
+  } else {
+    paramRes = await dbParametersRequest({
+      sectionId: dataSectionId,
+      fullText: selectedItemName,
+      position: selectedItemName.length,
+    });
+  }
 
   useSectionInfos.setState((state) => {
     let info;
