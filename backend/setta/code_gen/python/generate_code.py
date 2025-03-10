@@ -127,7 +127,10 @@ def get_value(x, selected):
             )
             prefix = f"{x['value']['callable']}({x['value']['url']}, "
             output = f"{prefix}{output})"
-            # prefix_len = len(prefix)
+            prefix_len = len(prefix)
+            relative_positions = [
+                {**r, "startPos": r["startPos"] + prefix_len} for r in relative_positions
+            ]
     else:
         output = None
         relative_positions = []

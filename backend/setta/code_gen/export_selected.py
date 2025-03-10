@@ -392,10 +392,11 @@ class Exporter:
                 ) = self.export_section_params(id)
                 url_info = get_selected_item(self.p, id)
                 if url_info:
-                    url = f'"{url_info["name"]}"'
+                    url = url_info["apiRequestInfo"]["baseUrl"] + url_info["name"]
+                    url = f'"{url}"'
                     callable = (
                         "requests.get"
-                        if url_info["apiRequestType"] == "get"
+                        if url_info["apiRequestInfo"]["requestType"] == "get"
                         else "requests.post"
                     )
                 else:

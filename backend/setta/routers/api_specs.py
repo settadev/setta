@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from setta.routers.dependencies import get_api_specs_in_memory
 from setta.utils.constants import C
 from setta.utils.openapi_utils import (
+    get_api_info,
     get_endpoint_parameters,
     get_endpoints_from_spec,
     get_openapi_spec,
@@ -63,23 +64,31 @@ def route_get_endpoint_parameters(
         )
         if not res:
             return []
+        
+    openapi_obj = api_specs_in_memory[x.apiSpecsURL]["specs"]
     endpoint_info = get_endpoint_parameters(
-        api_specs_in_memory[x.apiSpecsURL]["specs"], x.endpoint, x.method
+        openapi_obj, x.endpoint, x.method
     )
+
+    apiRequestInfo = get_api_info(openapi_obj)
+    apiRequestInfo = {"requestType": x.method, "baseUrl": apiRequestInfo["servers"][0]["url"]}
 
     params = endpoint_info["requestBody"]["content"]["application/json"]["schema"][
         "properties"
     ]
 
-    return [
+    params = [
         {
             "name": name,
             "defaultVal": p.get("default"),
             "description": p.get("description", ""),
-            "positionalOnly": False,
         }
         for name, p in params.items()
     ]
+
+    headers = [{"name": p["name"]} for p in endpoint_info["parameters"]["header"]]
+
+    return {"json": params, "headers": headers, "apiRequestInfo": apiRequestInfo}
 
 
 def get_openapi_spec_and_store_endpoints_in_memory(apiSpecsURL, api_specs_in_memory):

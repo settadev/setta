@@ -97,7 +97,7 @@
     "isSelected": false,
     "evRefs": [],
     "ignoreTypeErrors": false,
-    "apiRequestType": null
+    "apiRequestInfo": null
   },
   "codeInfoCol": {
     "children": { "null": [] }

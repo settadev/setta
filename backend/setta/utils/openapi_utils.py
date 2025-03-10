@@ -64,6 +64,7 @@ def get_openapi_spec(api_url):
                 "last_updated": datetime.now().isoformat(),
                 "api_name": info["title"],
                 "version": info["version"],
+                "servers": info["servers"]
             }
             with metadata_file.open("w") as f:
                 json.dump(metadata, f, indent=2)
@@ -210,48 +211,43 @@ def get_endpoint_parameters(openapi_obj, endpoint_path, method="get"):
 
     operation = path_item[method]
 
-    # Initialize parameters dictionary dynamically
+    # Initialize parameters dictionary
     parameters = {}
 
-    # Process operation parameters
+    # Collect parameters from path level
+    for param in path_item.get("parameters", []):
+        # Resolve parameter reference if needed
+        if "$ref" in param:
+            param = resolve_reference(spec_dict, param["$ref"])
+
+        process_parameter(param, parameters, spec_dict)
+
+    # Collect parameters from operation level
     for param in operation.get("parameters", []):
         # Resolve parameter reference if needed
         if "$ref" in param:
             param = resolve_reference(spec_dict, param["$ref"])
 
-        param_location = param.get("in")
+        process_parameter(param, parameters, spec_dict)
 
-        # Skip if no location specified
-        if not param_location:
-            continue
-
-        # Create the location category if it doesn't exist
-        if param_location not in parameters:
-            parameters[param_location] = []
-
-        # Resolve schema reference if present
-        schema = param.get("schema", {})
-        if schema and "$ref" in schema:
-            schema = resolve_reference(spec_dict, schema["$ref"])
-
-        param_info = {
-            "name": param.get("name"),
-            "required": param.get("required", False),
-            "description": param.get("description", ""),
-            "schema": schema,
-        }
-
-        parameters[param_location].append(param_info)
+    # Process security requirements (for auth headers)
+    security_headers = get_security_headers(operation, spec_dict)
+    if security_headers:
+        if "header" not in parameters:
+            parameters["header"] = []
+        parameters["header"].extend(security_headers)
 
     # Process request body if present
     request_body = None
     if "requestBody" in operation:
-        request_body = {
-            "required": operation["requestBody"].get("required", False),
-            "content": {},
-        }
+        req_body_obj = operation["requestBody"]
+        # Resolve reference if needed
+        if "$ref" in req_body_obj:
+            req_body_obj = resolve_reference(spec_dict, req_body_obj["$ref"])
 
-        content = operation["requestBody"].get("content", {})
+        request_body = {"required": req_body_obj.get("required", False), "content": {}}
+
+        content = req_body_obj.get("content", {})
         for content_type, media_type in content.items():
             # Resolve schema reference if present
             schema = media_type.get("schema", {})
@@ -266,6 +262,84 @@ def get_endpoint_parameters(openapi_obj, endpoint_path, method="get"):
         "parameters": parameters,
         "requestBody": request_body,
     }
+
+
+def process_parameter(param, parameters, spec_dict):
+    """Process a parameter and add it to the parameters dictionary"""
+    param_location = param.get("in")
+
+    # Skip if no location specified
+    if not param_location:
+        return
+
+    # Create the location category if it doesn't exist
+    if param_location not in parameters:
+        parameters[param_location] = []
+
+    # Resolve schema reference if present
+    schema = param.get("schema", {})
+    if schema and "$ref" in schema:
+        schema = resolve_reference(spec_dict, schema["$ref"])
+
+    param_info = {
+        "name": param.get("name"),
+        "required": param.get("required", False),
+        "description": param.get("description", ""),
+        "schema": schema,
+    }
+
+    parameters[param_location].append(param_info)
+
+
+def get_security_headers(operation, spec_dict):
+    """Extract security requirements as header parameters"""
+    headers = []
+
+    # Get global security requirements if no operation-specific ones
+    security_reqs = operation.get("security", spec_dict.get("security", []))
+
+    if not security_reqs:
+        return headers
+
+    # Get security schemes
+    components = spec_dict.get("components", {})
+    security_schemes = components.get("securitySchemes", {})
+
+    for security_req in security_reqs:
+        for scheme_name, scopes in security_req.items():
+            if scheme_name in security_schemes:
+                scheme = security_schemes[scheme_name]
+
+                # Resolve reference if needed
+                if "$ref" in scheme:
+                    scheme = resolve_reference(spec_dict, scheme["$ref"])
+
+                # Handle different security types
+                if scheme.get("type") == "apiKey" and scheme.get("in") == "header":
+                    headers.append(
+                        {
+                            "name": scheme.get("name"),
+                            "required": True,
+                            "description": scheme.get(
+                                "description", f"API key for {scheme_name}"
+                            ),
+                            "schema": {"type": "string"},
+                        }
+                    )
+                elif scheme.get("type") == "http" and scheme.get("scheme") == "bearer":
+                    headers.append(
+                        {
+                            "name": "Authorization",
+                            "required": True,
+                            "description": scheme.get(
+                                "description", "Bearer authentication token"
+                            ),
+                            "schema": {"type": "string", "pattern": "^Bearer .+$"},
+                        }
+                    )
+                # You can add more security types like OAuth2, OpenID, etc.
+
+    return headers
 
 
 def resolve_reference(spec_dict, ref):
