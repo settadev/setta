@@ -26,13 +26,13 @@ export function APIAreaSettings({ sectionId }) {
   }
 
   return (
-    <div className="mb-2 mt-2 w-full select-text">
+    <div className="mb-2 mt-2 flex w-full select-text flex-col gap-4">
       <div className="flex w-full items-center gap-3">
-        <p className="select-none  text-sm font-bold text-setta-400 dark:text-setta-600">
+        <h3 className="select-none whitespace-nowrap text-sm font-bold text-setta-400 dark:text-setta-500">
           API Specs
-        </p>
+        </h3>
         <input
-          className="mr-[2px] w-full truncate rounded-full bg-white px-4 py-1 text-sm text-setta-700 ring-2 ring-setta-200 focus:ring-2 focus:ring-blue-500 dark:bg-setta-900 dark:text-setta-400 dark:ring-setta-700"
+          className="mr-[2px] w-full truncate rounded-full border border-solid border-setta-500 bg-white px-4 py-1 text-sm text-setta-700 focus-visible:border-blue-500 dark:bg-setta-900 dark:text-setta-400 dark:ring-setta-700"
           value={value}
           onChange={onChange}
           onBlur={onBlur}
@@ -40,7 +40,7 @@ export function APIAreaSettings({ sectionId }) {
       </div>
       <div className="flex justify-end">
         <button
-          className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="mx-1 w-full cursor-pointer rounded-full bg-setta-600 px-4 py-2 text-center text-sm font-black text-white outline-none ring-0 hover:bg-blue-600 focus:outline-none focus-visible:outline-blue-600 dark:bg-setta-700 hover:dark:bg-blue-700"
           onClick={onClick}
         >
           Fetch API Specs
