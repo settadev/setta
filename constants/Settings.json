@@ -13,6 +13,7 @@
     "loadShortcut": "Mod + L",
     "searchShortcut": "Mod + K",
     "advancedSearchShortcut": "Mod + P",
+    "commandPaletteShortcut": "Mod + Shift + P",
     "resetZoomShortcut": "Mod + Comma",
     "copyShortcut": "Mod + C",
     "pasteShortcut": "Mod + V",
