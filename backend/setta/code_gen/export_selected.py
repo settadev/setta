@@ -583,6 +583,7 @@ class ExporterForInMemoryFn:
                 C.CHAT,
                 C.GLOBAL_VARIABLES,
                 C.TEXT_BLOCK,
+                C.API,
             ],
         )
         for id in list(self.p["projectConfig"]["children"].keys()):
@@ -596,7 +597,7 @@ class ExporterForInMemoryFn:
         self.create_var_mapping((id,), name)
         value = None
         value_is_returned = True
-        if type == C.SECTION:
+        if type == C.SECTION or type == C.API:
             selectedItem = get_selected_item_name(self.p, id)
             params = self.export_section_params(
                 id, f'{name}["params"]', is_global=False
