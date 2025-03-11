@@ -1,4 +1,5 @@
 import C from "constants/constants.json";
+import _ from "lodash";
 import {
   IoAlertCircleSharp,
   IoCheckmarkCircle,
@@ -12,7 +13,10 @@ import { useNotifications } from "state/definitions";
 
 export function NotificationsArea() {
   // Get all notifications from the store
-  const notifications = useNotifications((state) => state.notifications);
+  const notifications = useNotifications(
+    (state) => state.notifications.filter((n) => !n.temporary),
+    _.isEqual,
+  );
 
   return (
     <div className="flex w-full flex-col gap-4 overflow-y-auto">
