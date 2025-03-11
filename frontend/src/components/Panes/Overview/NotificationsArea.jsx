@@ -1,74 +1,118 @@
 import C from "constants/constants.json";
-import { IoMdAlert } from "react-icons/io";
-import { IoAlertCircleSharp, IoCheckmarkCircle, IoClose, IoInformationCircle, IoWarning } from "react-icons/io5";
+import {
+  IoAlertCircleSharp,
+  IoCheckmarkCircle,
+  IoClose,
+  IoInformationCircle,
+  IoWarning,
+} from "react-icons/io5";
 import { VscSave } from "react-icons/vsc";
+import { markAsRead, removeNotification } from "state/actions/notifications"; // Adjust import path as needed
+import { useNotifications } from "state/definitions";
 
 export function NotificationsArea() {
+  // Get all notifications from the store
+  const notifications = useNotifications((state) => state.notifications);
+
   return (
     <div className="flex w-full flex-col gap-4 overflow-y-auto">
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
-      <NotificationItem />
+      {notifications.length > 0 ? (
+        notifications.map((notification) => (
+          <NotificationItem key={notification.id} notification={notification} />
+        ))
+      ) : (
+        <div className="flex flex-col items-center justify-center py-8 text-setta-400 dark:text-setta-500">
+          <IoInformationCircle size={24} />
+          <p className="mt-2 text-sm">No notifications yet</p>
+        </div>
+      )}
     </div>
   );
 }
 
-function NotificationItem() {
+function NotificationItem({ notification }) {
+  const { id, type, message, timestamp, read_status } = notification;
+
+  // Format timestamp for display
+  const formattedTime = new Date(timestamp).toLocaleString();
+
+  // Handle removing a notification
+  const handleRemove = () => {
+    removeNotification(id);
+  };
+
+  // Handle marking a notification as read when interacted with
+  const handleMarkAsRead = () => {
+    if (!read_status) {
+      markAsRead(id);
+    }
+  };
+
   return (
-    <section className="group/notifications overflow-clip  rounded-md px-3 py-2 transition-all hover:bg-white hover:shadow-md hover:dark:bg-setta-800 hover:dark:shadow-lg">
+    <section
+      className={`group/notifications overflow-clip rounded-md px-3 py-2 transition-all hover:bg-white hover:shadow-md hover:dark:bg-setta-800 hover:dark:shadow-lg ${!read_status ? "bg-blue-50 dark:bg-setta-900/50" : ""}`}
+      onClick={handleMarkAsRead}
+    >
       <header className="mb-2 flex items-center justify-between gap-2">
-        <i className="text-red-500">
-          <IoMdAlert />
-        </i>
+        <i>{getNotificationIcon(type, "h-4 w-4")}</i>
         <h3 className="truncate font-semibold tracking-tight text-setta-600 group-hover/notifications:text-setta-900 dark:text-setta-300 group-hover/notifications:dark:text-setta-100">
-          Alert! There's something going on here I think.
+          {message}
         </h3>
-        <button className="cursor-pointer text-setta-500 hover:text-blue-600">
+        <button
+          className="cursor-pointer text-setta-500 hover:text-blue-600"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemove();
+          }}
+        >
           <IoClose size={15} />
         </button>
       </header>
 
-      <p className="text-xs text-setta-600 group-hover/notifications:text-setta-900 dark:text-setta-100 group-hover/notifications:dark:text-white">
-        The program has blue screened and you must reset universe.exe or
-        alternatively, re-orient 3 of the closest pulsars towards COORDINATES
-        HERE. Thank you.
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-setta-600 group-hover/notifications:text-setta-900 dark:text-setta-100 group-hover/notifications:dark:text-white">
+          {notification.metadata && notification.metadata.details
+            ? notification.metadata.details
+            : ""}
+        </p>
+        <span className="text-xs text-setta-400 dark:text-setta-500">
+          {formattedTime}
+        </span>
+      </div>
     </section>
   );
 }
 
-export function getNotificationIcon(type) {
+export function getNotificationIcon(type, className = "") {
   switch (type) {
     case C.NOTIFICATION_TYPE_SUCCESS:
       return (
-        <IoCheckmarkCircle className="ml-2 h-3 w-3 text-green-500 dark:text-green-400 md:ml-4" />
+        <IoCheckmarkCircle
+          className={`${className} text-green-500 dark:text-green-400`}
+        />
       );
     case C.NOTIFICATION_TYPE_ERROR:
       return (
-        <IoAlertCircleSharp className="ml-2 h-3 w-3 text-red-500 dark:text-red-400 md:ml-4" />
+        <IoAlertCircleSharp
+          className={`${className} text-red-500 dark:text-red-400`}
+        />
       );
     case C.NOTIFICATION_TYPE_WARNING:
       return (
-        <IoWarning className="ml-2 h-3 w-3 text-yellow-500 dark:text-yellow-400 md:ml-4" />
-      );
-    case C.NOTIFICATION_TYPE_INFO:
-      return (
-        <IoInformationCircle className="ml-2 h-3 w-3 text-blue-500 dark:text-blue-400 md:ml-4" />
+        <IoWarning
+          className={`${className} text-yellow-500 dark:text-yellow-400`}
+        />
       );
     case C.NOTIFICATION_TYPE_SAVE:
       return (
-        <VscSave className="ml-2 h-3 w-3 text-setta-400 dark:text-setta-50 md:ml-4" />
+        <VscSave className={`${className} text-setta-400 dark:text-setta-50`} />
       );
+    case C.NOTIFICATION_TYPE_INFO:
     default:
       return (
-        <IoInformationCircle className="ml-2 h-3 w-3 text-setta-400 dark:text-setta-50 md:ml-4" />
+        <IoInformationCircle
+          className={`${className} text-blue-500 dark:text-blue-400`}
+        />
       );
   }
 }
