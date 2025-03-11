@@ -1,5 +1,7 @@
+import C from "constants/constants.json";
 import { IoMdAlert } from "react-icons/io";
-import { IoClose } from "react-icons/io5";
+import { IoAlertCircleSharp, IoCheckmarkCircle, IoClose, IoInformationCircle, IoWarning } from "react-icons/io5";
+import { VscSave } from "react-icons/vsc";
 
 export function NotificationsArea() {
   return (
@@ -40,4 +42,33 @@ function NotificationItem() {
       </p>
     </section>
   );
+}
+
+export function getNotificationIcon(type) {
+  switch (type) {
+    case C.NOTIFICATION_TYPE_SUCCESS:
+      return (
+        <IoCheckmarkCircle className="ml-2 h-3 w-3 text-green-500 dark:text-green-400 md:ml-4" />
+      );
+    case C.NOTIFICATION_TYPE_ERROR:
+      return (
+        <IoAlertCircleSharp className="ml-2 h-3 w-3 text-red-500 dark:text-red-400 md:ml-4" />
+      );
+    case C.NOTIFICATION_TYPE_WARNING:
+      return (
+        <IoWarning className="ml-2 h-3 w-3 text-yellow-500 dark:text-yellow-400 md:ml-4" />
+      );
+    case C.NOTIFICATION_TYPE_INFO:
+      return (
+        <IoInformationCircle className="ml-2 h-3 w-3 text-blue-500 dark:text-blue-400 md:ml-4" />
+      );
+    case C.NOTIFICATION_TYPE_SAVE:
+      return (
+        <VscSave className="ml-2 h-3 w-3 text-setta-400 dark:text-setta-50 md:ml-4" />
+      );
+    default:
+      return (
+        <IoInformationCircle className="ml-2 h-3 w-3 text-setta-400 dark:text-setta-50 md:ml-4" />
+      );
+  }
 }

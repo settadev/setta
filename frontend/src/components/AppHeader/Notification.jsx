@@ -1,5 +1,4 @@
-import { IoAlertCircleSharp } from "react-icons/io5";
-import { VscSave } from "react-icons/vsc";
+import { getNotificationIcon } from "components/Panes/Overview/NotificationsArea";
 import { useNotifications } from "state/definitions";
 
 export function Notification() {
@@ -15,22 +14,9 @@ export function Notification() {
 
   const { message, type } = latestNotification;
 
-  // Determine which icon to show based on notification type
-  const getIcon = () => {
-    if (message === "Saved!" || type === "success") {
-      return (
-        <VscSave className="ml-2 h-3 w-3 text-setta-400 dark:text-setta-50 md:ml-4" />
-      );
-    } else {
-      return (
-        <IoAlertCircleSharp className="ml-2 h-3 w-3 text-setta-400 dark:text-setta-50 md:ml-4" />
-      );
-    }
-  };
-
   return (
     <div className="flex items-center gap-0.5 transition-all">
-      {getIcon()}
+      {getNotificationIcon(type)}
       <p className="ml-2 hidden self-center text-xs text-setta-500 dark:text-setta-100 md:inline-block">
         {message}
       </p>

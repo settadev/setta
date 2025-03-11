@@ -93,7 +93,7 @@ export function getProjectData({
 
 export async function saveProject() {
   let res;
-  addTemporaryNotification("Saving...");
+  addTemporaryNotification("Saving...", C.NOTIFICATION_TYPE_SAVE);
   if (useSectionInfos.getState().projectConfig.name === SETTINGS_PROJECT_NAME) {
     res = await dbSaveSettingsProject(getProjectData({}));
     if (res.status === 200) {
