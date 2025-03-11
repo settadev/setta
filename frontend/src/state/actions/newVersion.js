@@ -1,6 +1,6 @@
 import { dbSaveSectionJSONSource } from "requests/jsonSource";
 import { dbNewVersionFilename } from "requests/sectionVariants";
-import { setNotificationMessage } from "state/actions/notification";
+import { addTemporaryNotification } from "state/actions/notifications";
 import { duplicateCodeInfoCol } from "state/actions/sectionInfos";
 import { useSectionInfos } from "state/definitions";
 import { createRandomName } from "utils/idNameCreation";
@@ -28,7 +28,7 @@ async function maybeSaveNewJSONVersion(newVariantId, isJsonSource) {
   if (isJsonSource) {
     await dbSaveSectionJSONSource(newVariantId);
   }
-  setNotificationMessage("New Version Created");
+  addTemporaryNotification("New Version Created");
 }
 
 async function createNewVersionName(currName, isJsonSource) {

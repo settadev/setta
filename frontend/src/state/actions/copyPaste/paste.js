@@ -3,7 +3,7 @@ import { getActiveSectionsBounds } from "forks/xyflow/core/utils/graph";
 import _ from "lodash";
 import { dbCreateCopyOfSections } from "requests/pasteSections";
 import { useActiveSection, useMisc, useSectionInfos } from "state/definitions";
-import { setNotificationMessage } from "../notification";
+import { addTemporaryNotification } from "../notifications";
 import { loadSectionIntoState } from "../sections/loadSections";
 
 export async function paste(props) {
@@ -82,7 +82,7 @@ function removeSingletonSectionsIfAlreadyPresent(pasteData) {
     ) {
       toRemove.push(s.id);
       toRemove.push(s.paramSweepSectionId);
-      setNotificationMessage("Can't have more than 1 global section!");
+      addTemporaryNotification("Can't have more than 1 global section!");
     }
   }
 

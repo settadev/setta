@@ -4,7 +4,7 @@ import _ from "lodash";
 import { useActiveSection, useSectionInfos } from "state/definitions";
 import { getForSectionId } from "state/hooks/paramSweep";
 import { findAll } from "utils/getDescendants";
-import { setNotificationMessage } from "../notification";
+import { addTemporaryNotification } from "../notifications";
 import {
   getAllSectionsForDeletionOrCopying,
   getSectionType,
@@ -56,7 +56,7 @@ function getSections(sectionIds, state) {
   });
 
   if (_.size(allSections) !== _.size(withoutLoneParamSweeps)) {
-    setNotificationMessage("Lone param sweeps won't be included in copy");
+    addTemporaryNotification("Lone param sweeps won't be included in copy");
   }
 
   return withoutLoneParamSweeps;

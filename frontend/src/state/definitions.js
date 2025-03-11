@@ -126,10 +126,9 @@ export const useNodeInternals = withProjectState(
   ),
 );
 
-export const useNotification = create(
+export const useNotifications = create(
   withResetFn(() => ({
-    message: "",
-    timeoutId: null,
+    notifications: [],
   })),
 );
 

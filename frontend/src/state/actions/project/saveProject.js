@@ -17,7 +17,7 @@ import {
 import { SECTION_DISPLAY_MODES, SETTINGS_PROJECT_NAME } from "utils/constants";
 import { getArtifactStateForSaving } from "../artifacts";
 import { yamlToGUI } from "../guiToYaml";
-import { setNotificationMessage } from "../notification";
+import { addTemporaryNotification } from "../notifications";
 import { getSectionType } from "../sectionInfos";
 import { requestBase64FromCanvas } from "../temporaryMiscState";
 
@@ -93,7 +93,7 @@ export function getProjectData({
 
 export async function saveProject() {
   let res;
-  setNotificationMessage("Saving...");
+  addTemporaryNotification("Saving...");
   if (useSectionInfos.getState().projectConfig.name === SETTINGS_PROJECT_NAME) {
     res = await dbSaveSettingsProject(getProjectData({}));
     if (res.status === 200) {
@@ -106,7 +106,7 @@ export async function saveProject() {
   }
 
   if (res.status === 200) {
-    setNotificationMessage("Saved!");
+    addTemporaryNotification("Saved!");
   }
 }
 

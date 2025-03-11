@@ -4,7 +4,7 @@ import { useSectionInfos } from "state/definitions";
 import { newCodeInfo } from "utils/objs/codeInfo";
 import { addCodeInfo } from "../codeInfo";
 import { setParametersRequestWaitingForLSP } from "../lsp";
-import { setNotificationMessage } from "../notification";
+import { addTemporaryNotification } from "../notifications";
 import { getCodeInfoCol, getSectionVariant } from "../sectionInfos";
 import { maybeIncrementProjectStateVersion } from "../undo";
 
@@ -63,11 +63,11 @@ export async function setSelectedItem(
       if (params) {
         createChildrenCodeInfo(dataSectionId, info.id, params, state);
       } else {
-        setNotificationMessage("No parameters found");
+        addTemporaryNotification("No parameters found");
       }
       state.codeInfo[info.id].description = documentation;
     } else {
-      setNotificationMessage("No parameters found");
+      addTemporaryNotification("No parameters found");
     }
     setToNotWaiting();
     callbackSetAttr(info.id, state);

@@ -221,6 +221,21 @@ CREATE TABLE IF NOT EXISTS ArtifactGroup (
     FOREIGN KEY (artifactId) REFERENCES Artifact(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS Notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  projectConfigId TEXT NOT NULL,
+  timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  type TEXT NOT NULL,
+  message TEXT NOT NULL,
+  metadata JSON,
+  read_status BOOLEAN NOT NULL DEFAULT 0,
+  FOREIGN KEY (projectConfigId) REFERENCES ProjectConfig(id)
+);
+
+
+
+
+
 -- INSERTS ---
 INSERT OR IGNORE INTO Metadata (id, defaultProject) VALUES (1, NULL);
 

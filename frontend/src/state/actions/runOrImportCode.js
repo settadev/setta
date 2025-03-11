@@ -9,7 +9,7 @@ import {
   updateInMemorySubprocessInfo,
   updateInteractiveArtifacts,
 } from "./interactive";
-import { setNotificationMessage } from "./notification";
+import { addTemporaryNotification } from "./notifications";
 import {
   getProjectDataToGenerateCode,
   getProjectRuns,
@@ -34,7 +34,7 @@ async function maybeGetProjectDataWithSweep(sectionIds, withSweep) {
 }
 
 export async function importCodeBlocks(sectionIds, withSweep = false) {
-  setNotificationMessage("Importing your code...");
+  addTemporaryNotification("Importing your code...");
   const projects = await maybeGetProjectDataWithSweep(sectionIds, withSweep);
   const res = await dbImportCodeBlocks(projects);
   if (res.status === 200) {
@@ -44,7 +44,7 @@ export async function importCodeBlocks(sectionIds, withSweep = false) {
     // TODO: status should not be 200.
     // TODO: should say import failed or something
     if (!res.data.exceptionOccurred) {
-      setNotificationMessage("Done importing");
+      addTemporaryNotification("Done importing");
     }
   }
 }

@@ -5,7 +5,7 @@ import {
   findCandidateTemplateVars,
 } from "components/Utils/CodeMirror/utils";
 import C from "constants/constants.json";
-import { setNotificationMessage } from "state/actions/notification";
+import { addTemporaryNotification } from "state/actions/notifications";
 import { getProjectDataToGenerateCode } from "state/actions/project/generateCode";
 import { getSectionInfo } from "state/actions/sectionInfos";
 import { sendMessageAndWait } from "state/actions/temporaryMiscState";
@@ -16,7 +16,7 @@ import { sendMessage } from "./websocket";
 
 export async function dbRequestTypeCheck(userRequested = false) {
   if (userRequested) {
-    setNotificationMessage("Checking types...");
+    addTemporaryNotification("Checking types...");
     useTypeErrors.setState({ userRequested });
   }
   const project = await getProjectDataToGenerateCode({});
