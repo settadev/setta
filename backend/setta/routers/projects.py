@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from setta.database.backup import maybe_create_backup
+from setta.database.db.notifications.load import load_project_notifications
+from setta.database.db.notifications.save import save_notification
 from setta.database.db.projects.delete import delete_project_configs
 from setta.database.db.projects.load import (
     ProjectNotFound,
@@ -119,10 +121,52 @@ def route_load_full_project(x: ProjectLoadFullRequest, dbq=Depends(get_dbq)):
 
 @router.post(C.ROUTE_SAVE_PROJECT)
 def route_save_project(x: ProjectSaveRequest, dbq=Depends(get_dbq)):
+    project_config_id = x.project["projectConfig"]["id"]
     with dbq as db:
-        maybe_create_backup(db.path)
-        save_project_details(db, x.project)
-        maybe_export_database(db, db.path)
+        try:
+            # Perform existing save operations
+            maybe_create_backup(db.path)
+            save_project_details(db, x.project)
+            maybe_export_database(db, db.path)
+
+            # Create success notification
+            save_notification(
+                db=db,
+                project_config_id=project_config_id,
+                type=C.NOTIFICATION_TYPE_SUCCESS,
+                message="Project saved successfully",
+                metadata={
+                    "details": f"Project '{x.project['projectConfig']['name']}' saved"
+                },
+            )
+
+            # Get the notification object to return to frontend
+            notifications = load_project_notifications(db, project_config_id, limit=1)
+            notification = notifications[0] if notifications else None
+
+            # Return success response with notification
+            return {"success": True, "notification": notification}
+
+        except Exception as e:
+            # Create error notification
+            save_notification(
+                db=db,
+                project_config_id=project_config_id,
+                type=C.NOTIFICATION_TYPE_ERROR,
+                message="Failed to save project",
+                metadata={"details": str(e)},
+            )
+
+            # Get the notification object to return to frontend
+            notifications = load_project_notifications(db, project_config_id, limit=1)
+            error_notification = notifications[0] if notifications else None
+
+            # Return error response with notification
+            return {
+                "success": False,
+                "error": str(e),
+                "notification": error_notification,
+            }
 
 
 @router.post(C.ROUTE_CREATE_PROJECT_CONFIG)

@@ -17,7 +17,7 @@ import {
 import { SECTION_DISPLAY_MODES, SETTINGS_PROJECT_NAME } from "utils/constants";
 import { getArtifactStateForSaving } from "../artifacts";
 import { yamlToGUI } from "../guiToYaml";
-import { addTemporaryNotification } from "../notifications";
+import { addNotification, addTemporaryNotification } from "../notifications";
 import { getSectionType } from "../sectionInfos";
 import { requestBase64FromCanvas } from "../temporaryMiscState";
 
@@ -93,20 +93,38 @@ export function getProjectData({
 
 export async function saveProject() {
   let res;
+  // Show temporary notification while saving
   addTemporaryNotification("Saving...", C.NOTIFICATION_TYPE_SAVE);
+
   if (useSectionInfos.getState().projectConfig.name === SETTINGS_PROJECT_NAME) {
     res = await dbSaveSettingsProject(getProjectData({}));
     if (res.status === 200) {
       useSettings.setState(res.data);
     }
   } else {
-    res = await dbSaveProject({
-      project: await getProjectDataForSaving(),
-    });
-  }
+    try {
+      res = await dbSaveProject({
+        project: await getProjectDataForSaving(),
+      });
 
-  if (res.status === 200) {
-    addTemporaryNotification("Saved!");
+      // Add the permanent notification from the backend if available
+      if (res.data && res.data.notification) {
+        addNotification(res.data.notification);
+      }
+    } catch (error) {
+      // Create a communication error notification
+      addNotification({
+        id: `error-${Date.now()}`,
+        type: C.NOTIFICATION_TYPE_WARNING,
+        message: "Could not confirm if save completed",
+        timestamp: new Date().toISOString(),
+        metadata: {
+          details:
+            "Communication with the server was interrupted. Your changes may or may not have been saved.",
+        },
+        read_status: false,
+      });
+    }
   }
 }
 

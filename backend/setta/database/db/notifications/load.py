@@ -4,12 +4,12 @@ import json
 def load_project_notifications(db, project_config_id, limit=20):
     """
     Load the latest notifications for a specific project.
-    
+
     Parameters:
     - db: The database connection/cursor object
     - project_config_id: The ID of the project to get notifications for
     - limit: Maximum number of notifications to return (default: 20)
-    
+
     Returns:
     - A list of notification objects
     """
@@ -29,14 +29,11 @@ def load_project_notifications(db, project_config_id, limit=20):
             timestamp DESC
         LIMIT :limit
     """
-    
-    query_params = {
-        "project_config_id": project_config_id,
-        "limit": limit
-    }
-    
+
+    query_params = {"project_config_id": project_config_id, "limit": limit}
+
     db.execute(query, query_params)
-    
+
     notifications = []
     for row in db.fetchall():
         notification = {
@@ -45,8 +42,8 @@ def load_project_notifications(db, project_config_id, limit=20):
             "type": row["type"],
             "message": row["message"],
             "metadata": json.loads(row["metadata"]) if row["metadata"] else {},
-            "read_status": bool(row["read_status"])
+            "read_status": bool(row["read_status"]),
         }
         notifications.append(notification)
-    
+
     return notifications
