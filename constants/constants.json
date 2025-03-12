@@ -97,6 +97,7 @@
   "ROUTE_LOAD_ARTIFACT_FROM_DISK": "/loadArtifactFromDisk",
   "ROUTE_RESTART_LANGUAGE_SERVER": "/restartLanguageServer",
   "ROUTE_FILE_WATCH_LIST": "/fileWatchList",
+  "ROUTE_GET_NOTIFICATIONS": "/getNotifications",
   "NESTED_PARAM": "NESTED_PARAM",
   "ARGS_PREFIX": "__",
   "TEMPLATE_PREFIX": "$",

@@ -1,5 +1,6 @@
 import C from "constants/constants.json";
 import _ from "lodash";
+import { useEffect } from "react";
 import {
   IoAlertCircleSharp,
   IoCheckmarkCircle,
@@ -8,15 +9,39 @@ import {
   IoWarning,
 } from "react-icons/io5";
 import { VscSave } from "react-icons/vsc";
-import { markAsRead, removeNotification } from "state/actions/notifications"; // Adjust import path as needed
-import { useNotifications } from "state/definitions";
+import { dbGetNotifications } from "requests/notifications";
+import {
+  markAsRead,
+  removeNotification,
+  setNotifications,
+} from "state/actions/notifications"; // Assuming this import path
+import { useNotifications, useSectionInfos } from "state/definitions";
 
 export function NotificationsArea() {
-  // Get all notifications from the store
+  // Get all non-temporary notifications from the store
   const notifications = useNotifications(
     (state) => state.notifications.filter((n) => !n.temporary),
     _.isEqual,
   );
+
+  const projectConfigId = useSectionInfos((x) => x.projectConfig.id);
+
+  // Fetch notifications when component mounts
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await dbGetNotifications(projectConfigId);
+        if (response.status === 200 && response.data) {
+          // Set the notifications in the store
+          setNotifications(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [projectConfigId]);
 
   return (
     <div className="flex w-full flex-col gap-4 overflow-y-auto">
@@ -33,7 +58,6 @@ export function NotificationsArea() {
     </div>
   );
 }
-
 function NotificationItem({ notification }) {
   const { id, type, message, timestamp, read_status } = notification;
 

@@ -86,6 +86,9 @@ class FilterDataForJSONExportRequest(BaseModel):
 class AddDefaultDataForJSONImportRequest(BaseModel):
     project: dict
 
+class GetNotificationsRequest(BaseModel):
+    projectConfigId: str
+
 
 @router.post(C.ROUTE_ALL_PROJECT_CONFIG_METADATA)
 def route_all_project_config_metadata(dbq=Depends(get_dbq)):
@@ -230,3 +233,10 @@ def router_filter_data_for_json_export(x: FilterDataForJSONExportRequest):
 def router_add_default_data_for_json_import(x: FilterDataForJSONExportRequest):
     add_defaults_to_project_and_load_json_sources(x.project)
     return x.project
+
+
+@router.post(C.ROUTE_GET_NOTIFICATIONS)
+def route_get_notifications(x: GetNotificationsRequest, dbq=Depends(get_dbq)):
+    with dbq as db:
+        notifications = load_project_notifications(db, x.projectConfigId)
+        return notifications
