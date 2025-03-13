@@ -61,8 +61,11 @@ export function NotificationsArea() {
 function NotificationItem({ notification }) {
   const { id, type, message, timestamp, read_status } = notification;
 
-  // Format timestamp for display
-  const formattedTime = new Date(timestamp).toLocaleString();
+  // Format timestamp for display - convert UTC to local time
+  const formattedTime = new Date(timestamp).toLocaleString(undefined, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
 
   // Handle removing a notification
   const handleRemove = () => {

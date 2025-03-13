@@ -2,6 +2,8 @@ import { getNotificationIcon } from "components/Panes/Overview/NotificationsArea
 import { useEffect, useState } from "react";
 import { useNotifications } from "state/definitions";
 
+const getTimeoutDuration = (notification) => notification.timeout || 3000;
+
 export function Notification() {
   // State to track the notification to display in the navbar
   const [displayNotification, setDisplayNotification] = useState(null);
@@ -18,11 +20,15 @@ export function Notification() {
       latestNotification &&
       (!displayNotification || latestNotification.id !== displayNotification.id)
     ) {
+      const timeoutDuration = getTimeoutDuration(latestNotification);
+      const nowTime = new Date().getTime();
+      const notificationTime = new Date(latestNotification.timestamp).getTime();
+      if (nowTime - notificationTime > timeoutDuration) {
+        return;
+      }
+
       // Update what's being displayed
       setDisplayNotification(latestNotification);
-
-      // Use the notification's timeout if it exists, otherwise default to 5000ms
-      const timeoutDuration = latestNotification.timeout || 3000;
 
       // Set a timeout to clear the display
       const timeoutId = setTimeout(() => {
