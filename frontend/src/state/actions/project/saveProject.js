@@ -107,7 +107,6 @@ export async function saveProject() {
         project: await getProjectDataForSaving(),
       });
 
-      // Add the permanent notification from the backend if available
       if (res.data && res.data.success) {
         addTemporaryNotification("Saved!", C.NOTIFICATION_TYPE_SAVE);
       } else {

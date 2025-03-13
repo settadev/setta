@@ -2,6 +2,7 @@ import { findCandidateTemplateVars } from "components/Utils/CodeMirror/utils";
 import C from "constants/constants.json";
 import { getProjectData } from "state/actions/project/saveProject";
 import { getSectionType, getSectionVariant } from "state/actions/sectionInfos";
+import { useSectionInfos } from "state/definitions";
 import { post } from "./utils";
 
 export async function dbImportCodeBlocks(projects) {
@@ -19,8 +20,9 @@ export async function dbSendProjectToInteractiveCode(projects) {
 }
 
 export async function dbKillInMemorySubprocesses() {
+  const { id: projectConfigId } = useSectionInfos.getState().projectConfig;
   return await post({
-    body: {},
+    body: { projectConfigId },
     address: C.ROUTE_KILL_IN_MEMORY_SUBPROCESSES,
   });
 }

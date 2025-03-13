@@ -246,10 +246,13 @@ class Tasks:
 
     def kill_in_memory_subprocesses(self):
         self.stop_event.set()
+        num_killed = 0
         for v in self.in_memory_subprocesses.values():
             v["subprocess"].close()
+            num_killed += 1
         self.in_memory_subprocesses = {}
         self.stop_event.clear()
+        return num_killed
 
     def close(self):
         self.kill_in_memory_subprocesses()

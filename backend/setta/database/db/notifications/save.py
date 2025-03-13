@@ -46,8 +46,4 @@ def save_notification(db, project_config_id, type, message, metadata=None):
     result = db.fetchone()
     notification_id = result["id"] if result else None
 
-    # Commit the transaction to save changes
-    # Note: If you're using a transaction manager, you might not need this
-    # db.commit()
-
     return notification_id

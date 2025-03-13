@@ -47,3 +47,51 @@ def load_project_notifications(db, project_config_id, limit=20):
         notifications.append(notification)
 
     return notifications
+
+
+
+def load_notification(db, notification_id):
+    """
+    Load a single notification by its ID.
+
+    Parameters:
+    - db: The database connection/cursor object
+    - notification_id: The ID of the notification to retrieve
+
+    Returns:
+    - A notification object if found, None otherwise
+    """
+    query = """
+        SELECT
+            id,
+            timestamp,
+            type,
+            message,
+            metadata,
+            read_status,
+            projectConfigId
+        FROM
+            Notifications
+        WHERE
+            id = :notification_id
+    """
+
+    query_params = {"notification_id": notification_id}
+
+    db.execute(query, query_params)
+    row = db.fetchone()
+
+    if not row:
+        return None
+
+    notification = {
+        "id": row["id"],
+        "timestamp": row["timestamp"],
+        "type": row["type"],
+        "message": row["message"],
+        "metadata": json.loads(row["metadata"]) if row["metadata"] else {},
+        "read_status": bool(row["read_status"]),
+        "project_config_id": row["projectConfigId"]
+    }
+
+    return notification
