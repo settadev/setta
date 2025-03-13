@@ -1,8 +1,7 @@
 import { getNotificationIcon } from "components/Panes/Overview/NotificationsArea";
 import { useEffect, useState } from "react";
+import { getTimeoutDuration } from "state/actions/notifications";
 import { useNotifications } from "state/definitions";
-
-const getTimeoutDuration = (notification) => notification.timeout || 3000;
 
 export function Notification() {
   // State to track the notification to display in the navbar

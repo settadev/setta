@@ -17,7 +17,10 @@ import {
 import { SECTION_DISPLAY_MODES, SETTINGS_PROJECT_NAME } from "utils/constants";
 import { getArtifactStateForSaving } from "../artifacts";
 import { yamlToGUI } from "../guiToYaml";
-import { addTemporaryNotification } from "../notifications";
+import {
+  addNotificationFromRes,
+  addTemporaryNotification,
+} from "../notifications";
 import { getSectionType } from "../sectionInfos";
 import { requestBase64FromCanvas } from "../temporaryMiscState";
 
@@ -102,22 +105,11 @@ export async function saveProject() {
       useSettings.setState(res.data);
     }
   } else {
-    try {
-      res = await dbSaveProject({
+    addNotificationFromRes(
+      await dbSaveProject({
         project: await getProjectDataForSaving(),
-      });
-
-      if (res.data && res.data.success) {
-        addTemporaryNotification("Saved!", C.NOTIFICATION_TYPE_SAVE);
-      } else {
-        addTemporaryNotification("Failed to save", C.NOTIFICATION_TYPE_ERROR);
-      }
-    } catch (error) {
-      addTemporaryNotification(
-        "Backend communication error",
-        C.NOTIFICATION_TYPE_ERROR,
-      );
-    }
+      }),
+    );
   }
 }
 

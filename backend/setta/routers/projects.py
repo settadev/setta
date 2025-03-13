@@ -6,7 +6,10 @@ from pydantic import BaseModel
 
 from setta.database.backup import maybe_create_backup
 from setta.database.db.notifications.delete import delete_notification
-from setta.database.db.notifications.load import load_project_notifications
+from setta.database.db.notifications.load import (
+    create_notification_dict,
+    load_project_notifications,
+)
 from setta.database.db.projects.delete import delete_project_configs
 from setta.database.db.projects.load import (
     ProjectNotFound,
@@ -136,14 +139,12 @@ def route_save_project(x: ProjectSaveRequest, dbq=Depends(get_dbq)):
             save_project_details(db, x.project)
             maybe_export_database(db, db.path)
             # Return success response with notification
-            return {"success": True}
+            return create_notification_dict(message="Saved!", temporary=True)
 
         except Exception as e:
-            # Return error response with notification
-            return {
-                "success": False,
-                "error": str(e),
-            }
+            return create_notification_dict(
+                message="Failed to save", type=C.NOTIFICATION_TYPE_ERROR, temporary=True
+            )
 
 
 @router.post(C.ROUTE_CREATE_PROJECT_CONFIG)

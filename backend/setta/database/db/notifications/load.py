@@ -1,3 +1,5 @@
+from setta.database.utils import create_new_id
+from setta.utils.constants import C
 from setta.utils.utils import try_json
 
 
@@ -79,8 +81,16 @@ def load_notification(db, notification_id):
 
 
 def create_notification_dict(
-    id, type, message, timestamp=None, metadata=None, read_status=False
+    message,
+    id=None,
+    type=C.NOTIFICATION_TYPE_INFO,
+    timestamp=None,
+    metadata=None,
+    read_status=False,
+    temporary=False,
 ):
+    if not id:
+        id = create_new_id()
     read_status = bool(read_status)
     if not isinstance(metadata, dict):
         metadata = try_json(metadata)
@@ -94,4 +104,5 @@ def create_notification_dict(
         "timestamp": timestamp,
         "metadata": metadata,
         "read_status": read_status,
+        "temporary": temporary,
     }

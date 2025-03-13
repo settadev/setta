@@ -1,10 +1,22 @@
+import C from "constants/constants.json";
 import { useNotifications } from "state/definitions";
+import { createNewId } from "utils/idNameCreation";
 
 // Standalone notification actions as separate functions
 export const addNotification = (notification) => {
   useNotifications.setState((state) => ({
     notifications: [notification, ...state.notifications],
   }));
+
+  if (notification.temporary) {
+    setTimeout(() => {
+      useNotifications.setState((state) => ({
+        notifications: state.notifications.filter(
+          (n) => n.id !== notification.id,
+        ),
+      }));
+    }, getTimeoutDuration(notification));
+  }
 };
 
 export const markAsRead = (notificationId) => {
@@ -25,12 +37,20 @@ export const setNotifications = (notifications) => {
   useNotifications.setState({ notifications });
 };
 
+export function addNotificationFromRes(res) {
+  const notification = res.data;
+  if (!notification.timestamp) {
+    notification.timestamp = new Date().toISOString();
+  }
+  addNotification(notification);
+}
+
 export const addTemporaryNotification = (
   message,
-  type = "info",
+  type = C.NOTIFICATION_TYPE_INFO,
   timeout = 3000,
 ) => {
-  const id = `temp-${Date.now()}`;
+  const id = createNewId();
   const notification = {
     id,
     timestamp: new Date().toISOString(),
@@ -39,19 +59,10 @@ export const addTemporaryNotification = (
     read_status: false,
     temporary: true,
     source: "frontend",
+    timeout,
   };
 
-  useNotifications.setState((state) => ({
-    notifications: [notification, ...state.notifications],
-  }));
-
-  // Auto-remove after timeout
-  setTimeout(() => {
-    useNotifications.setState((state) => ({
-      notifications: state.notifications.filter((n) => n.id !== id),
-    }));
-  }, timeout);
-
+  addNotification(notification);
   return id;
 };
 
@@ -64,3 +75,6 @@ export const replaceTemporaryNotification = (tempId, permanentNotification) => {
     ),
   }));
 };
+
+export const getTimeoutDuration = (notification) =>
+  notification.timeout || 3000;

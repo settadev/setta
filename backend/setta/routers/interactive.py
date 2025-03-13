@@ -17,7 +17,10 @@ from setta.code_gen.export_selected import (
     get_section_type,
 )
 from setta.code_gen.find_placeholders import parse_template_var
-from setta.database.db.notifications.load import load_notification
+from setta.database.db.notifications.load import (
+    create_notification_dict,
+    load_notification,
+)
 from setta.database.db.notifications.save import save_notification
 from setta.tasks.fns.utils import replace_template_vars_with_random_names
 from setta.tasks.tasks import construct_subprocess_key
@@ -163,7 +166,11 @@ async def route_kill_in_memory_subprocesses(
     try:
         num_killed = tasks.kill_in_memory_subprocesses()
         if num_killed == 0:
-            return {"success": True}
+            return create_notification_dict(
+                message="No subprocesses to kill",
+                type=C.NOTIFICATION_TYPE_INFO,
+                temporary=True,
+            )
         with dbq as db:
             notification_id = save_notification(
                 db,
@@ -171,14 +178,14 @@ async def route_kill_in_memory_subprocesses(
                 C.NOTIFICATION_TYPE_INFO,
                 f"Killed {num_killed} subprocesses",
             )
-            notification = load_notification(db, notification_id)
-            return {"success": True, "notification": notification}
+            return load_notification(db, notification_id)
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-        }
+        return create_notification_dict(
+            message="Failed to kill subprocesses",
+            type=C.NOTIFICATION_TYPE_ERROR,
+            temporary=True,
+        )
 
 
 @router.post(C.ROUTE_FORMAT_CODE)
