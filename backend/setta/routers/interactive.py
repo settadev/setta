@@ -37,9 +37,9 @@ class FormatCodeRequest(BaseModel):
     project: dict
     candidateTemplateVars: dict
 
+
 class KillInMemorySubprocessesRequest(BaseModel):
     projectConfigId: str
-
 
 
 @router.post(C.ROUTE_SEND_PROJECT_TO_INTERACTIVE_CODE)
@@ -157,21 +157,29 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
 
 
 @router.post(C.ROUTE_KILL_IN_MEMORY_SUBPROCESSES)
-async def route_kill_in_memory_subprocesses(x:KillInMemorySubprocessesRequest, tasks=Depends(get_tasks), dbq=Depends(get_dbq)):
+async def route_kill_in_memory_subprocesses(
+    x: KillInMemorySubprocessesRequest, tasks=Depends(get_tasks), dbq=Depends(get_dbq)
+):
     try:
         num_killed = tasks.kill_in_memory_subprocesses()
         if num_killed == 0:
             return {"success": True}
         with dbq as db:
-            notification_id = save_notification(db, x.projectConfigId, C.NOTIFICATION_TYPE_INFO, f"Killed {num_killed} subprocesses")
+            notification_id = save_notification(
+                db,
+                x.projectConfigId,
+                C.NOTIFICATION_TYPE_INFO,
+                f"Killed {num_killed} subprocesses",
+            )
             notification = load_notification(db, notification_id)
             return {"success": True, "notification": notification}
-    
+
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
         }
+
 
 @router.post(C.ROUTE_FORMAT_CODE)
 async def route_format_code(x: FormatCodeRequest):

@@ -5,9 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from setta.database.backup import maybe_create_backup
-from setta.database.db.notifications.load import load_project_notifications
-from setta.database.db.notifications.save import save_notification
 from setta.database.db.notifications.delete import delete_notification
+from setta.database.db.notifications.load import load_project_notifications
 from setta.database.db.projects.delete import delete_project_configs
 from setta.database.db.projects.load import (
     ProjectNotFound,

@@ -17,5 +17,5 @@ def delete_notification(db, notification_id):
 
     db.execute(query, {"notification_id": notification_id})
     result = db.fetchone()
-    
-    return result is not None 
+
+    return result is not None

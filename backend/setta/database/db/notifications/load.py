@@ -1,4 +1,4 @@
-import json
+from setta.utils.utils import try_json
 
 
 def load_project_notifications(db, project_config_id, limit=20):
@@ -36,18 +36,10 @@ def load_project_notifications(db, project_config_id, limit=20):
 
     notifications = []
     for row in db.fetchall():
-        notification = {
-            "id": row["id"],
-            "timestamp": row["timestamp"],
-            "type": row["type"],
-            "message": row["message"],
-            "metadata": json.loads(row["metadata"]) if row["metadata"] else {},
-            "read_status": bool(row["read_status"]),
-        }
+        notification = create_notification_dict(**row)
         notifications.append(notification)
 
     return notifications
-
 
 
 def load_notification(db, notification_id):
@@ -68,8 +60,7 @@ def load_notification(db, notification_id):
             type,
             message,
             metadata,
-            read_status,
-            projectConfigId
+            read_status
         FROM
             Notifications
         WHERE
@@ -84,14 +75,23 @@ def load_notification(db, notification_id):
     if not row:
         return None
 
-    notification = {
-        "id": row["id"],
-        "timestamp": row["timestamp"],
-        "type": row["type"],
-        "message": row["message"],
-        "metadata": json.loads(row["metadata"]) if row["metadata"] else {},
-        "read_status": bool(row["read_status"]),
-        "project_config_id": row["projectConfigId"]
-    }
+    return create_notification_dict(**row)
 
-    return notification
+
+def create_notification_dict(
+    id, type, message, timestamp=None, metadata=None, read_status=False
+):
+    read_status = bool(read_status)
+    if not isinstance(metadata, dict):
+        metadata = try_json(metadata)
+    if metadata is None:
+        metadata = {}
+
+    return {
+        "id": id,
+        "type": type,
+        "message": message,
+        "timestamp": timestamp,
+        "metadata": metadata,
+        "read_status": read_status,
+    }
