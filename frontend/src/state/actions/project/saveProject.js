@@ -17,7 +17,7 @@ import {
 import { SECTION_DISPLAY_MODES, SETTINGS_PROJECT_NAME } from "utils/constants";
 import { getArtifactStateForSaving } from "../artifacts";
 import { yamlToGUI } from "../guiToYaml";
-import { addNotification, addTemporaryNotification } from "../notifications";
+import { addTemporaryNotification } from "../notifications";
 import { getSectionType } from "../sectionInfos";
 import { requestBase64FromCanvas } from "../temporaryMiscState";
 
@@ -108,22 +108,16 @@ export async function saveProject() {
       });
 
       // Add the permanent notification from the backend if available
-      if (res.data && res.data.notification) {
-        addNotification(res.data.notification);
+      if (res.data && res.data.success) {
+        addTemporaryNotification("Saved!", C.NOTIFICATION_TYPE_SAVE);
+      } else {
+        addTemporaryNotification("Failed to save", C.NOTIFICATION_TYPE_ERROR);
       }
     } catch (error) {
-      // Create a communication error notification
-      addNotification({
-        id: `error-${Date.now()}`,
-        type: C.NOTIFICATION_TYPE_WARNING,
-        message: "Could not confirm if save completed",
-        timestamp: new Date().toISOString(),
-        metadata: {
-          details:
-            "Communication with the server was interrupted. Your changes may or may not have been saved.",
-        },
-        read_status: false,
-      });
+      addTemporaryNotification(
+        "Backend communication error",
+        C.NOTIFICATION_TYPE_ERROR,
+      );
     }
   }
 }
