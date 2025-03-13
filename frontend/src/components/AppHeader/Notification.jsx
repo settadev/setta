@@ -35,7 +35,10 @@ export function Notification() {
         setDisplayNotification(null);
       }, timeoutDuration);
 
-      return () => clearTimeout(timeoutId);
+      return () => {
+        setDisplayNotification(null);
+        clearTimeout(timeoutId);
+      };
     }
   }, [latestNotification]); // Only depend on latestNotification
 
