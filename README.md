@@ -12,6 +12,11 @@
 
 ## News
 
+**March 10**: [v0.0.16](https://github.com/settadev/setta/releases/tag/v0.0.16)
+- Made tooltips resizable and draggable.
+- Added command palette.
+- Improved code generation to account for different argument-passing styles.
+
 **March 7**: [v0.0.15](https://github.com/settadev/setta/releases/tag/v0.0.15)
 - Improved context menu organization.
 - Added ability to change size of artifacts while preserving aspect ratio.
@@ -20,10 +25,6 @@
 **March 5**: [v0.0.14](https://github.com/settadev/setta/releases/tag/v0.0.14)
 - Allow access to individual layers of Drawing sections, as well as the combined output.
 - Added button + shortcut for sending current full project state to in-memory functions.
-
-**March 4**: [v0.0.13](https://github.com/settadev/setta/releases/tag/v0.0.13)
-- Updated frontend javascript dependencies.
-
 
 ## What does Setta do?
 
@@ -60,6 +61,13 @@ Or click on one of the images below to go directly to that example:
     <td><a href="https://github.com/settadev/examples/tree/main/transformers_trainer"><img src="https://github.com/user-attachments/assets/1f6554f8-8d49-4ba8-af48-f5dc6bc5d845" /></a></td>
     <td><a href="https://github.com/settadev/examples/tree/main/pytorch_metric_learning_trainer"><img src="https://github.com/user-attachments/assets/45ae2047-9dbd-4057-9191-9a3460357ccc" /></a></td>
   </tr>
+
+  <tr>
+    <td><a href="https://github.com/settadev/examples/tree/main/sapientml_automl"><img src="https://github.com/user-attachments/assets/d58e648a-47e2-4eda-b9e5-9062494518a4" /></a></td>
+  </tr>
+
+
+  
 </table>
 
 We also have [tutorial videos](https://www.youtube.com/@settadev).

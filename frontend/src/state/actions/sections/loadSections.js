@@ -44,6 +44,7 @@ export function loadSectionIntoState({
       position: { x: n.x, y: n.y },
       zIndex: n.zIndex,
       tempZIndex: n.zIndex,
+      visibility: sections[id].visibility,
     });
   }
   addNodes(nodes);

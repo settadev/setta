@@ -2,6 +2,8 @@ import re
 
 import docstring_parser
 
+from setta.utils.constants import ParameterPassingStyle
+
 
 def process_signature_help_response(response):
     content = None
@@ -40,13 +42,21 @@ def wrapper_parse_signature(signature, docstring, get_proposed_params):
     params = get_proposed_params(signature, docstring)
     param_info_list = []
     positional_only_indicator_idx = -1
+    keyword_only_indicator_idx = -1
 
-    for idx, (name, default, description) in enumerate(params):
+    for idx, (name, _, _) in enumerate(params):
         if name == "/":
             positional_only_indicator_idx = idx
+        if name == "*":
+            keyword_only_indicator_idx = idx
+
+    for idx, (name, default, description) in enumerate(params):
+        if name in [None, "/", "*", "", "..."]:
             continue
-        if name in [None, "", "*", "..."]:
-            continue
+
+        passingStyle = get_passing_style(
+            idx, positional_only_indicator_idx, keyword_only_indicator_idx, name
+        )
 
         if not default:
             default = ""
@@ -57,15 +67,12 @@ def wrapper_parse_signature(signature, docstring, get_proposed_params):
         # Append parsed information to list
         param_info_list.append(
             {
-                "name": name,
+                "name": name.lstrip("*"),
                 "defaultVal": default,
                 "description": description,
-                "positionalOnly": False,
+                "passingStyle": passingStyle,
             }
         )
-
-    for idx in range(0, positional_only_indicator_idx):
-        param_info_list[idx]["positionalOnly"] = True
 
     return param_info_list
 
@@ -79,21 +86,55 @@ def get_pyright_param_proposals(signature, _):
     params = [(p["label"], p["documentation"]["value"]) for p in parameters]
     proposals = []
     for param, description in params:
-        # Extract parameter name and default value
-        if param.startswith("/"):
-            proposals.append((param, None, None))
-            continue
-        parts = param.split("=")
-        name = extract_variable_name(parts[0].strip())
-        default = parts[1].strip() if len(parts) > 1 else None
+        name, _, default = parse_param_name(param)
         proposals.append((name, default, description))
 
     return proposals
 
 
-def extract_variable_name(code_string):
-    # Find potential variable names
-    potential_names = re.findall(r"\b[a-zA-Z_]\w*\b", code_string)
+def parse_param_name(param_string):
+    # Special cases for / and *
+    if param_string in ["/", "*"]:
+        return param_string, None, None
 
-    # Return the first valid identifier
-    return next((name for name in potential_names if name.isidentifier()), None)
+    # Extract default value if present
+    default_value = None
+    if "=" in param_string:
+        param_string, default_part = param_string.split("=", 1)
+        default_value = default_part.strip()
+
+    # Extract type annotation if present
+    type_annotation = None
+    if ":" in param_string:
+        param_string, type_part = param_string.split(":", 1)
+        type_annotation = type_part.strip()
+
+    # Variable name is what remains, trimmed of whitespace
+    name = extract_variable_name(param_string)
+
+    return name, type_annotation, default_value
+
+
+def extract_variable_name(code_string):
+    # Find potential variable names including * and ** prefixes
+    potential_names = re.findall(r"\*{1,2}?[a-zA-Z_]\w*|\b[a-zA-Z_]\w*\b", code_string)
+
+    # For names with * or **, we don't need to check isidentifier() since they're not standard identifiers
+    # Just return the first match
+    if potential_names:
+        return potential_names[0]
+    return None
+
+
+def get_passing_style(
+    idx, positional_only_indicator_idx, keyword_only_indicator_idx, name
+):
+    if name.startswith("**"):  # Check for **kwargs first
+        return ParameterPassingStyle.KWARGS
+    if name.startswith("*"):  # Check for *args second
+        return ParameterPassingStyle.ARGS
+    if 0 <= idx < positional_only_indicator_idx:  # Then check position
+        return ParameterPassingStyle.POSITIONAL_ONLY
+    if keyword_only_indicator_idx > -1 and idx > keyword_only_indicator_idx:
+        return ParameterPassingStyle.KEYWORD_ONLY
+    return ParameterPassingStyle.DEFAULT
