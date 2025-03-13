@@ -26,7 +26,7 @@ def load_project_notifications(db, project_config_id, limit=20):
         WHERE
             projectConfigId = :project_config_id
         ORDER BY
-            timestamp DESC
+            id DESC
         LIMIT :limit
     """
 
