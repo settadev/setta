@@ -7,3 +7,10 @@ export async function dbGetNotifications(projectConfigId) {
     address: C.ROUTE_GET_NOTIFICATIONS,
   });
 }
+
+export async function dbDeleteNotification(notificationId) {
+  return await post({
+    body: { notificationId: String(notificationId) },
+    address: C.ROUTE_DELETE_NOTIFICATION,
+  });
+}

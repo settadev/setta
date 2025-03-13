@@ -9,7 +9,10 @@ import {
   IoWarning,
 } from "react-icons/io5";
 import { VscSave } from "react-icons/vsc";
-import { dbGetNotifications } from "requests/notifications";
+import {
+  dbDeleteNotification,
+  dbGetNotifications,
+} from "requests/notifications";
 import {
   markAsRead,
   removeNotification,
@@ -63,13 +66,14 @@ function NotificationItem({ notification }) {
 
   // Format timestamp for display - convert UTC to local time
   const formattedTime = new Date(timestamp).toLocaleString(undefined, {
-    dateStyle: 'short',
-    timeStyle: 'short',
+    dateStyle: "short",
+    timeStyle: "short",
   });
 
   // Handle removing a notification
-  const handleRemove = () => {
+  const handleRemove = async () => {
     removeNotification(id);
+    await dbDeleteNotification(id);
   };
 
   // Handle marking a notification as read when interacted with

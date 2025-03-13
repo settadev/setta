@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from setta.database.backup import maybe_create_backup
 from setta.database.db.notifications.load import load_project_notifications
 from setta.database.db.notifications.save import save_notification
+from setta.database.db.notifications.delete import delete_notification
 from setta.database.db.projects.delete import delete_project_configs
 from setta.database.db.projects.load import (
     ProjectNotFound,
@@ -86,8 +87,13 @@ class FilterDataForJSONExportRequest(BaseModel):
 class AddDefaultDataForJSONImportRequest(BaseModel):
     project: dict
 
+
 class GetNotificationsRequest(BaseModel):
     projectConfigId: str
+
+
+class DeleteNotificationRequest(BaseModel):
+    notificationId: str
 
 
 @router.post(C.ROUTE_ALL_PROJECT_CONFIG_METADATA)
@@ -136,7 +142,7 @@ def route_save_project(x: ProjectSaveRequest, dbq=Depends(get_dbq)):
             save_notification(
                 db=db,
                 project_config_id=project_config_id,
-                type=C.NOTIFICATION_TYPE_SUCCESS,
+                type=C.NOTIFICATION_TYPE_SAVE,
                 message="Project saved successfully",
                 metadata={
                     "details": f"Project '{x.project['projectConfig']['name']}' saved"
@@ -240,3 +246,10 @@ def route_get_notifications(x: GetNotificationsRequest, dbq=Depends(get_dbq)):
     with dbq as db:
         notifications = load_project_notifications(db, x.projectConfigId)
         return notifications
+
+
+@router.post(C.ROUTE_DELETE_NOTIFICATION)
+def route_delete_notification(x: DeleteNotificationRequest, dbq=Depends(get_dbq)):
+    with dbq as db:
+        success = delete_notification(db, x.notificationId)
+        return {"success": success}
