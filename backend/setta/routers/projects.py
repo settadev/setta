@@ -133,18 +133,21 @@ def route_load_full_project(x: ProjectLoadFullRequest, dbq=Depends(get_dbq)):
 @router.post(C.ROUTE_SAVE_PROJECT)
 def route_save_project(x: ProjectSaveRequest, dbq=Depends(get_dbq)):
     with dbq as db:
+        notification = None
         try:
             # Perform existing save operations
             maybe_create_backup(db.path)
             save_project_details(db, x.project)
             maybe_export_database(db, db.path)
             # Return success response with notification
-            return create_notification_dict(message="Saved!", temporary=True)
+            notification = create_notification_dict(message="Saved!", temporary=True)
 
         except Exception as e:
-            return create_notification_dict(
+            notification = create_notification_dict(
                 message="Failed to save", type=C.NOTIFICATION_TYPE_ERROR, temporary=True
             )
+
+        return {"notification": notification}
 
 
 @router.post(C.ROUTE_CREATE_PROJECT_CONFIG)

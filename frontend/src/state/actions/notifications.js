@@ -38,7 +38,10 @@ export const setNotifications = (notifications) => {
 };
 
 export function addNotificationFromRes(res) {
-  const notification = res.data;
+  const notification = res.data.notification;
+  if (!notification) {
+    return;
+  }
   if (!notification.timestamp) {
     notification.timestamp = new Date().toISOString();
   }

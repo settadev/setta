@@ -163,29 +163,33 @@ async def update_interactive_code(p, tasks, lsp_writers, idx):
 async def route_kill_in_memory_subprocesses(
     x: KillInMemorySubprocessesRequest, tasks=Depends(get_tasks), dbq=Depends(get_dbq)
 ):
+    notification = None
     try:
         num_killed = tasks.kill_in_memory_subprocesses()
         if num_killed == 0:
-            return create_notification_dict(
+            notification = create_notification_dict(
                 message="No subprocesses to kill",
                 type=C.NOTIFICATION_TYPE_INFO,
                 temporary=True,
             )
-        with dbq as db:
-            notification_id = save_notification(
-                db,
-                x.projectConfigId,
-                C.NOTIFICATION_TYPE_INFO,
-                f"Killed {num_killed} subprocesses",
-            )
-            return load_notification(db, notification_id)
+        else:
+            with dbq as db:
+                notification_id = save_notification(
+                    db,
+                    x.projectConfigId,
+                    C.NOTIFICATION_TYPE_INFO,
+                    f"Killed {num_killed} subprocesses",
+                )
+                notification = load_notification(db, notification_id)
 
     except Exception as e:
-        return create_notification_dict(
+        notification = create_notification_dict(
             message="Failed to kill subprocesses",
             type=C.NOTIFICATION_TYPE_ERROR,
             temporary=True,
         )
+
+    return {"notification": notification}
 
 
 @router.post(C.ROUTE_FORMAT_CODE)
